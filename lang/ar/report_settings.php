@@ -8,4 +8,6 @@ return [
     'report_interval' => 'فترة التقرير',
     'add_new_setting' => 'إضافة إعداد جديد',
     'added_success' => 'تم إضافة إعداد التقرير بنجاح',
+    'updated_success' => 'تم تحديث إعداد التقرير بنجاح',
+    'deleted_success' => 'تم حذف إعداد التقرير بنجاح',
 ];

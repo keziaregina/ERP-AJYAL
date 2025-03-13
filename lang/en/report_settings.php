@@ -9,4 +9,6 @@ return [
     'report_interval' => 'Report Interval',
     'add_new_setting' => 'Add New Setting',
     'added_success' => 'Report setting added successfully',
+    'updated_success' => 'Report setting updated successfully',
+    'deleted_success' => 'Report setting deleted successfully',
 ];

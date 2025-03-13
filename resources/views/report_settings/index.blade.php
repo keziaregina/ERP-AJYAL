@@ -65,10 +65,10 @@
             } ]
         });
         console.log(report_settings_table);
-        $(document).on('click', 'button.delete_barcode_button', function(){
+        $(document).on('click', 'button.delete_report_settings_button', function(){
             swal({
               title: LANG.sure,
-              text: LANG.confirm_delete_barcode,
+              text: LANG.confirm_delete_report_settings,
               icon: "warning",
               buttons: true,
               dangerMode: true,
