@@ -242,7 +242,7 @@ class AdminSidebarMenu
             }
 
             //Purchase dropdown
-            if (in_array('purchases', $enabled_modules) && (auth()->user()->can('purchase.view') || auth()->user()->can('purchase.create') || auth()->user()->can('purchase.update'))) {
+            if (in_array('purchases', $enabled_modules) && (auth()->user()->can('purchase.view') || auth()->user()->can('purchase.create') || auth()->user()->can('purchase.update') || auth()->user()->can('purchase.create_only'))) {
                 $menu->dropdown(
                     __('purchase.purchases'),
                     function ($sub) use ($common_settings) {
@@ -268,7 +268,7 @@ class AdminSidebarMenu
                                 ['icon' => '', 'active' => request()->segment(1) == 'purchases' && request()->segment(2) == null]
                             );
                         }
-                        if (auth()->user()->can('purchase.create')) {
+                        if (auth()->user()->can('purchase.create') || auth()->user()->can('purchase.create_only')) {
                             $sub->url(
                                 action([\App\Http\Controllers\PurchaseController::class, 'create']),
                                 __('purchase.add_purchase'),

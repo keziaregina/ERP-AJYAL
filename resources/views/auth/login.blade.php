@@ -228,7 +228,9 @@
             });
             $('a.demo-login').click(function(e) {
                 e.preventDefault();
+                // console.log("{{ $username }}");
                 $('#username').val($(this).data('admin'));
+                // $('#username').val("{{ $username }}");
                 $('#password').val("{{ $password }}");
                 $('form#login-form').submit();
             });
