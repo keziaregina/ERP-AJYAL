@@ -73,6 +73,23 @@
     <script type="text/javascript">
         $(document).ready(function() {
 
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+
             //selling_price_group_table
             var selling_price_group_table = $('#selling_price_group_table').DataTable({
                 processing: true,
@@ -85,6 +102,9 @@
                     "searchable": false
                 }]
             });
+
+            saveColumnVisibility('selling_price_group_table', 'colvisState_selling_price_group');
+            loadColumnVisibility('selling_price_group_table', 'colvisState_selling_price_group');
 
             $(document).on('submit', 'form#selling_price_group_form', function(e) {
                 e.preventDefault();

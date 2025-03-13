@@ -67,6 +67,23 @@
 @section('javascript')
 <script type="text/javascript">
     $(document).ready( function(){
+        function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+            
         $('#al_date_filter').daterangepicker(dateRangeSettings, function(start, end) {
             $('#al_date_filter').val(
                 start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format)
@@ -109,6 +126,9 @@
                 { data: 'note', name: 'note'}
             ]
         });  
+
+        saveColumnVisibility('activity_log_table', 'colvisState_activity_log');
+        loadColumnVisibility('activity_log_table', 'colvisState_activity_log');
 
         $(document).on('change', '#al_users_filter, #subject_type', function(){
             activity_log_table.ajax.reload();

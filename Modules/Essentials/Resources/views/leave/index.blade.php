@@ -94,6 +94,24 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
+
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+
             leaves_table = $('#leave_table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -130,6 +148,9 @@
                     { data: 'action', name: 'action' },
                 ],
             });
+
+            saveColumnVisibility('leave_table', 'colvisState_leave');
+            loadColumnVisibility('leave_table', 'colvisState_leave');
 
             $('#leave_filter_date_range').daterangepicker(
                 dateRangeSettings,

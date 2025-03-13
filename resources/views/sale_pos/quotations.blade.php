@@ -78,6 +78,23 @@
 @section('javascript')
 <script type="text/javascript">
 $(document).ready( function(){
+    function saveColumnVisibility(tableId, storageKey) {
+        $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+            let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+            colvisState[column] = state;
+            localStorage.setItem(storageKey, JSON.stringify(colvisState));
+        });
+    }
+    
+    function loadColumnVisibility(tableId, storageKey) {
+        let colvisState = JSON.parse(localStorage.getItem(storageKey));
+        if (colvisState) {
+            $.each(colvisState, function (index, state) {
+                $('#' + tableId).DataTable().column(index).visible(state);
+            });
+        }
+    }
+    
     //Date range as a button
     $('#sell_list_filter_date_range').daterangepicker(
         dateRangeSettings,
@@ -136,6 +153,9 @@ $(document).ready( function(){
         }
     });
     
+    saveColumnVisibility('sell_table', 'colvisState_quotation');
+    loadColumnVisibility('sell_table', 'colvisState_quotation');
+
     $(document).on('change', '#sell_list_filter_location_id, #sell_list_filter_customer_id, #created_by',  function() {
         sell_table.ajax.reload();
     });

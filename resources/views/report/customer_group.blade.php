@@ -65,6 +65,22 @@
     
     <script type="text/javascript">
         $(document).ready(function(){
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
             if($('#cg_date_range').length == 1){
                 $('#cg_date_range').daterangepicker(
                     dateRangeSettings,
@@ -101,7 +117,11 @@
                                 __currency_convert_recursively($('#cg_report_table'));
                             }
                         });
-            //Customer Group report filter
+            
+            saveColumnVisibility('cg_report_table', 'colvisState_cg_report');
+            loadColumnVisibility('cg_report_table', 'colvisState_cg_report');
+            
+                        //Customer Group report filter
             $('select#cg_location_id, select#cg_customer_group_id, #cg_date_range').change( function(){
                 cg_report_table.ajax.reload();
             });

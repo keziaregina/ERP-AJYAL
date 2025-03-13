@@ -362,6 +362,22 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
             if ($('#sales_targets_table').length) {
                 var sales_targets_table = $('#sales_targets_table').DataTable({
                     processing: true,
@@ -374,6 +390,9 @@
                     fixedHeader: false,
                     ajax: "{{ action([\Modules\Essentials\Http\Controllers\DashboardController::class, 'getUserSalesTargets']) }}"
                 });
+
+                saveColumnVisibility('sales_targets_table', 'colvisState_sales_targets');
+                loadColumnVisibility('sales_targets_table', 'colvisState_sales_targets');
             }
         });
     </script>

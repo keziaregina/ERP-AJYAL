@@ -81,6 +81,54 @@ $(document).ready(function() {
         });
     });
 
+    function saveColumnVisibility(tableId, storageKey) {
+        $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+            let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+            colvisState[column] = state;
+            localStorage.setItem(storageKey, JSON.stringify(colvisState));
+        });
+    }
+    
+    function loadColumnVisibility(tableId, storageKey) {
+        let colvisState = JSON.parse(localStorage.getItem(storageKey));
+        if (colvisState) {
+            $.each(colvisState, function (index, state) {
+                $('#' + tableId).DataTable().column(index).visible(state);
+            });
+        }
+    }
+
+    // Global Buttons
+    var datatablesButton = [
+        [
+            {
+                extend: 'csvHtml5',
+                text: '<i class="fa fa-file-csv"></i> Export CSV',
+                className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
+            },
+            {
+                extend: 'excelHtml5',
+                text: '<i class="fa fa-file-excel"></i> Export Excel',
+                className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
+            },
+            {
+                extend: 'print',
+                text: '<i class="fa fa-print"></i> Print',
+                className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
+            },
+            {
+                extend: 'colvis',
+                text: '<i class="fa fa-columns"></i> Column visibility',
+                className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
+            },
+            {
+                extend: 'pdfHtml5',  
+                text: '<i class="fa fa-file-pdf"></i> Export PDF',
+                className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
+            }
+        ],
+    ];
+
     //Brands table
     var brands_table = $('#brands_table').DataTable({
         processing: true,
@@ -95,6 +143,9 @@ $(document).ready(function() {
             },
         ],
     });
+
+    saveColumnVisibility('brands_table', 'colvisState_brands');
+    loadColumnVisibility('brands_table', 'colvisState_brands');
 
     $(document).on('click', 'button.edit_brand_button', function() {
         $('div.brands_modal').load($(this).data('href'), function() {
@@ -173,6 +224,9 @@ $(document).ready(function() {
             },
         ],
     });
+
+    saveColumnVisibility('tax_rates_table', 'colvisState_tax_rates');
+    loadColumnVisibility('tax_rates_table', 'colvisState_tax_rates');
 
     $(document).on('submit', 'form#tax_rate_add_form', function(e) {
         e.preventDefault();
@@ -285,6 +339,9 @@ $(document).ready(function() {
             { data: 'action', name: 'action' },
         ],
     });
+
+    saveColumnVisibility('unit_table', 'colvisState_unit');
+    loadColumnVisibility('unit_table', 'colvisState_unit');
 
     $(document).on('submit', 'form#unit_add_form', function(e) {
         e.preventDefault();
@@ -439,6 +496,8 @@ $(document).ready(function() {
     }
     
     contact_table = $('#contact_table').DataTable({
+        // dom: 'Bfrtip',
+        // buttons: datatablesButton,
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -511,6 +570,17 @@ $(document).ready(function() {
             $('.footer_contact_return_due').html(__currency_trans_from_en(total_return_due));
         }
     });
+
+    if (contact_table_type == 'supplier') {
+        saveColumnVisibility('contact_table', 'colvisState_contact-supplier');
+        loadColumnVisibility('contact_table', 'colvisState_contact-supplier');
+    } else if (contact_table_type == 'customer') {
+        saveColumnVisibility('contact_table', 'colvisState_contact-customer');
+        loadColumnVisibility('contact_table', 'colvisState_contact-customer');
+    } else {
+        saveColumnVisibility('contact_table', 'colvisState_contact');
+        loadColumnVisibility('contact_table', 'colvisState_contact');
+    }
 
     $(document).on('ifChanged', '#has_sell_due, #has_sell_return, \
     #has_purchase_due, #has_purchase_return, #has_advance_balance, #has_opening_balance', function(){
@@ -704,6 +774,8 @@ $(document).ready(function() {
     //Start: CRUD for product variations
     //Variations table
     var variation_table = $('#variation_table').DataTable({
+        // dom: 'Bfrtip',
+        // buttons: datatablesButton,
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -716,6 +788,10 @@ $(document).ready(function() {
             },
         ],
     });
+
+    saveColumnVisibility('variation_table', 'colvisState_variation');
+    loadColumnVisibility('variation_table', 'colvisState_variation');
+
     $(document).on('click', '#add_variation_values', function() {
         var html =
             '<div class="form-group"><div class="col-sm-7 col-sm-offset-3"><input type="text" name="variation_values[]" class="form-control" required></div><div class="col-sm-2"><button type="button" class="tw-dw-btn tw-dw-btn-error tw-text-white tw-dw-btn-sm delete_variation_value">-</button></div></div>';
@@ -980,6 +1056,10 @@ $(document).ready(function() {
             { data: 'action', name: 'action' },
         ],
     });
+
+    saveColumnVisibility('tax_groups_table', 'colvisState_tax_groups');
+    loadColumnVisibility('tax_groups_table', 'colvisState_tax_groups');
+
     $('.tax_group_modal').on('shown.bs.modal', function() {
         $('.tax_group_modal')
             .find('.select2')
@@ -1121,6 +1201,10 @@ $(document).ready(function() {
             },
         ],
     });
+
+    saveColumnVisibility('invoice_table', 'colvisState_invoice');
+    loadColumnVisibility('invoice_table', 'colvisState_invoice');
+
     $(document).on('submit', 'form#invoice_scheme_add_form', function(e) {
         e.preventDefault();
         var form = $(this);
@@ -1268,6 +1352,10 @@ $(document).ready(function() {
             },
         ],
     });
+
+    saveColumnVisibility('business_locations_table', 'colvisState_business_locations');
+    loadColumnVisibility('business_locations_table', 'colvisState_business_locations');
+    
     $('.location_add_modal, .location_edit_modal').on('shown.bs.modal', function(e) {
         $('form#business_location_add_form')
             .submit(function(e) {
@@ -1378,6 +1466,10 @@ $(document).ready(function() {
             },
         ],
     });
+
+    saveColumnVisibility('expense_category_table', 'colvisState_expense_category');
+    loadColumnVisibility('expense_category_table', 'colvisState_expense_category');
+
     $(document).on('submit', 'form#expense_category_add_form', function(e) {
         e.preventDefault();
         var data = $(this).serialize();
@@ -1503,6 +1595,9 @@ $(document).ready(function() {
                 .attr('class', 'clickable_td');
         },
     });
+
+    saveColumnVisibility('expense_table', 'colvisState_expense');
+    loadColumnVisibility('expense_table', 'colvisState_expense');
 
     $('select#location_id, select#expense_for, select#expense_contact_filter, \
         select#expense_category_id, select#expense_payment_status, \
@@ -1708,6 +1803,10 @@ $(document).ready(function() {
             { data: 'action' },
         ],
     });
+
+    saveColumnVisibility('sales_commission_agent_table', 'colvisState_sales_commission_agent');
+    loadColumnVisibility('sales_commission_agent_table', 'colvisState_sales_commission_agent');
+
     $('div.commission_agent_modal').on('shown.bs.modal', function(e) {
         $('form#sale_commission_agent_form')
             .submit(function(e) {
@@ -1806,6 +1905,9 @@ $(document).ready(function() {
             },
         ],
     });
+
+    saveColumnVisibility('customer_groups_table', 'colvisState_customer_groups');
+    loadColumnVisibility('customer_groups_table', 'colvisState_customer_groups');
 
     $(document).on('click', 'button.edit_customer_group_button', function() {
         $('div.customer_groups_modal').load($(this).data('href'), function() {
@@ -1963,6 +2065,8 @@ $(document).ready(function() {
                     ],
                 });
 
+    saveColumnVisibility('discounts_table', 'colvisState_discounts');
+    loadColumnVisibility('discounts_table', 'colvisState_discounts');
 
     types_of_service_table = $('#types_of_service_table').DataTable({
                         processing: true,

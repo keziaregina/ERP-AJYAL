@@ -46,6 +46,22 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
             //Status table
             var warranty_table = $('#warranty_table').DataTable({
                 processing: true,
@@ -75,6 +91,9 @@
                     },
                 ]
             });
+
+            saveColumnVisibility('warranty_table', 'colvisState_warranty');
+            loadColumnVisibility('warranty_table', 'colvisState_warranty');
 
             $(document).on('submit', 'form#warranty_form', function(e) {
                 e.preventDefault();

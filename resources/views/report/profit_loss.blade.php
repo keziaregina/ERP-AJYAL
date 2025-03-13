@@ -154,6 +154,23 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+
             profit_by_products_table = $('#profit_by_products_table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -190,6 +207,9 @@
                         total_profit));
                 }
             });
+
+            saveColumnVisibility('profit_by_products_table', 'colvisState_profit_by_products');
+            loadColumnVisibility('profit_by_products_table', 'colvisState_profit_by_products');
 
             $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
                 var target = $(e.target).attr('href');
@@ -232,6 +252,9 @@
                                     __currency_trans_from_en(total_profit));
                             },
                         });
+
+                        saveColumnVisibility('profit_by_categories_table', 'colvisState_profit_by_categories');
+                        loadColumnVisibility('profit_by_categories_table', 'colvisState_profit_by_categories');
                     } else {
                         profit_by_categories_datatable.ajax.reload();
                     }
@@ -274,6 +297,9 @@
                                     __currency_trans_from_en(total_profit));
                             },
                         });
+
+                        saveColumnVisibility('profit_by_brands_table', 'colvisState_profit_by_brands');
+                        loadColumnVisibility('profit_by_brands_table', 'colvisState_profit_by_brands');
                     } else {
                         profit_by_brands_datatable.ajax.reload();
                     }
@@ -316,6 +342,9 @@
                                     __currency_trans_from_en(total_profit));
                             },
                         });
+
+                        saveColumnVisibility('profit_by_locations_table', 'colvisState_profit_by_locations');
+                        loadColumnVisibility('profit_by_locations_table', 'colvisState_profit_by_locations');
                     } else {
                         profit_by_locations_datatable.ajax.reload();
                     }
@@ -358,6 +387,9 @@
                                     __currency_trans_from_en(total_profit));
                             },
                         });
+
+                        saveColumnVisibility('profit_by_invoice_table', 'colvisState_profit_by_invoice');
+                        loadColumnVisibility('profit_by_invoice_table', 'colvisState_profit_by_invoice');
                     } else {
                         profit_by_invoice_datatable.ajax.reload();
                     }
@@ -400,6 +432,9 @@
                                     __currency_trans_from_en(total_profit));
                             },
                         });
+
+                        saveColumnVisibility('profit_by_date_table', 'colvisState_profit_by_date');
+                        loadColumnVisibility('profit_by_date_table', 'colvisState_profit_by_date');
                     } else {
                         profit_by_date_datatable.ajax.reload();
                     }
@@ -442,6 +477,9 @@
                                     __currency_trans_from_en(total_profit));
                             },
                         });
+
+                        saveColumnVisibility('profit_by_customers_table', 'colvisState_profit_by_customers');
+                        loadColumnVisibility('profit_by_customers_table', 'colvisState_profit_by_customers');
                     } else {
                         profit_by_customers_table.ajax.reload();
                     }
@@ -471,6 +509,9 @@
                                 'gross-profit');
                             $('#profit_by_day_table .footer_total').text(total_profit);
                             __currency_convert_recursively($('#profit_by_day_table'));
+
+                            saveColumnVisibility('profit_by_day_table', 'colvisState_profit_by_day');
+                            loadColumnVisibility('profit_by_day_table', 'colvisState_profit_by_day');
                         },
                     });
                 } else if (target == '#profit_by_products') {

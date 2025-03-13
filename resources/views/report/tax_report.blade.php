@@ -254,6 +254,23 @@
 @section('javascript')
 <script type="text/javascript">
     $(document).ready(function() {
+        function saveColumnVisibility(tableId, storageKey) {
+            $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                colvisState[column] = state;
+                localStorage.setItem(storageKey, JSON.stringify(colvisState));
+            });
+        }
+        
+        function loadColumnVisibility(tableId, storageKey) {
+            let colvisState = JSON.parse(localStorage.getItem(storageKey));
+            if (colvisState) {
+                $.each(colvisState, function (index, state) {
+                    $('#' + tableId).DataTable().column(index).visible(state);
+                });
+            }
+        }
+        
         $('#tax_report_date_range').daterangepicker(
             dateRangeSettings, 
             function(start, end) {
@@ -311,6 +328,10 @@
                 __currency_convert_recursively($('#input_tax_table'));
             },
         });
+
+        saveColumnVisibility('input_tax_table', 'colvisState_input_tax');
+        loadColumnVisibility('input_tax_table', 'colvisState_input_tax');
+
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             if ($(e.target).attr('href') == '#output_tax_tab') {
                 if (typeof (output_tax_datatable) == 'undefined') {
@@ -362,6 +383,9 @@
                             __currency_convert_recursively($('#output_tax_table'));
                         },
                     });
+
+                    saveColumnVisibility('output_tax_table', 'colvisState_output_tax');
+                    loadColumnVisibility('output_tax_table', 'colvisState_output_tax');
                 }
             } else if ($(e.target).attr('href') == '#expense_tax_tab') {
                 if (typeof (expense_tax_datatable) == 'undefined') {
@@ -410,6 +434,9 @@
                             __currency_convert_recursively($('#expense_tax_table'));
                         },
                     });
+                    
+                    saveColumnVisibility('expense_tax_table', 'colvisState_expense_tax');
+                    loadColumnVisibility('expense_tax_table', 'colvisState_expense_tax');
                 }
             }
 

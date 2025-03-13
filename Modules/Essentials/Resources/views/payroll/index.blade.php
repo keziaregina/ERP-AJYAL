@@ -202,6 +202,23 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready( function(){
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+
             payrolls_table = $('#payrolls_table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -245,6 +262,9 @@
                     __currency_convert_recursively($('#payrolls_table'));
                 },
             });
+
+            saveColumnVisibility('payrolls_table', 'colvisState_payrolls');
+            loadColumnVisibility('payrolls_table', 'colvisState_payrolls');
 
             $(document).on('change', '#user_id_filter, #month_year_filter, #department_id, #designation_id, #location_id_filter', function() {
                 payrolls_table.ajax.reload();
@@ -315,6 +335,9 @@
                     },
                 });
 
+                saveColumnVisibility('ad_pc_table', 'colvisState_ad_pc-');
+                loadColumnVisibility('ad_pc_table', 'colvisState_ad_pc-');
+
                 $(document).on('click', '.delete-allowance', function(e) {
                     e.preventDefault();
                     swal({
@@ -362,7 +385,11 @@
                             { data: 'created_at', name: 'essentials_payroll_groups.created_at', searchable: false},
                             { data: 'action', name: 'action', searchable: false, orderable: false}
                         ]
-                    });
+                });
+                
+                saveColumnVisibility('payroll_group_table', 'colvisState_payroll_group');
+	            loadColumnVisibility('payroll_group_table', 'colvisState_payroll_group');
+            
             @endcan
             @can('essentials.delete_payroll')
                 $(document).on('click', '.delete-payroll', function(e) {

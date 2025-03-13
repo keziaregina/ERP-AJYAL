@@ -1,4 +1,22 @@
 $(document).ready(function() {
+
+    function saveColumnVisibility(tableId, storageKey) {
+        $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+            let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+            colvisState[column] = state;
+            localStorage.setItem(storageKey, JSON.stringify(colvisState));
+        });
+    }
+    
+    function loadColumnVisibility(tableId, storageKey) {
+        let colvisState = JSON.parse(localStorage.getItem(storageKey));
+        if (colvisState) {
+            $.each(colvisState, function (index, state) {
+                $('#' + tableId).DataTable().column(index).visible(state);
+            });
+        }
+    }
+
     //Add products
     if ($('#search_product_for_srock_adjustment').length > 0) {
         //Add Product
@@ -161,6 +179,10 @@ $(document).ready(function() {
             __currency_convert_recursively($('#stock_transfer_table'));
         },
     });
+
+    saveColumnVisibility('stock_transfer_table', 'colvisState_stock_transfer');
+    loadColumnVisibility('stock_transfer_table', 'colvisState_stock_transfer');
+
     var detailRows = [];
 
     $('#stock_transfer_table tbody').on('click', '.view_stock_transfer', function() {

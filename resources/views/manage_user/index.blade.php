@@ -54,6 +54,23 @@
 <script type="text/javascript">
     //Roles table
     $(document).ready( function(){
+        function saveColumnVisibility(tableId, storageKey) {
+            $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                colvisState[column] = state;
+                localStorage.setItem(storageKey, JSON.stringify(colvisState));
+            });
+        }
+        
+        function loadColumnVisibility(tableId, storageKey) {
+            let colvisState = JSON.parse(localStorage.getItem(storageKey));
+            if (colvisState) {
+                $.each(colvisState, function (index, state) {
+                    $('#' + tableId).DataTable().column(index).visible(state);
+                });
+            }
+        }
+
         var users_table = $('#users_table').DataTable({
                     processing: true,
                     serverSide: true,
@@ -71,8 +88,12 @@
                         {"data":"email"},
                         {"data":"action"}
                     ]
-                });
-        $(document).on('click', 'button.delete_user_button', function(){
+        });
+
+        saveColumnVisibility('users_table', 'colvisState_users');
+        loadColumnVisibility('users_table', 'colvisState_users');
+        
+                $(document).on('click', 'button.delete_user_button', function(){
             swal({
               title: LANG.sure,
               text: LANG.confirm_delete_user,

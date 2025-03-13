@@ -64,7 +64,7 @@
 				<div class="row">
 					<div class="col-md-12">
 						<div class="table-responsive">
-					<table class="table table-bordered table-striped documents">
+					<table id="memos" class="table table-bordered table-striped documents">
 						<thead>
 							<tr>
 								<th> @lang('essentials::lang.heading')</th>
@@ -89,6 +89,24 @@
 @section('javascript')
 <script type="text/javascript">
 	$(document).ready(function(){
+
+		function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+
 		//dataTable(memos)
 		var documents = $(".documents").DataTable({
 			processing: true,
@@ -100,6 +118,9 @@
 						{data: "action", name:"action", "orderable": false},
 					]
 		});
+
+		saveColumnVisibility('memos', 'colvisState_memos');
+		loadColumnVisibility('memos', 'colvisState_memos');
 
 		//destroy a document
 		$(document).on('click', '.delete_doc', function(){

@@ -48,6 +48,23 @@
     <script type="text/javascript">
         $(document).ready( function(){
 
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+            
             leave_type_table = $('#leave_type_table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -61,6 +78,8 @@
                 ],
             });
 
+            saveColumnVisibility('leave_type_table', 'colvisState_leave_type');
+            loadColumnVisibility('leave_type_table', 'colvisState_leave_type');
         });
 
         $(document).on('submit', 'form#add_leave_type_form, form#edit_leave_type_form', function (e) {

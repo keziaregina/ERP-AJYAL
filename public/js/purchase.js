@@ -514,6 +514,23 @@ $(document).ready(function() {
         update_grand_total();
     });
 
+    function saveColumnVisibility(tableId, storageKey) {
+        $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+            let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+            colvisState[column] = state;
+            localStorage.setItem(storageKey, JSON.stringify(colvisState));
+        });
+    }
+    
+    function loadColumnVisibility(tableId, storageKey) {
+        let colvisState = JSON.parse(localStorage.getItem(storageKey));
+        if (colvisState) {
+            $.each(colvisState, function (index, state) {
+                $('#' + tableId).DataTable().column(index).visible(state);
+            });
+        }
+    }
+    
     //Purchase table
     purchase_table = $('#purchase_table').DataTable({
         processing: true,
@@ -597,6 +614,9 @@ $(document).ready(function() {
                 .attr('class', 'clickable_td');
         },
     });
+
+    saveColumnVisibility('purchase_table', 'colvisState_purchase');
+    loadColumnVisibility('purchase_table', 'colvisState_purchase');
 
     $(document).on(
         'change',

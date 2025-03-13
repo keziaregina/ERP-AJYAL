@@ -71,6 +71,23 @@
     <script src="{{ asset('js/payment.js?v=' . $asset_v) }}"></script>
     <script>
         $(document).ready(function() {
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+
             $('#purchase_list_filter_date_range').daterangepicker(
                 dateRangeSettings,
                 function(start, end) {
@@ -171,6 +188,9 @@
                     $(row).find('td:eq(5)').attr('class', 'clickable_td');
                 }
             });
+
+            saveColumnVisibility('purchase_return_datatable', 'colvisState_purchase_return');
+            loadColumnVisibility('purchase_return_datatable', 'colvisState_purchase_return');
 
             $(document).on(
                 'change',

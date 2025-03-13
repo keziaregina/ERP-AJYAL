@@ -226,8 +226,26 @@
     <script src="{{ asset('js/product.js?v=' . $asset_v) }}"></script>
     <script src="{{ asset('js/opening_stock.js?v=' . $asset_v) }}"></script>
     <script type="text/javascript">
+        
         $(document).ready(function() {
-            product_table = $('#product_table').DataTable({
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+
+            var product_table = $('#product_table').DataTable({
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,
@@ -374,6 +392,10 @@
                     __currency_convert_recursively($('#product_table'));
                 },
             });
+
+            saveColumnVisibility('product_table', 'colvisState_product');
+            loadColumnVisibility('product_table', 'colvisState_product');
+            
             // Array to track the ids of the details displayed rows
             var detailRows = [];
 
@@ -595,7 +617,7 @@
                 });
             @endif
         });
-
+        
         $(document).on('shown.bs.modal', 'div.view_product_modal, div.view_modal, #view_product_modal',
             function() {
                 var div = $(this).find('#view_product_stock_details');

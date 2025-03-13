@@ -210,6 +210,23 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+
             attendance_table = $('#attendance_table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -240,6 +257,9 @@
                     @endcan
                 ],
             });
+
+            saveColumnVisibility('attendance_table', 'colvisState_attendance');
+            loadColumnVisibility('attendance_table', 'colvisState_attendance');
 
             $('#date_range').daterangepicker(
                 dateRangeSettings,
@@ -310,6 +330,9 @@
                     { data: 'action', name: 'action' },
                 ],
             });
+
+            saveColumnVisibility('shift_table', 'colvisState_shift');
+            loadColumnVisibility('shift_table', 'colvisState_shift');
 
             $('#shift_modal, #edit_shift_modal').on('shown.bs.modal', function(e) {
                 $('form#add_shift_form').validate();

@@ -1,6 +1,23 @@
 <script type="text/javascript">
 	$(document).ready( function () {
 
+		function saveColumnVisibility(tableId, storageKey) {
+			$('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+				let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+				colvisState[column] = state;
+				localStorage.setItem(storageKey, JSON.stringify(colvisState));
+			});
+		}
+		
+		function loadColumnVisibility(tableId, storageKey) {
+			let colvisState = JSON.parse(localStorage.getItem(storageKey));
+			if (colvisState) {
+				$.each(colvisState, function (index, state) {
+					$('#' + tableId).DataTable().column(index).visible(state);
+				});
+			}
+		}
+
 		$('#production_list_filter_date_range').daterangepicker(
         dateRangeSettings,
 	        function (start, end) {
@@ -54,6 +71,9 @@
 	        }
 	    });
 
+		saveColumnVisibility('productions_table', 'colvisState_productions');
+        loadColumnVisibility('productions_table', 'colvisState_productions');
+
 	    $(document).on('change', '#production_list_filter_date_range, #productstion_list_filter_location_id',  function() {
         	productions_table.ajax.reload();
     	});
@@ -102,6 +122,9 @@
 	            __currency_convert_recursively($('#recipe_table'));
 	        },
 	    });
+
+		saveColumnVisibility('recipe_table', 'colvisState_recipe');
+        loadColumnVisibility('recipe_table', 'colvisState_recipe');
 	});
 
 	$(document).on('shown.bs.modal', '#recipe_modal', function(){

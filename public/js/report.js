@@ -1,4 +1,22 @@
 $(document).ready(function() {
+
+    function saveColumnVisibility(tableId, storageKey) {
+        $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+            let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+            colvisState[column] = state;
+            localStorage.setItem(storageKey, JSON.stringify(colvisState));
+        });
+    }
+    
+    function loadColumnVisibility(tableId, storageKey) {
+        let colvisState = JSON.parse(localStorage.getItem(storageKey));
+        if (colvisState) {
+            $.each(colvisState, function (index, state) {
+                $('#' + tableId).DataTable().column(index).visible(state);
+            });
+        }
+    }
+
     //Purchase & Sell report
     //Date range as a button
     if ($('#purchase_sell_date_filter').length == 1) {
@@ -92,6 +110,9 @@ $(document).ready(function() {
             __currency_convert_recursively($('#supplier_report_tbl'));
         },
     });
+
+    saveColumnVisibility('supplier_report_tbl', 'colvisState_supplier_report_tbl');
+	loadColumnVisibility('supplier_report_tbl', 'colvisState_supplier_report_tbl');
 
     if($('#supplier_report_tbl').length != 0){
         $('#cnt_customer_group_id, #contact_type, #cs_report_location_id, #scr_contact_id').change(function() {
@@ -198,6 +219,9 @@ $(document).ready(function() {
             }
         },
     });
+
+    saveColumnVisibility('stock_report_table', 'colvisState_stock_report');
+	loadColumnVisibility('stock_report_table', 'colvisState_stock_report');
 
     if ($('#trending_product_date_range').length == 1) {
         get_sub_categories();
@@ -393,6 +417,10 @@ $(document).ready(function() {
             $('.footer_total').html(__currency_trans_from_en(total));
         },
     });
+
+    saveColumnVisibility('register_report_table', 'colvisState_register_report');
+	loadColumnVisibility('register_report_table', 'colvisState_register_report');
+
     $('.view_register').on('shown.bs.modal', function() {
         __currency_convert_recursively($(this));
     });
@@ -534,6 +562,8 @@ $(document).ready(function() {
                 __currency_convert_recursively($('#sr_sales_report'));
             },
         });
+        saveColumnVisibility2('table#sr_sales_report', 'colvisState_table#sr_sales_report');
+        loadColumnVisibility2('table#sr_sales_report', 'colvisState_table#sr_sales_report');
 
         //Sales representative report -> Expenses
         sr_expenses_report = $('table#sr_expenses_report').DataTable({
@@ -583,6 +613,8 @@ $(document).ready(function() {
                 __currency_convert_recursively($('#sr_expenses_report'));
             },
         });
+        saveColumnVisibility2('table#sr_expenses_report', 'colvisState_table#sr_expenses_report');
+        loadColumnVisibility2('table#sr_expenses_report', 'colvisState_table#sr_expenses_report');
 
         //Sales representative report -> Sales with commission
         sr_sales_commission_report = $('table#sr_sales_with_commission_table').DataTable({
@@ -645,6 +677,8 @@ $(document).ready(function() {
                 __currency_convert_recursively($('#sr_sales_with_commission'));
             },
         });
+        saveColumnVisibility2('table#sr_sales_with_commission_table', 'colvisState_table#sr_sales_with_commission_table');
+        loadColumnVisibility2('table#sr_sales_with_commission_table', 'colvisState_table#sr_sales_with_commission_table');
 
         //Sales representive filter
         $('select#sr_id, select#sr_business_id').change(function() {
@@ -747,6 +781,23 @@ $(document).ready(function() {
         updateProfitLoss();
     });
 
+    function saveColumnVisibility2(tableId, storageKey) {
+        $(tableId).on('column-visibility.dt', function (e, settings, column, state) {
+            let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+            colvisState[column] = state;
+            localStorage.setItem(storageKey, JSON.stringify(colvisState));
+        });
+    }
+    
+    function loadColumnVisibility2(tableId, storageKey) {
+        let colvisState = JSON.parse(localStorage.getItem(storageKey));
+        if (colvisState) {
+            $.each(colvisState, function (index, state) {
+                $(tableId).DataTable().column(index).visible(state);
+            });
+        }
+    }
+
     //Product Purchase Report
     if ($('#product_pr_date_filter').length == 1) {
         $('#product_pr_date_filter').daterangepicker(dateRangeSettings, function(start, end) {
@@ -819,6 +870,9 @@ $(document).ready(function() {
             __currency_convert_recursively($('#product_purchase_report_table'));
         },
     });
+
+    saveColumnVisibility2('table#product_purchase_report_table', 'colvisState_table#product_purchase');
+	loadColumnVisibility2('table#product_purchase_report_table', 'colvisState_table#product_purchase');
 
     if ($('#search_product').length > 0) {
         $('#search_product').autocomplete({
@@ -949,6 +1003,9 @@ $(document).ready(function() {
                 __currency_convert_recursively($('#product_sell_report_table'));
             },
         });
+
+        saveColumnVisibility2('table#product_sell_report_table', 'colvisState_table#product_sell_report_table');
+        loadColumnVisibility2('table#product_sell_report_table', 'colvisState_table#product_sell_report_table');
     }
 
     var is_lot_enabled = $('#lot_enabled').length > 0 ? true : false;
@@ -1002,6 +1059,9 @@ $(document).ready(function() {
         },
     });
 
+    saveColumnVisibility2('table#product_sell_report_with_purchase_table', 'colvisState_table#product_sell_report_with_purchase_table');
+	loadColumnVisibility2('table#product_sell_report_with_purchase_table', 'colvisState_table#product_sell_report_with_purchase_table');    
+
     product_sell_grouped_report = $('table#product_sell_grouped_report_table').DataTable({
         processing: true,
         serverSide: true,
@@ -1054,6 +1114,9 @@ $(document).ready(function() {
             __currency_convert_recursively($('#product_sell_grouped_report_table'));
         },
     });
+
+    saveColumnVisibility2('table#product_sell_grouped_report_table', 'colvisState_table#product_sell_grouped_report_table');
+	loadColumnVisibility2('table#product_sell_grouped_report_table', 'colvisState_table#product_sell_grouped_report_table');
 
     $(
         '#psr_customer_group_id, #psr_filter_category_id, #psr_filter_brand_id, #product_sell_report_form #variation_id, #product_sell_report_form #location_id, #product_sell_report_form #customer_id'
@@ -1198,6 +1261,9 @@ $(document).ready(function() {
         },
     });
 
+    saveColumnVisibility2('table#purchase_payment_report_table', 'colvisState_table#purchase_payment_report');
+	loadColumnVisibility2('table#purchase_payment_report_table', 'colvisState_table#purchase_payment_report');
+
     // Array to track the ids of the details displayed rows
     var ppr_detail_rows = [];
 
@@ -1306,6 +1372,10 @@ $(document).ready(function() {
             }
         },
     });
+
+    saveColumnVisibility2('table#sell_payment_report_table', 'colvisState_table#sell_payment_report');
+	loadColumnVisibility2('table#sell_payment_report_table', 'colvisState_table#sell_payment_report');
+
     // Array to track the ids of the details displayed rows
     var spr_detail_rows = [];
 
@@ -1455,11 +1525,18 @@ $(document).ready(function() {
             __currency_convert_recursively($('#items_report_table'));
         },
     });
+    
+    saveColumnVisibility('items_report_table', 'colvisState_items_report');
+	loadColumnVisibility('items_report_table', 'colvisState_items_report');
+
     $(document).on('change', '#ir_supplier_id, #ir_customer_id, #ir_location_id', function(){
         items_report_table.ajax.reload();
     });
 
     expense_report_table = $('#expense_report_table').DataTable();
+
+    saveColumnVisibility('expense_report_table', 'colvisState_expense_report');
+	loadColumnVisibility('expense_report_table', 'colvisState_expense_report');    
 
     if ($('#closing_stock_by_pp').length == 1) {
         get_stock_value();

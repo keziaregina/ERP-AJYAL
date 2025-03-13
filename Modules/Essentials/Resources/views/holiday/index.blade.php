@@ -75,6 +75,23 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+            
             holidays_table = $('#holidays_table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -109,6 +126,9 @@
                     @endif
                 ],
             });
+
+            saveColumnVisibility('holidays_table', 'colvisState_holidays');
+            loadColumnVisibility('holidays_table', 'colvisState_holidays');
 
             $('#holiday_filter_date_range').daterangepicker(
                 dateRangeSettings,

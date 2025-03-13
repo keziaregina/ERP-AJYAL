@@ -279,6 +279,23 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+
             $('#all_subscriptions_table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -335,6 +352,8 @@
                     __currency_convert_recursively($('#all_subscriptions_table'), true);
                 }
             });
+            saveColumnVisibility('all_subscriptions_table', 'colvisState_all_subscriptions');
+            loadColumnVisibility('all_subscriptions_table', 'colvisState_all_subscriptions');
             $(document).on('click', '.force_activate_now', function(e) {
 
                 e.preventDefault();

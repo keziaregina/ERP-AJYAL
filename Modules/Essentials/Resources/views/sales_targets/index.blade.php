@@ -35,6 +35,23 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
+            function saveColumnVisibility(tableId, storageKey) {
+                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                    let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                    colvisState[column] = state;
+                    localStorage.setItem(storageKey, JSON.stringify(colvisState));
+                });
+            }
+            
+            function loadColumnVisibility(tableId, storageKey) {
+                let colvisState = JSON.parse(localStorage.getItem(storageKey));
+                if (colvisState) {
+                    $.each(colvisState, function (index, state) {
+                        $('#' + tableId).DataTable().column(index).visible(state);
+                    });
+                }
+            }
+
             sales_target_table = $('#sales_target_table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -46,6 +63,9 @@
                     { data: 'action', name: 'action' },
                 ],
             });
+
+            saveColumnVisibility('sales_target_table', 'colvisState_sales_target');
+            loadColumnVisibility('sales_target_table', 'colvisState_sales_target');
 
             $(document).on('submit', 'form#add_holiday_form', function(e) {
                 e.preventDefault();
