@@ -805,7 +805,7 @@ class AdminSidebarMenu
                 auth()->user()->can('invoice_settings.access') ||
                 auth()->user()->can('tax_rate.view') ||
                 auth()->user()->can('tax_rate.create') ||
-                auth()->user()->can('access_package_subscriptions')) {
+                auth()->user()->can('access_package_subscriptions')||auth()->user()->can('report_settings.access')) {
                 $menu->dropdown(
                     __('business.settings'),
                     function ($sub) use ($enabled_modules) {
@@ -848,6 +848,14 @@ class AdminSidebarMenu
                                 action([\App\Http\Controllers\TaxRateController::class, 'index']),
                                 __('tax_rate.tax_rates'),
                                 ['icon' => '', 'active' => request()->segment(1) == 'tax-rates']
+                            );
+                        }
+
+                        if (auth()->user()->can('report_settings.access')) {
+                            $sub->url(
+                                action([\App\Http\Controllers\ReportSettingsController::class, 'index']),
+                                __('report_settings.report_settings'),
+                                ['icon' => '', 'active' => request()->segment(1) == 'report-settings']
                             );
                         }
 
