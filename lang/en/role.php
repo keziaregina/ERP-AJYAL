@@ -41,6 +41,7 @@ return [
 
     'purchase.view' => 'View purchase & Stock Adjustment',
     'purchase.create' => 'Add purchase & Stock Adjustment',
+    'purchase.create_only' => 'Add purchase only',
     'purchase.update' => 'Edit purchase & Stock Adjustment',
     'purchase.delete' => 'Delete purchase & Stock Adjustment',
 

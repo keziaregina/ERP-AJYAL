@@ -414,6 +414,18 @@
               </label>
             </div>
           </div>
+
+            {{-- New permission add purchase only --}}
+
+            <div class="col-md-12">
+              <div class="checkbox">
+                <label>
+                  {!! Form::checkbox('permissions[]', 'purchase.create_only', false, 
+                  [ 'class' => 'input-icheck']); !!} {{ __( 'role.purchase.create_only' ) }}
+                </label>
+              </div>
+            </div>
+
           <div class="col-md-12">
             <div class="checkbox">
               <label>

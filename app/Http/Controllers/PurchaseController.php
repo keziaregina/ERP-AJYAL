@@ -229,7 +229,7 @@ class PurchaseController extends Controller
      */
     public function create()
     {
-        if (! auth()->user()->can('purchase.create')) {
+        if (! auth()->user()->can('purchase.create') && ! auth()->user()->can('purchase.create_only')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -290,11 +290,12 @@ class PurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        if (! auth()->user()->can('purchase.create')) {
+        if (! auth()->user()->can('purchase.create') && ! auth()->user()->can('purchase.create_only')) {
             abort(403, 'Unauthorized action.');
         }
 
         try {
+            
             $business_id = $request->session()->get('user.business_id');
 
             //Check if subscribed or not
