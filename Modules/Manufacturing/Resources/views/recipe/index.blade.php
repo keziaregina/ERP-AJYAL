@@ -38,7 +38,11 @@
                         <th>@lang( 'product.sub_category' )</th>
                         <th>@lang( 'lang_v1.quantity' )</th>
                         <th>@lang( 'lang_v1.price' ) @show_tooltip(__('manufacturing::lang.price_updated_live'))</th>
-                        <th>@lang( 'sale.unit_price' )</th>
+                        {{-- @can("manufacturing.access_price") --}}
+                        @if (auth()->user()->can("manufacturing.access_price"))
+                            <th>@lang( 'sale.unit_price' )</th>
+                        @endif
+                        {{-- @endcan --}}
                         <th>@lang( 'messages.action' )</th>
                     </tr>
                 </thead>

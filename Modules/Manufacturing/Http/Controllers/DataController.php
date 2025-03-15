@@ -53,6 +53,11 @@ class DataController extends Controller
                 'label' => __('manufacturing::lang.access_production'),
                 'default' => false,
             ],
+            [
+                'value' => 'manufacturing.access_price',
+                'label' => __('manufacturing::lang.access_price'),
+                'default' => false,
+            ],
         ];
     }
 

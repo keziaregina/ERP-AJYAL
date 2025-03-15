@@ -100,6 +100,10 @@ class RoleController extends Controller
 
         $common_settings = ! empty(session('business.common_settings')) ? session('business.common_settings') : [];
 
+        $data = compact('selling_price_groups', 'module_permissions', 'common_settings');
+        // Log::info("DATA====================>");
+        // Log::info(json_encode($data,JSON_PRETTY_PRINT));
+
         return view('role.create')
                 ->with(compact('selling_price_groups', 'module_permissions', 'common_settings'));
     }
@@ -112,6 +116,10 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
+
+        Log::info("REQUEST====================>");
+        Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+
         if (! auth()->user()->can('roles.create')) {
             abort(403, 'Unauthorized action.');
         }
@@ -215,6 +223,9 @@ class RoleController extends Controller
     
         $common_settings = ! empty(session('business.common_settings')) ? session('business.common_settings') : [];
 
+        $datas = compact('role', 'role_permissions', 'selling_price_groups', 'module_permissions', 'common_settings');
+        Log::info(json_encode($datas,JSON_PRETTY_PRINT));
+        
         return view('role.edit')
             ->with(compact('role', 'role_permissions', 'selling_price_groups', 'module_permissions', 'common_settings'));
     }

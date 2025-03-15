@@ -115,7 +115,9 @@
 	            { data: 'sub_category', name: 'sc.name' },
 	            { data: 'total_quantity', name: 'total_quantity' },
 	            { data: 'recipe_total' },
-	            { data: 'unit_cost' },
+				{ data: 'unit_cost',
+					visible: {{ auth()->user()->can("manufacturing.access_price") ? 'true' : 'false' }}
+				},
 	            { data: 'action', name: 'action' },
 	        ],
 	        fnDrawCallback: function(oSettings) {

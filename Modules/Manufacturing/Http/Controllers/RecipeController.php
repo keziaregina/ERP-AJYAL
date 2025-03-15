@@ -83,7 +83,7 @@ class RecipeController extends Controller
                                     'sc.name as sub_category'
                                 );
 
-            return Datatables::of($recipes)
+            $datatables = Datatables::of($recipes)
                 ->addColumn('action', '<button data-href="{{action(\'\Modules\Manufacturing\Http\Controllers\RecipeController@show\', [$id])}}" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-accent btn-modal" data-container=".view_modal"><i class="fa fa-eye"></i> @lang("messages.view")</button> &nbsp; @can("manufacturing.edit_recipe") <a href="{{action(\'\Modules\Manufacturing\Http\Controllers\RecipeController@addIngredients\')}}?variation_id={{$variation_id}}" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-primary" ><i class="fa fa-edit"></i> @lang("messages.edit")</a>
                     &nbsp; 
                     <button data-href="{{action(\'\Modules\Manufacturing\Http\Controllers\RecipeController@destroy\',[$id])}}" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error delete_recipe"><i class="fa fa-trash"></i> @lang("messages.delete")</button> @endcan')
@@ -107,22 +107,53 @@ class RecipeController extends Controller
                     }
 
                     return $html;
-                })
-                ->addColumn('unit_cost', function ($row) {
-                    //Recipe price is dynamically calculated from each ingredients
-                    $price = $this->mfgUtil->getRecipeTotal($row);
+                });
 
-                    $unit_cost = $row->total_quantity > 0 ? $price / $row->total_quantity : 0;
+                if (auth()->user()->can("manufacturing.access_price")) {
 
-                    return '<span class="display_currency unit_cost" data-unit_cost="'.$unit_cost.'" data-currency_symbol="true">'.$unit_cost.'</span>';
-                })
-                ->filterColumn('recipe_name', function ($query, $keyword) {
+                    $datatables->addColumn('unit_cost', function ($row) {
+                        //Recipe price is dynamically calculated from each ingredients
+                        $price = $this->mfgUtil->getRecipeTotal($row);
+    
+                        $unit_cost = $row->total_quantity > 0 ? $price / $row->total_quantity : 0;
+    
+                        // return '@if(auth()->user()->can("manufacturing.access_price") <span class="display_currency unit_cost" data-unit_cost="'.$unit_cost.'" data-currency_symbol="true">'.$unit_cost.'</span> @endcan';
+                        // if (auth()->user()->can("manufacturing.access_price")) {
+                        return '<span class="display_currency unit_cost" data-unit_cost="'.$unit_cost.'" data-currency_symbol="true">'.$unit_cost.'</span>';
+                        // } 
+    
+                        // return '-';
+                            // return '<span class="display_currency unit_cost" data-unit_cost="'.$unit_cost.'" data-currency_symbol="true">'.$unit_cost.'</span>';
+                    });
+                }
+                // ->addColumn('unit_cost', function ($row) {
+                //     //Recipe price is dynamically calculated from each ingredients
+                //     $price = $this->mfgUtil->getRecipeTotal($row);
+
+                //     $unit_cost = $row->total_quantity > 0 ? $price / $row->total_quantity : 0;
+
+                //     // return '@if(auth()->user()->can("manufacturing.access_price") <span class="display_currency unit_cost" data-unit_cost="'.$unit_cost.'" data-currency_symbol="true">'.$unit_cost.'</span> @endcan';
+                //     if (auth()->user()->can("manufacturing.access_price")) {
+                //         return '<span class="display_currency unit_cost" data-unit_cost="'.$unit_cost.'" data-currency_symbol="true">'.$unit_cost.'</span>';
+                //     } 
+
+                //     return '-';
+                //         // return '<span class="display_currency unit_cost" data-unit_cost="'.$unit_cost.'" data-currency_symbol="true">'.$unit_cost.'</span>';
+                // })
+
+                $datatables->filterColumn('recipe_name', function ($query, $keyword) {
                     $query->whereRaw("CONCAT(p.name, ' - ', pv.name, ' - ', v.name, ' (', v.sub_sku, ')') like ?", ["%{$keyword}%"]);
                 })
                 ->addColumn('row_select', function ($row) {
                     return  '<input type="checkbox" class="row-select" value="'.$row->id.'">';
-                })
-                ->rawColumns(['action', 'recipe_total', 'total_quantity', 'unit_cost', 'row_select'])
+                });
+
+                $rawColumns = ['action', 'recipe_total', 'total_quantity', 'row_select'];
+                if (auth()->user()->can("manufacturing.access_price")) {
+                    $rawColumns[] = 'unit_cost';
+                }
+
+                return $datatables->rawColumns($rawColumns)
                 ->make(true);
         }
 
