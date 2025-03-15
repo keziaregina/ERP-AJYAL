@@ -62,8 +62,13 @@
                         <th>@lang('purchase.location')</th>
                         <th>@lang('sale.product')</th>
                         <th>@lang('lang_v1.quantity')</th>
-                        <th>@lang('manufacturing::lang.total_cost')</th>
-                        <th>@lang('messages.action')</th>
+                        @can('manufacturing.access_price', 'web')
+                            <th>@lang('manufacturing::lang.total_cost')</th>
+                            <th>@lang('messages.action')</th>
+                        @else
+                            <th class="hidden">@lang('manufacturing::lang.total_cost')</th>
+                            <th class="hidden">@lang('messages.action')</th>
+                        @endcan
                     </tr>
                 </thead>
             </table>

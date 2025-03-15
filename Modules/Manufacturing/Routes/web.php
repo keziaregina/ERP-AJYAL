@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 Route::middleware('web', 'authh', 'SetSessionData', 'auth', 'language', 'timezone', 'AdminSidebarMenu')->prefix('manufacturing')->group(function () {
     Route::get('/install', [Modules\Manufacturing\Http\Controllers\InstallController::class, 'index']);
     Route::post('/install', [Modules\Manufacturing\Http\Controllers\InstallController::class, 'install']);
