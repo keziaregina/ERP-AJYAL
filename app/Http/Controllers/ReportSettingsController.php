@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Reporting;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use App\ReportSettings;
 use App\User;
+use Illuminate\Support\Facades\Mail;
 
 class ReportSettingsController extends Controller
 {
@@ -73,12 +75,17 @@ class ReportSettingsController extends Controller
         }
         try {
             $business_id = request()->session()->get('user.business_id');
+            $user = User::find($request->user_name);
+
             $report_settings = new ReportSettings();
             $report_settings->user_id = $request->user_name;
             $report_settings->type = $request->report_type;
             $report_settings->interval = $request->report_interval;
             $report_settings->business_id = $business_id;
             $report_settings->save();
+
+            Mail::to($user->email)->queue(new Reporting($report_settings));
+
             $output = ['success' => true,
                 'msg' => __('report_settings.added_success'),
             ];

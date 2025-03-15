@@ -31,6 +31,12 @@ class Kernel extends ConsoleKernel
 
             $schedule->command('pos:autoSendPaymentReminder')->dailyAt('8:00');
 
+            // Schedule to send report email based on interval and types
+            $schedule->command('send-report:daily')->dailyAt('07:00');
+            $schedule->command('send-report:weekly')->weekly()->at('07:00');
+            $schedule->command('send-report:monthly')->monthly()->at('07:00');
+            $schedule->command('send-report:yearly')->yearly()->at('07:00');
+
         }
 
         if ($env === 'demo') {
@@ -40,6 +46,11 @@ class Kernel extends ConsoleKernel
                     //->everyThirtyMinutes()
                     ->emailOutputTo($email);
         }
+
+        // $schedule->command('send-report:daily')->everyMinute();
+        // $schedule->command('send-report:weekly')->everyMinute();
+        // $schedule->command('send-report:monthly')->everyMinute();
+        // $schedule->command('send-report:yearly')->everyMinute();
     }
 
     /**
@@ -50,6 +61,7 @@ class Kernel extends ConsoleKernel
     protected function commands()
     {
         $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__.'/Commands/SendReportMail');
         require base_path('routes/console.php');
     }
 }
