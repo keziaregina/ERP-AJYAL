@@ -574,7 +574,7 @@ $(document).ready(function() {
                                 alignment: 'center',
                                 margin: [0, 0, 0, 10]
                             });
-doc.pageMargins = [20, 50, 20, 30];
+                    doc.pageMargins = [20, 50, 20, 30];
                     var tableIndex = doc.content.findIndex(item => item.table);
 
                     if (tableIndex !== -1) {
@@ -586,21 +586,21 @@ doc.pageMargins = [20, 50, 20, 30];
                         });
                     }
                     var table = doc.content[tableIndex + 1].table;
-    var colCount = table.body[0].length;
-    
-    table.widths = Array(colCount).fill('auto');
-    table.layout = {
-        hLineWidth: function(i, node) { return 0.5; }, 
-        vLineWidth: function(i, node) { return 0.5; },
-        hLineColor: function(i, node) { return '#aaa'; }, 
-        vLineColor: function(i, node) { return '#aaa'; }
-    };
+                    var colCount = table.body[0].length;
+                    
+                    table.widths = Array(colCount).fill('auto');
+                    table.layout = {
+                        hLineWidth: function(i, node) { return 0.5; }, 
+                        vLineWidth: function(i, node) { return 0.5; },
+                        hLineColor: function(i, node) { return '#aaa'; }, 
+                        vLineColor: function(i, node) { return '#aaa'; }
+                    };
 
-    table.body.forEach(row => {
-        row.forEach(cell => {
-            cell.margin = [5, 5, 5, 5];
-        });
-    });
+                    table.body.forEach(row => {
+                        row.forEach(cell => {
+                            cell.margin = [5, 5, 5, 5];
+                        });
+                    });
                     doc.styles.tableHeader = {
                         alignment: 'left',
                         fillColor: '#2d4154',
@@ -697,6 +697,20 @@ doc.pageMargins = [20, 50, 20, 30];
                 .find('td:eq(5)')
                 .attr('class', 'clickable_td');
         },
+    });
+
+    var pdfButton = document.querySelector('.buttons-pdf');
+    var target = document.querySelector('.hover-q');
+    var originalContent = target.getAttribute('data-content');
+
+    pdfButton.addEventListener('mouseenter', function () {
+        // console.log(target.getAttribute('data-content'));
+        target.setAttribute('data-content', 'test');
+        // console.log(target.getAttribute('data-content'));
+    });
+    pdfButton.addEventListener('mouseleave', function () {
+        target.setAttribute('data-content', originalContent);
+        // console.log(target.getAttribute('data-content'));
     });
 
     saveColumnVisibility('purchase_table', 'colvisState_purchase');
