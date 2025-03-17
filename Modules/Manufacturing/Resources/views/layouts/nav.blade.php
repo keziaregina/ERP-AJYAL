@@ -19,13 +19,17 @@
                         <li @if(request()->segment(1) == 'manufacturing' && in_array(request()->segment(2), ['recipe', 'add-ingredient'])) class="active" @endif><a href="{{action([\Modules\Manufacturing\Http\Controllers\RecipeController::class, 'index'])}}">@lang('manufacturing::lang.recipe')</a></li>
                     @endcan
 
-                    @can('manufacturing.access_production')
+                    @canany(['manufacturing.access_production', 'manufacturing.access_price'])
                         <li @if(request()->segment(2) == 'production') class="active" @endif><a href="{{action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'index'])}}">@lang('manufacturing::lang.production')</a></li>
 
                         <li @if(request()->segment(1) == 'manufacturing' && request()->segment(2) == 'settings') class="active" @endif><a href="{{action([\Modules\Manufacturing\Http\Controllers\SettingsController::class, 'index'])}}">@lang('messages.settings')</a></li>
+                            
+                        @if (auth()->user()->can('manufacturing.access_production') && auth()->user()->can('manufacturing.access_price'))
+                            <li @if(request()->segment(2) == 'report') class="active" @endif><a href="{{action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'getManufacturingReport'])}}">@lang('manufacturing::lang.manufacturing_report')</a></li>
+                        @endif
 
-                        <li @if(request()->segment(2) == 'report') class="active" @endif><a href="{{action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'getManufacturingReport'])}}">@lang('manufacturing::lang.manufacturing_report')</a></li>
-                    @endcan
+                    @endcanany
+
                 </ul>
 
             </div><!-- /.navbar-collapse -->

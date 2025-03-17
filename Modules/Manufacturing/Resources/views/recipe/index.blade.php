@@ -38,10 +38,16 @@
                         <th>@lang( 'product.sub_category' )</th>
                         <th>@lang( 'lang_v1.quantity' )</th>
                         <th>@lang( 'lang_v1.price' ) @show_tooltip(__('manufacturing::lang.price_updated_live'))</th>
-                        <th>@lang( 'sale.unit_price' )</th>
-                        <th>@lang( 'messages.action' )</th>
+                        @can('manufacturing.access_price', 'web')
+                            <th>@lang( 'sale.unit_price' )</th>
+                            <th>@lang( 'messages.action' )</th>
+                        @else
+                            <th class="hidden">@lang( 'sale.unit_price' )</th>
+                            <th class="hidden">@lang( 'messages.action' )</th>
+                        @endcan
                     </tr>
                 </thead>
+                @can('manufacturing.access_price', 'web')
                 <tfoot>
                     <tr>
                         <td colspan="8">
@@ -49,6 +55,7 @@
                         </td>
                     </tr>
                 </tfoot>
+                @endcan
             </table>
         </div>
     @endcomponent

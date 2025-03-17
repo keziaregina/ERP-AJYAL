@@ -29,6 +29,28 @@
 	        $('#production_list_filter_date_range').val('');
 	        productions_table.ajax.reload();
 	    });
+
+		let canAccessPrice = {{ auth()->user()->can('manufacturing.access_price') ? 'true' : 'false' }};
+		let recipe_columns = [
+				{ data: 'row_select' },
+				{ data: 'recipe_name', name: 'recipe_name' },
+				{ data: 'category', name: 'c.name' },
+				{ data: 'sub_category', name: 'sc.name' },
+				{ data: 'total_quantity', name: 'total_quantity' },
+				{ data: 'recipe_total', visible: canAccessPrice },
+				{ data: 'unit_cost', visible: canAccessPrice },
+				{ data: 'action', name: 'action', visible: canAccessPrice },
+			];
+
+		let productions_columns = [
+	            { data: 'transaction_date', name: 'transaction_date' },
+	            { data: 'ref_no', name: 'ref_no' },
+	            { data: 'location_name', name: 'bl.name' },
+	            { data: 'product_name', name: 'product_name' },
+	            { data: 'quantity', searchable: false },
+	            { data: 'final_total', name: 'final_total', visible: canAccessPrice },
+	            { data: 'action', name: 'action', visible: canAccessPrice },
+	        ];
 		//Purchase table
 	    productions_table = $('#productions_table').DataTable({
 	        processing: true,
@@ -57,15 +79,7 @@
 	                searchable: false,
 	            },
 	        ],
-	        columns: [
-	            { data: 'transaction_date', name: 'transaction_date' },
-	            { data: 'ref_no', name: 'ref_no' },
-	            { data: 'location_name', name: 'bl.name' },
-	            { data: 'product_name', name: 'product_name' },
-	            { data: 'quantity', searchable: false },
-	            { data: 'final_total', name: 'final_total' },
-	            { data: 'action', name: 'action' },
-	        ],
+	        columns: productions_columns,
 	        fnDrawCallback: function(oSettings) {
 	            __currency_convert_recursively($('#productions_table'));
 	        }
@@ -108,16 +122,7 @@
 	            },
 	        ],
 	        "order": [[ 1, "desc" ]],
-	        columns: [
-	        	{ data: 'row_select' },
-	            { data: 'recipe_name', name: 'recipe_name' },
-	            { data: 'category', name: 'c.name' },
-	            { data: 'sub_category', name: 'sc.name' },
-	            { data: 'total_quantity', name: 'total_quantity' },
-	            { data: 'recipe_total' },
-	            { data: 'unit_cost' },
-	            { data: 'action', name: 'action' },
-	        ],
+	        columns: recipe_columns,
 	        fnDrawCallback: function(oSettings) {
 	            __currency_convert_recursively($('#recipe_table'));
 	        },

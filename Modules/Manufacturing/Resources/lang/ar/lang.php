@@ -32,6 +32,7 @@ return[
     'mfg_ref_no_prefix' => 'رقم المرجع رقم الإنتاج',
     'access_production' => 'إنتاج الوصول',
     'access_recipe' => 'عرض الوصفة',
+    'access_price' => 'الوصول إلى السعر',
     'total_production_cost' => 'إجمالي تكلفة الإنتاج',
     'wastage_tooltip' => 'النسبة المئوية من إجمالي كمية الإنتاج الضائعة أثناء الإنتاج',
     'production_cost_tooltip' => 'النسبة المئوية من إجمالي تكلفة المكونات',
