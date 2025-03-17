@@ -26,11 +26,11 @@ class Reporting extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(ReportSettings $report_settings)
+    public function __construct(ReportSettings $report_settings, $filename)
     {
         $this->data = $report_settings;
         $this->user = User::find($this->data->user_id);
-        $this->path = 'pdf/report/Ajyal Al-Madina.pdf';
+        $this->path = $filename;
     }
 
     /**

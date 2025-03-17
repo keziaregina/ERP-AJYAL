@@ -340,10 +340,10 @@ class ReportController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // dd($this->getStockValue());
         $business_id = $request->session()->get('user.business_id');
 
-        $selling_price_groups = SellingPriceGroup::where('business_id', $business_id)
-                                                ->get();
+        $selling_price_groups = SellingPriceGroup::where('business_id', $business_id)->get();
         $allowed_selling_price_group = false;
         foreach ($selling_price_groups as $selling_price_group) {
             if (auth()->user()->can('selling_price_group.'.$selling_price_group->id)) {

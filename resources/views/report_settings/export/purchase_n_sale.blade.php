@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Purchase & Sales Summary</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,8 +19,6 @@
         header h1 {
             font-size: 15px;
         }
-
-        .container {}
 
         .card {
             background-color: #f4f7fa;
@@ -80,29 +79,32 @@
 
 <body>
     <header>
-        <img src="{{ 'data:image/png;base64,' . base64_encode(file_get_contents(@$image)) }}" alt="logo">
+        <img src="{{ 'data:image/png;base64,' . base64_encode(file_get_contents(@$logo)) }}" alt="logo">
         <h1>Ajyal Al - Madina</h1>
     </header>
     <main>
         <div class="container">
+            <h3 style="text-center">
+                Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+            </h3>
             <div class="card">
                 <h3>Purchases</h3>
                 <table>
                     <tr>
                         <td class="label">Total Purchase:</td>
-                        <td>4,830.000 ៛</td>
+                        <td>{{ $report['purchase']['total_purchase_exc_tax'] ?: '0' }} {{ $currency }}</td>
                     </tr>
                     <tr>
                         <td class="label">Purchase Including tax:</td>
-                        <td>5,440.000 ៛</td>
+                        <td>{{ $report['purchase']['total_purchase_inc_tax'] ?: '0' }} {{ $currency }}</td>
                     </tr>
                     <tr>
                         <td class="label">Total Purchase Return Including Tax:</td>
-                        <td>0.000 ៛</td>
+                        <td>{{ $report['total_purchase_return'] ?: '0' }} {{ $currency }}</td>
                     </tr>
                     <tr>
                         <td class="label">Purchase Due: </td>
-                        <td>5,135.000 ៛</td>
+                        <td>{{ $report['purchase']['purchase_due'] ?: '0' }} {{ $currency }}</td>
                     </tr>
                 </table>
             </div>
@@ -112,43 +114,40 @@
                 <table>
                     <tr>
                         <td class="label">Total Sale:</td>
-                        <td>0.000 ៛</td>
+                        <td>{{ $report['sell']['total_sell_exc_tax'] ?: '0' }} {{ $currency }}</td>
                     </tr>
                     <tr>
                         <td class="label">Sale Including tax:</td>
-                        <td>0.000 ៛</td>
+                        <td>{{ $report['sell']['total_sell_inc_tax'] ?: '0' }} {{ $currency }}</td>
                     </tr>
                     <tr>
                         <td class="label">Total Sell Return Including Tax:</td>
-                        <td>0.000 ៛</td>
+                        <td>{{ $report['total_sell_return'] ?: '0' }} {{ $currency }}</td>
                     </tr>
                     <tr>
                         <td class="label">Sale Due:</td>
-                        <td>0.000 ៛</td>
+                        <td>{{ $report['sell']['invoice_due'] ?: '0' }} {{ $currency }}</td>
                     </tr>
                 </table>
             </div>
         </div>
+        <div class="overall">
+            <h3>Overall</h3>
+            <h4>(Sale - Sell Return) - (Purchase - Purchase Return)</h4>
+            <table>
+                <tr class="negative">
+                    <td>Sale - Purchase</td>
+                    <td>:</td>
+                    <td>{{ $report['difference']['total'] ?: '0' }} {{ $currency }}</td>
+                </tr>
+                <tr class="negative">
+                    <td>Due amount</td>
+                    <td>:</td>
+                    <td>{{ $report['difference']['due'] ?: '0' }} {{ $currency }}</td>
+                </tr>
+            </table>
+        </div>
     </main>
-
-    <div class="overall">
-        <h3>Overall</h3>
-        <h4>(Sale - Sell Return) - (Purchase - Purchase Return)</h4>
-        <table>
-            <tr class="negative">
-                <td>Sale - Purchase</td>
-                <td>:</td>
-                <td>-5,440.000</td>
-            </tr>
-            <tr class="negative">
-                <td>Due amount</td>
-                <td>:</td>
-                <td>-5,440.000</td>
-            </tr>
-        </table>
-    </div>
-
 </body>
 
 </html>
-

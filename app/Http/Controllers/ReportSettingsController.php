@@ -84,19 +84,6 @@ class ReportSettingsController extends Controller
             $report_settings->interval = $request->report_interval;
             $report_settings->business_id = $business_id;
             $report_settings->save();
-            
-            $image = public_path('img/logo-small.png');
-            $filename = storage_path('app/public/pdf/report/Ajyal Al-Madina.pdf');
-            $directory = dirname($filename);
-            if (!file_exists($directory)) {
-                mkdir($directory, 0777, true);
-            }
-
-            $pdf = Pdf::setPaper('a4', 'landscape')->loadView('pdf', ['data' => $report_settings, 'image' => $image, 'user' => $user ]);
-            
-            $pdf->save($filename);
-            // Mail::to($user->email)->queue(new Reporting($report_settings));
-
             $output = ['success' => true,
                 'msg' => __('report_settings.added_success'),
             ];
