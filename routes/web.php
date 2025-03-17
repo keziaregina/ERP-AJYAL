@@ -60,6 +60,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VariationTemplateController;
 use App\Http\Controllers\WarrantyController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReportSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -132,6 +133,8 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     // Route::resource('payment-account', 'PaymentAccountController');
 
     Route::resource('tax-rates', TaxRateController::class);
+
+    Route::resource('report-settings', ReportSettingsController::class);
 
     Route::resource('units', UnitController::class);
 

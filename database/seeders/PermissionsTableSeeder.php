@@ -56,6 +56,7 @@ class PermissionsTableSeeder extends Seeder
 
             ['name' => 'business_settings.access'],
             ['name' => 'barcode_settings.access'],
+            ['name' => 'report_settings.access'],
             ['name' => 'invoice_settings.access'],
 
             ['name' => 'brand.view'],

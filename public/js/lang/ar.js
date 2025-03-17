@@ -34,6 +34,7 @@ LANG = {
     'confirm_delete_tax_rate': 'سيتم حذف معدل الضريبة هذا.',
     'confirm_delete_brand': 'سيتم حذف هذه العلامة التجارية.',
     'confirm_delete_barcode': 'سيتم حذف إعداد الباركود هذا.',
+    'confirm_delete_report_settings': 'سيتم حذف هذا الإعداد.',
     'add_name_as_new_product': 'أضف "term:" كمنتج جديد',
     'no_products_found': 'لم يتم العثور على منتج مطابق!',
     'cancel': 'إلغاء',
