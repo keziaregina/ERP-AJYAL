@@ -6,11 +6,14 @@ use App\Mail\Reporting;
 use App\Mail\Reporting2;
 use App\ReportSettings;
 use App\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
 class Daily extends Command
 {
+    public $transactionUtil;
+
     /**
      * The name and signature of the console command.
      *
@@ -34,14 +37,28 @@ class Daily extends Command
     {
         $datas = ReportSettings::where('interval', 'daily')->get();
         foreach ($datas as $data) {
-            $email = User::find($data->user_id);
-            if ($data->type === 'tax_report') {
-                Mail::to($email)->queue(new Reporting($data));
-            } else {
-                Mail::to($email)->queue(new Reporting2($data));
-            }
-        }
+            // if ($data->type === 'purchase_n_sell_report') {
+                $user = User::find($data->user_id);
+                $image = public_path('img/logo-small.png');
+                $filename = storage_path('app/public/pdf/report/Ajyal Al-Madina.pdf');
+                $directory = dirname($filename);
 
-        return 'Berhasil';
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0777, true);
+                }
+                
+                $pdf = Pdf::setPaper('a4', 'landscape')->loadView('report_settings/export/purchase_sales', ['data' => $data, 'image' => $image, 'user' => $user ]);
+                
+                $pdf->save($filename);
+                Mail::to($user->email)->queue(new Reporting($data, $filename));
+            // } else {
+            //     return 'wkwkw';
+            // }
+        }
+    }
+
+    public function getPurchaseSaleReport()
+    {
+
     }
 }
