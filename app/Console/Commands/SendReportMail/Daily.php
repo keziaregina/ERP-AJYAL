@@ -2,13 +2,14 @@
 
 namespace App\Console\Commands\SendReportMail;
 
-use App\Mail\Reporting;
-use App\Mail\Reporting2;
-use App\ReportSettings;
 use App\User;
+use App\Mail\Reporting;
+use App\ReportSettings;
+use App\Mail\Reporting2;
 use App\Utils\TransactionUtil;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
@@ -66,29 +67,36 @@ class Daily extends Command
             switch ($data->type) {
                 case 'purchase_n_sell_report':
                     $type = 'purchase_n_sale';
+                    $data['report_type'] = 'Purchase & Sales Summary';
                     $report = $this->getPurchaseSellReport($user, $dates['start_date'], $dates['end_date']);
                     break;
                 case 'contacts_report':
                     $type = 'contact';
+                    $data['report_type'] = 'Contacts Summary';
                     break;
                 case 'tax_report':
                     $type = 'tax';
+                    $data['report_type'] = 'Tax';
                     break;
                 case 'stock_report':
                     $type = 'stock';
+                    $data['report_type'] = 'Stock';
                     $report = $this->getStockValue($user, $dates['start_date'], $dates['end_date']);
                     break;
                 case 'trending_product_report':
                     $type = 'trending_product';
+                    $data['report_type'] = 'Trending Product';
                     break;
                 case 'sales_representative':
                     $type = 'sales_representative';
                     break;
                 case 'register_report':
                     $type = 'register';
+                    $data['report_type'] = 'Register';
                     break;
                 case 'expense_report':
                     $type = 'expense';
+                    $data['report_type'] = 'Expense';
                     break;
                 default:
             }
@@ -103,8 +111,12 @@ class Daily extends Command
                     'dates' => $dates,
                     'currency' => 'ر.س'
                 ]);
-            // $pdf->save(Storage::disk('public')->path($filename));
+
+            $data['interval'] = 'daily';
+
+
             $file=Storage::disk('public')->put($filename, $pdf->output()); 
+
             Mail::to($user->email)
                 ->queue(new Reporting($data, $filename));
         }

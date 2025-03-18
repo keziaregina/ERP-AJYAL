@@ -2,16 +2,17 @@
 
 namespace App\Mail;
 
-use App\ReportSettings;
 use App\User;
+use App\ReportSettings;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class Reporting extends Mailable implements ShouldQueue
 {
@@ -29,6 +30,8 @@ class Reporting extends Mailable implements ShouldQueue
     public function __construct(ReportSettings $report_settings, $filename)
     {
         $this->data = $report_settings;
+        Log::info("data --->");
+        Log::info(json_encode($this->data,JSON_PRETTY_PRINT));
         $this->user = User::find($this->data->user_id);
         $this->path = $filename;
     }
@@ -56,6 +59,8 @@ class Reporting extends Mailable implements ShouldQueue
             view: 'emails.report_setting',
             with: [
                 'path' => $this->path,
+                'interval' => $this->data->interval,
+                'report_type' => $this->data->report_type
             ],
         );
     }
