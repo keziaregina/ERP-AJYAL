@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Contact;
 use App\Mail\Reporting;
 use App\Transaction;
 use App\User;
@@ -9,7 +10,9 @@ use App\Utils\BusinessUtil;
 use App\Utils\ProductUtil;
 use App\Utils\TransactionUtil;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
@@ -87,6 +90,19 @@ class ReportEmailService
                 $data['report_type'] = 'Activity Log';
                 $report = $this->getActivityLog($user, $dates['start_date'], $dates['end_date']);
                 break;
+            case 'customer_n_supplier_report':
+                // FIXME: fix customer & supplier report arabic and logo
+                // Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->");
+                $type = 'customer_n_supplier';
+                $data['report_type'] = 'Customer & Supplier';
+                $report = $this->getCustomerSupplierReport($user, $dates['start_date'], $dates['end_date']);
+                break;
+                
+            case 'customer_group_report':
+                // FIXME: fix customer group report arabic and logo
+                $type = 'customer_group';
+                $data['report_type'] = 'Customer Group';
+                $report = $this->getCustomerGroupReport($user, $dates['start_date'], $dates['end_date']);
             default:
         }
         $view = 'report_settings/export/' . $type;
@@ -328,5 +344,144 @@ class ReportEmailService
 
         $registers = $this->transactionUtil->registerReportExport($business_id, $permitted_locations, $start_date, $end_date, $user->id);
         return $registers;
+    }
+
+    public function getCustomerSupplierReport(User $user, $start_date = null, $end_date = null)
+    {
+        Auth::login($user);
+
+        $business_id = $user->business_id;
+        // $location_id = 10;
+        $contact_id = null;
+
+        $contacts = Contact::where('contacts.business_id', $business_id)
+        ->join('transactions AS t', 'contacts.id', '=', 't.contact_id')
+        ->active()
+        ->groupBy('contacts.id')
+        ->select(
+            DB::raw("SUM(IF(t.type = 'purchase', final_total, 0)) as total_purchase"),
+            DB::raw("SUM(IF(t.type = 'purchase_return', final_total, 0)) as total_purchase_return"),
+            DB::raw("SUM(IF(t.type = 'sell' AND t.status = 'final', final_total, 0)) as total_invoice"),
+            DB::raw("SUM(IF(t.type = 'purchase', (SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as purchase_paid"),
+            DB::raw("SUM(IF(t.type = 'sell' AND t.status = 'final', (SELECT SUM(IF(is_return = 1,-1*amount,amount)) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as invoice_received"),
+            DB::raw("SUM(IF(t.type = 'sell_return', (SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as sell_return_paid"),
+            DB::raw("SUM(IF(t.type = 'purchase_return', (SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as purchase_return_received"),
+            DB::raw("SUM(IF(t.type = 'sell_return', final_total, 0)) as total_sell_return"),
+            DB::raw("SUM(IF(t.type = 'opening_balance', final_total, 0)) as opening_balance"),
+            DB::raw("SUM(IF(t.type = 'opening_balance', (SELECT SUM(IF(is_return = 1,-1*amount,amount)) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as opening_balance_paid"),
+            DB::raw("SUM(IF(t.type = 'ledger_discount' AND sub_type='sell_discount', final_total, 0)) as total_ledger_discount_sell"),
+            DB::raw("SUM(IF(t.type = 'ledger_discount' AND sub_type='purchase_discount', final_total, 0)) as total_ledger_discount_purchase"),
+            'contacts.supplier_business_name',
+            'contacts.name',
+            'contacts.id',
+            'contacts.type as contact_type'
+        );
+        $permitted_locations = auth()->user()->permitted_locations();
+
+        if ($permitted_locations != 'all') {
+            $contacts->whereIn('t.location_id', $permitted_locations);
+        }
+
+        // if (! empty($request->input('customer_group_id'))) {
+        //     $contacts->where('contacts.customer_group_id', $request->input('customer_group_id'));
+        // }
+
+        // if (! empty($request->input('location_id'))) {
+        //     $contacts->where('t.location_id', $request->input('location_id'));
+        // }
+
+        // if (! empty($request->input('contact_id'))) {
+        //     $contacts->where('t.contact_id', $request->input('contact_id'));
+        // }
+
+        // if (! empty($request->input('contact_type'))) {
+        //     $contacts->whereIn('contacts.type', [$request->input('contact_type'), 'both']);
+        // }
+
+        // $start_date = $request->get('start_date');
+        // $end_date = $request->get('end_date');
+        if (! empty($start_date) && ! empty($end_date)) {
+            $contacts->where('t.transaction_date', '>=', $start_date)
+                ->where('t.transaction_date', '<=', $end_date);
+        }
+
+
+
+        $contacts = $contacts->get();
+
+        foreach ($contacts as $row) {
+            if (! empty($row->supplier_business_name)) {
+                $row->name .= ', '.$row->supplier_business_name;
+            }
+            
+            $total_ledger_discount_purchase = $row->total_ledger_discount_purchase ?? 0;
+            $total_ledger_discount_sell = $total_ledger_discount_sell ?? 0;
+            $due = ($row->total_invoice - $row->invoice_received - $total_ledger_discount_sell) - ($row->total_purchase - $row->purchase_paid - $total_ledger_discount_purchase) - ($row->total_sell_return - $row->sell_return_paid) + ($row->total_purchase_return - $row->purchase_return_received);
+
+            if ($row->contact_type == 'supplier') {
+                $due -= $row->opening_balance - $row->opening_balance_paid;
+            } else {
+                $due += $row->opening_balance - $row->opening_balance_paid;
+            }
+
+            $due_formatted = $this->transactionUtil->num_f($due, true);
+        
+            $row->due = $due_formatted;
+        }
+
+        Auth::logout();
+        Log::info("CONTACT -------------------------------------------------->");
+        Log::info(json_encode($contacts,JSON_PRETTY_PRINT));
+
+        return $contacts;
+    }
+
+    public function getCustomerGroupReport(User $user, $start_date = null, $end_date = null)
+    {
+        $business_id = $user->business_id;
+        // $location_id = 10;
+        Auth::login($user);
+
+        $contact_id = null;
+
+        $query = Transaction::leftjoin('customer_groups AS CG', 'transactions.customer_group_id', '=', 'CG.id')
+        ->where('transactions.business_id', $business_id)
+        ->where('transactions.type', 'sell')
+        ->where('transactions.status', 'final')
+        ->groupBy('transactions.customer_group_id')
+        ->select(DB::raw('SUM(final_total) as total_sell'), 'CG.name');
+
+        // $group_id = $request->get('customer_group_id', null);
+        $group_id = null;
+        if (! empty($group_id)) {
+        $query->where('transactions.customer_group_id', $group_id);
+        }
+
+        $permitted_locations = auth()->user()->permitted_locations();
+        if ($permitted_locations != 'all') {
+        $query->whereIn('transactions.location_id', $permitted_locations);
+        }
+
+        // $location_id = $request->get('location_id', null);
+        // if (! empty($location_id)) {
+        // $query->where('transactions.location_id', $location_id);
+        // }
+
+        // $start_date = $request->get('start_date');
+        // $end_date = $request->get('end_date');
+
+        if (! empty($start_date) && ! empty($end_date)) {
+        $query->whereBetween(DB::raw('date(transaction_date)'), [$start_date, $end_date]);
+        }
+
+        $customer_group = $query->get();
+
+        Auth::logout();
+        Log::info("CUSTOMER GROUP -------------------------------------------------->");
+        Log::info(json_encode($customer_group,JSON_PRETTY_PRINT));
+
+        return $customer_group;
+
+        
     }
 }
