@@ -2,31 +2,32 @@
 
 namespace App\Utils;
 
-use App\AccountTransaction;
+use App\Contact;
+use App\Product;
+use App\TaxRate;
 use App\Business;
+use App\Currency;
+use App\Variation;
+use App\Transaction;
+use App\CashRegister;
+use App\PurchaseLine;
+use App\InvoiceScheme;
 use App\BusinessLocation;
 use App\CashDenomination;
-use App\Contact;
-use App\Currency;
-use App\Events\TransactionPaymentAdded;
-use App\Events\TransactionPaymentDeleted;
-use App\Events\TransactionPaymentUpdated;
-use App\Exceptions\AdvanceBalanceNotAvailable;
-use App\Exceptions\PurchaseSellMismatch;
-use App\InvoiceScheme;
-use App\Product;
-use App\PurchaseLine;
-use App\Restaurant\ResTable;
-use App\TaxRate;
-use App\Transaction;
+use App\AccountTransaction;
 use App\TransactionPayment;
+use Illuminate\Support\Str;
+use App\Restaurant\ResTable;
 use App\TransactionSellLine;
-use App\TransactionSellLinesPurchaseLines;
-use App\Variation;
 use App\VariationLocationDetails;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use App\CashRegister;
+use Illuminate\Support\Facades\Log;
+use App\Events\TransactionPaymentAdded;
+use App\Exceptions\PurchaseSellMismatch;
+use App\Events\TransactionPaymentDeleted;
+use App\Events\TransactionPaymentUpdated;
+use App\TransactionSellLinesPurchaseLines;
+use App\Exceptions\AdvanceBalanceNotAvailable;
 
 
 class TransactionUtil extends Util
@@ -2636,7 +2637,15 @@ class TransactionUtil extends Util
                         );
 
         //Check for permitted locations of a user
-        $permitted_locations = auth()->user()->permitted_locations();
+        // Log::info("user------------------------->");
+        // Log::info(json_encode(auth()->user(),JSON_PRETTY_PRINT));
+
+        $permitted_locations = [];
+
+        if (auth()->user()) {
+            $permitted_locations = auth()->user()->permitted_locations();   
+        }
+        
         if ($permitted_locations != 'all') {
             $query1->whereIn('transactions.location_id', $permitted_locations);
             $query2->whereIn('transactions.location_id', $permitted_locations);
@@ -2738,7 +2747,12 @@ class TransactionUtil extends Util
                         );
 
         ///Check for permitted locations of a user
-        $permitted_locations = auth()->user()->permitted_locations();
+        $permitted_locations = [];
+
+        if (auth()->user()) {
+            $permitted_locations = auth()->user()->permitted_locations();   
+        }
+        
         if ($permitted_locations != 'all') {
             $query1->whereIn('transactions.location_id', $permitted_locations);
             $query2->whereIn('transactions.location_id', $permitted_locations);
