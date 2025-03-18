@@ -12,19 +12,24 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use App\Utils\ProductUtil;
+use App\Utils\BusinessUtil;
 
 class Daily extends Command
 {
     public $transactionUtil;
-
+    public $productUtil;
     public $filename;
+    public $businessUtil;
     
     public $logo;
 
-    public function __construct(TransactionUtil $transactionUtil)
+    public function __construct(TransactionUtil $transactionUtil, ProductUtil $productUtil, BusinessUtil $businessUtil)
     {
         parent::__construct();
         $this->transactionUtil = $transactionUtil;
+        $this->productUtil = $productUtil;
+        $this->businessUtil = $businessUtil;
         $this->logo = public_path('img/logo-small.png');
         // $this->filename = storage_path('app/public/pdf/report/Ajyal Al-Madina.pdf');
     }
@@ -98,10 +103,14 @@ class Daily extends Command
                     $type = 'expense';
                     $data['report_type'] = 'Expense';
                     break;
+                case 'profit_or_loss_report':
+                    $type = 'profit_or_loss';
+                    $data['report_type'] = 'Profit / Loss';
+                    $report = $this->getProfitOrLossReport($user, $dates['start_date'], $dates['end_date']);
+                    break;
                 default:
             }
             $view = 'report_settings/export/' . $type;
-
             $pdf = Pdf::setPaper('a4', 'landscape')
                 ->loadView($view, [
                     'data' => $data, 
@@ -118,7 +127,7 @@ class Daily extends Command
             $file=Storage::disk('public')->put($filename, $pdf->output()); 
 
             Mail::to($user->email)
-                ->queue(new Reporting($data, $filename));
+                ->queue(new Reporting($data, $filename,$type));
         }
     }
 
@@ -209,11 +218,30 @@ class Daily extends Command
         $potential_profit = $closing_stock_by_sp - $closing_stock_by_pp;
         $profit_margin = empty($closing_stock_by_sp) ? 0 : ($potential_profit / $closing_stock_by_sp) * 100;
 
+        
+        // $for = request()->input('for') == 'view_product' ? 'view_product' : 'datatables';
+
+        // $products = $this->productUtil->getProductStockDetails($business_id, $filters, $for);
+        // // \Log::info($products);
+
         return [
             'closing_stock_by_pp' => $closing_stock_by_pp,
             'closing_stock_by_sp' => $closing_stock_by_sp,
             'potential_profit' => $potential_profit,
             'profit_margin' => $profit_margin,
         ];
+    }
+
+    public function getProfitOrLossReport(User $user, $start_date = null, $end_date = null)
+    {
+        $business_id = $user->business_id;
+        $location_id = 10;
+        $purchase_details = $this->transactionUtil->getPurchaseTotals($business_id, $start_date, $end_date, $location_id);
+        $fy = $this->businessUtil->getCurrentFinancialYear($business_id);
+        $user_id = $user->id;
+        $permitted_locations = $user->permitted_locations();
+        $data = $this->transactionUtil->getProfitLossDetails($business_id, $location_id, $start_date, $end_date, $user_id, $permitted_locations);
+        \Log::info($data);
+        return $data;
     }
 }

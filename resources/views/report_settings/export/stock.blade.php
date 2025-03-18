@@ -53,11 +53,15 @@
             text-align: center;
         }
         @font-face {
-            font-family: 'Amiri';
-            src: url("{{ storage_path('fonts/Amiri-Regular.ttf') }}") format("truetype");
+    font-family: 'Amiri';
+    src: url("{{ asset('fonts/Amiri-Regular.ttf') }}") format("truetype");
         }
+
         .arabic {
+            direction: rtl;
+            text-align: right;
             font-family: 'Amiri', sans-serif;
+            font-weight: normal;
         }
     </style>
 </head>
@@ -100,17 +104,17 @@
             <div>
                 <table border="0">
                     <thead>
-                        <th>Open Time</th>
-                        <th>Close Time</th>
+                        <th>SKU</th>
+                        <th>Product</th>
+                        <th>Variation</th>
+                        <th>Category</th>
                         <th>Location</th>
-                        <th>User</th>
-                        <th>Total Card Slips</th>
-                        <th>Total Cheques</th>
-                        <th>Total Cash</th>
-                        <th>Total Bank Transfer</th>
-                        <th>Total Advance Payment</th>
-                        <th>Other Payment</th>
-                        <th>Total</th>
+                        <th>Unit Selling Price</th>
+                        <th>Current Stock</th>
+                        <th>Total Stock Price (By Purchase Price)</th>
+                        <th>Total Stock Price (By Sale Price)</th>
+                        <th>Potential Profit</th>
+                        
                     </thead>
                     <tbody>
                         <tr>

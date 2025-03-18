@@ -76,14 +76,16 @@
         }
         
         @font-face {
-            font-family: 'Amiri';
-            src: url("{{ storage_path('fonts/Amiri-Regular.ttf') }}") format("truetype");
-        }
-        .arabic {
-            direction: rtl;
-            /* text-align: right; */
-            font-family: 'Amiri', sans-serif;
-        }
+    font-family: 'Amiri';
+    src: url("{{ asset('fonts/Amiri-Regular.ttf') }}") format("truetype");
+}
+
+.arabic {
+    direction: rtl;
+    text-align: right;
+    font-family: 'Amiri', sans-serif;
+    font-weight: normal;
+}
 
     </style>
 </head>

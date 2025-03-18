@@ -50,6 +50,7 @@ class ReportSettingsController extends Controller
         }
         $users = User::all()->pluck('first_name', 'id');
         $reportTypes = [
+            'profit_or_loss_report' => 'Profit / Loss Report',
             'purchase_n_sell_report' => 'Purchase & Sell Report',
             'contacts_report' => 'Contacts Report',
             'stock_report' => 'Stock Report',
