@@ -80,7 +80,7 @@
 
 <body>
     <header>
-        <img src="{{ 'data:image/png;base64,' . base64_encode(file_get_contents(@$logo)) }}" alt="logo">
+        <img src="{{$logo }}" alt="logo">
         <h1 class="header">Ajyal Al - Madina</h1>
     </header>
     <main>
