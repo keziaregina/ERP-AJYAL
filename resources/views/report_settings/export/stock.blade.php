@@ -37,6 +37,14 @@
             padding: 10px;
         }
 
+        th {
+            background-color: #6b7280
+        }
+
+        td{
+            background-color: #c2c2c2
+        }
+
         .label {
             margin-bottom: 10px;
             font-weight: bold;
@@ -71,43 +79,84 @@
                     <tr>
                         <td>
                             <div class="label">Closing stock (By purchase price)</div>
-                            <div class="value">{{ number_format($report['closing_stock_by_pp'], 3) }} {{ $currency }}</div>
+                            <div class="value">{{ number_format($report['stock_value']['closing_stock_by_pp'], 3) }} {{ $currency }}</div>
                         </td>
                         <td>
                             <div class="label">Closing stock (By sale price)</div>
-                            <div class="value">{{ number_format($report['closing_stock_by_sp'], 3) }} {{ $currency }}</div>
+                            <div class="value">{{ number_format($report['stock_value']['closing_stock_by_sp'], 3) }} {{ $currency }}</div>
                         </td>
                         <td>
                             <div class="label">Potential profit</div>
-                            <div class="value">{{ number_format($report['potential_profit'], 3) }} {{ $currency }}</div>
+                            <div class="value">{{ number_format($report['stock_value']['potential_profit'], 3) }} {{ $currency }}</div>
                         </td>
                         <td>
                             <div class="label">Profit Margin %</div>
-                            <div class="value">{{ $report['profit_margin'] }}</div>
+                            <div class="value">{{ $report['stock_value']['profit_margin'] }}</div>
                         </td>
                     </tr>
                 </table>
             </div>
 
-            <div>
+            <div style="margin-top: 20px;">
                 <table border="0">
                     <thead>
-                        <th>Open Time</th>
-                        <th>Close Time</th>
-                        <th>Location</th>
-                        <th>User</th>
-                        <th>Total Card Slips</th>
-                        <th>Total Cheques</th>
-                        <th>Total Cash</th>
-                        <th>Total Bank Transfer</th>
-                        <th>Total Advance Payment</th>
-                        <th>Other Payment</th>
-                        <th>Total</th>
+                        <tr>
+                            <th rowspan="2">#</th>
+                            <th>SKU</th>
+                            <th>Product</th>
+                            <th>Variations</th>
+                            <th>Category</th>
+                            <th>Location</th>
+                            <th>Unit Selling Price</th>
+                            <th>Current Stock</th>
+                            <th>Current Stock (By Purchase Price)</th>
+                            <th>Current Stock (By Sale Price)</th>
+                        </tr>
+                        <tr>
+                            <th>Potential Profit</th>
+                            <th>Total Unit Sold</th>
+                            <th>Total Unit Transfered</th>
+                            <th>Total Unit Adjusted</th>
+                            <th>Cust Field1</th>
+                            <th>Cust Field2</th>
+                            <th>Cust Field3</th>
+                            <th>Cust Field4</th>
+                            <th>Current Stock (Manufacturing)</th>
+                        </tr>
                     </thead>
                     <tbody>
+                        @foreach ($report['stock_report'] as $index => $item)
+                           @php
+                                $stock = $item->stock ? $item->stock : 0;
+                                $unit_selling_price = (float) $item->group_price > 0 ? $item->group_price : $item->unit_price;
+
+                                $stock_price_by_sp = $stock * $unit_selling_price;
+                                $potential_profit = (float) $stock_price_by_sp - (float) $item->stock_price;
+                           @endphp 
                         <tr>
-                            <td></td>
+                            <td rowspan="2">{{ $index + 1 }}</td>
+                            <td>{{ $item->sku }}</td>
+                            <td>{{ $item->product }}</td>
+                            <td>{{ $item->variation_name ?: '-' }}</td>
+                            <td>{{ $item->category_name ?: '-' }}</td>
+                            <td>{{ $item->location_name ?: '-' }}</td>
+                            <td>{{ $item->unit_price }}</td>
+                            <td>{{ $item->stock ?: '-' }}</td>
+                            <td>{{ $item->stock_price ?: '-' }}</td>
+                            <td>{{ $stock_price_by_sp }}</td>
                         </tr>
+                        <tr>
+                            <td>{{ $potential_profit }}</td>
+                            <td>{{ $item->total_sold ?: '-' }} Bags</td>
+                            <td>{{ $item->total_transfered ?: '-' }} Bags</td>
+                            <td>{{ $item->total_adjusted ?: '-' }} Bags</td>
+                            <td>{{ $item->product_custom_field1 ?: '-' }}</td>
+                            <td>{{ $item->product_custom_field2 ?: '-' }}</td>
+                            <td>{{ $item->product_custom_field3 ?: '-' }}</td>
+                            <td>{{ $item->product_custom_field4 ?: '-' }}</td>
+                            <td>{{ $item->total_mfg_stock ?: '-' }}</td>
+                        </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
