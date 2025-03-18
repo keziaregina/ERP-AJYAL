@@ -72,14 +72,25 @@
 
         .negative {
             color: #e74c3c;
-            font-weight: bold;
+            /* font-weight: bold; */
         }
+        
+        @font-face {
+            font-family: 'Amiri';
+            src: url("{{ storage_path('fonts/Amiri-Regular.ttf') }}") format("truetype");
+        }
+        .arabic {
+            direction: rtl;
+            text-align: right;
+            font-family: 'Amiri', sans-serif;
+        }
+
     </style>
 </head>
 
 <body>
     <header>
-        <img src="{{ 'data:image/png;base64,' . base64_encode(file_get_contents(@$logo)) }}" alt="logo">
+        <img src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina</h1>
     </header>
     <main>
@@ -92,19 +103,20 @@
                 <table>
                     <tr>
                         <td class="label">Total Purchase:</td>
-                        <td>{{ $report['purchase']['total_purchase_exc_tax'] ?: '0' }} {{ $currency }}</td>
+
+                        <td>{{ $report['purchase']['total_purchase_exc_tax'] ? $report['purchase']['total_purchase_exc_tax'] : '0' }} <span class="arabic">{{ $currency }}</span></td>
                     </tr>
                     <tr>
                         <td class="label">Purchase Including tax:</td>
-                        <td>{{ $report['purchase']['total_purchase_inc_tax'] ?: '0' }} {{ $currency }}</td>
+                        <td>{{ $report['purchase']['total_purchase_inc_tax'] ?: '0' }} <span class="arabic">{{ $currency }}</span></td>
                     </tr>
                     <tr>
                         <td class="label">Total Purchase Return Including Tax:</td>
-                        <td>{{ $report['total_purchase_return'] ?: '0' }} {{ $currency }}</td>
+                        <td>{{ $report['total_purchase_return'] ?: '0' }} <span class="arabic">{{ $currency }}</span></td>
                     </tr>
                     <tr>
                         <td class="label">Purchase Due: </td>
-                        <td>{{ $report['purchase']['purchase_due'] ?: '0' }} {{ $currency }}</td>
+                        <td>{{ $report['purchase']['purchase_due'] ?: '0' }} <span class="arabic">{{ $currency }}</span></td>
                     </tr>
                 </table>
             </div>
@@ -114,19 +126,19 @@
                 <table>
                     <tr>
                         <td class="label">Total Sale:</td>
-                        <td>{{ $report['sell']['total_sell_exc_tax'] ?: '0' }} {{ $currency }}</td>
+                        <td>{{ $report['sell']['total_sell_exc_tax'] ? $report['sell']['total_sell_exc_tax'] : '0' }} <span class="arabic">{{ $currency }}</span></td>
                     </tr>
                     <tr>
                         <td class="label">Sale Including tax:</td>
-                        <td>{{ $report['sell']['total_sell_inc_tax'] ?: '0' }} {{ $currency }}</td>
+                        <td>{{ $report['sell']['total_sell_inc_tax'] ? $report['sell']['total_sell_inc_tax'] : '0' }} <span class="arabic">{{ $currency }}</span></td>
                     </tr>
                     <tr>
                         <td class="label">Total Sell Return Including Tax:</td>
-                        <td>{{ $report['total_sell_return'] ?: '0' }} {{ $currency }}</td>
+                        <td>{{ $report['total_sell_return'] ? $report['total_sell_return'] : '0' }} <span class="arabic">{{ $currency }}</span></td>
                     </tr>
                     <tr>
                         <td class="label">Sale Due:</td>
-                        <td>{{ $report['sell']['invoice_due'] ?: '0' }} {{ $currency }}</td>
+                        <td>{{ $report['sell']['invoice_due'] ? $report['sell']['invoice_due'] : '0' }} <span class="arabic">{{ $currency }}</span></td>
                     </tr>
                 </table>
             </div>
@@ -138,12 +150,12 @@
                 <tr class="negative">
                     <td>Sale - Purchase</td>
                     <td>:</td>
-                    <td>{{ $report['difference']['total'] ?: '0' }} {{ $currency }}</td>
+                    <td>{{ $report['difference']['total'] ?: '0' }} <span class="arabic">{{ $currency }}</span></td>
                 </tr>
                 <tr class="negative">
                     <td>Due amount</td>
                     <td>:</td>
-                    <td>{{ $report['difference']['due'] ?: '0' }} {{ $currency }}</td>
+                    <td>{{ $report['difference']['due'] ?: '0' }} <span class="arabic">{{ $currency }}</span></td>
                 </tr>
             </table>
         </div>

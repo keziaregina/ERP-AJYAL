@@ -160,7 +160,6 @@ class Daily extends Command
             'total' => $sell_details['total_sell_inc_tax'] - $total_sell_return_inc_tax - ($purchase_details['total_purchase_inc_tax'] - $total_purchase_return_inc_tax),
             'due' => $sell_details['invoice_due'] - $purchase_details['purchase_due'],
         ];
-
         return ['purchase' => $purchase_details,
             'sell' => $sell_details,
             'total_purchase_return' => $total_purchase_return_inc_tax,
