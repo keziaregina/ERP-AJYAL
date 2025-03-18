@@ -52,13 +52,21 @@
         .center {
             text-align: center;
         }
+        @font-face {
+            font-family: 'Amiri';
+            src: url("{{ storage_path('fonts/Amiri-Regular.ttf') }}") format("truetype");
+        }
+        .arabic {
+            font-family: 'Amiri', sans-serif;
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <img src="{{ 'data:image/png;base64,' . base64_encode(file_get_contents(@$logo)) }}" alt="logo">
+        <img src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina</h1>
+        <span class="arabic">{{ env('APP_TITLE') }}</span>
     </header>
     <main>
         <div class="container">
@@ -71,15 +79,15 @@
                     <tr>
                         <td>
                             <div class="label">Closing stock (By purchase price)</div>
-                            <div class="value">{{ number_format($report['closing_stock_by_pp'], 3) }} {{ $currency }}</div>
+                            <div class="value">{{ number_format($report['closing_stock_by_pp'], 3) }} <span class="arabic">{{ $currency }}</span></div>
                         </td>
                         <td>
                             <div class="label">Closing stock (By sale price)</div>
-                            <div class="value">{{ number_format($report['closing_stock_by_sp'], 3) }} {{ $currency }}</div>
+                            <div class="value">{{ number_format($report['closing_stock_by_sp'], 3) }} <span class="arabic">{{ $currency }}</span></div>
                         </td>
                         <td>
                             <div class="label">Potential profit</div>
-                            <div class="value">{{ number_format($report['potential_profit'], 3) }} {{ $currency }}</div>
+                            <div class="value">{{ number_format($report['potential_profit'], 3) }} <span class="arabic">{{ $currency }}</span></div>
                         </td>
                         <td>
                             <div class="label">Profit Margin %</div>
