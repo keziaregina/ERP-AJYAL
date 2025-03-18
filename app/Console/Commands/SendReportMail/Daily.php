@@ -6,6 +6,7 @@ use App\User;
 use App\Mail\Reporting;
 use App\ReportSettings;
 use App\Mail\Reporting2;
+use App\Transaction;
 use App\Utils\TransactionUtil;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\Command;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use App\Utils\ProductUtil;
 use App\Utils\BusinessUtil;
+use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\Models\Activity;
 
 class Daily extends Command
 {
@@ -108,6 +111,11 @@ class Daily extends Command
                     $data['report_type'] = 'Profit / Loss';
                     $report = $this->getProfitOrLossReport($user, $dates['start_date'], $dates['end_date']);
                     break;
+                case 'activity_log':
+                    $type = 'activity_log';
+                    $data['report_type'] = 'Activity Log';
+                    $report = $this->getActivityLog($user, $dates['start_date'], $dates['end_date']);
+                    break;
                 default:
             }
             $view = 'report_settings/export/' . $type;
@@ -127,7 +135,9 @@ class Daily extends Command
             $file=Storage::disk('public')->put($filename, $pdf->output()); 
 
             Mail::to($user->email)
-                ->queue(new Reporting($data, $filename,$type));
+                ->send(new Reporting($data, $filename, $type));
+
+            Storage::disk('public')->delete($filename);
         }
     }
 
@@ -244,4 +254,107 @@ class Daily extends Command
         \Log::info($data);
         return $data;
     }
+
+    public function getActivityLog(User $user, $start_date = null, $end_date = null)
+    {
+        $business_id = $user->business_id;
+        $activities = Activity::with(['subject'])
+                                ->leftjoin('users as u', 'u.id', '=', 'activity_log.causer_id')
+                                ->where('activity_log.business_id', $business_id)
+                                ->select(
+                                    'activity_log.*',
+                                    DB::raw("CONCAT(COALESCE(u.surname, ''), ' ', COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as created_by")
+                                )->whereDate('activity_log.created_at', '>=', $start_date)
+                                ->whereDate('activity_log.created_at', '<=', $end_date)->get();
+
+        if (! empty(request()->user_id)) {
+            $activities->where('causer_id', request()->user_id);
+        }
+
+        $subject_type = request()->subject_type;
+        if (! empty($subject_type)) {
+            if ($subject_type == 'contact') {
+                $activities->where('subject_type', \App\Contact::class);
+            } elseif ($subject_type == 'user') {
+                $activities->where('subject_type', \App\User::class);
+            } elseif (in_array($subject_type, ['sell', 'purchase',
+                'sales_order', 'purchase_order', 'sell_return', 'purchase_return', 'sell_transfer', 'expense', 'purchase_order', ])) {
+                $activities->where('subject_type', \App\Transaction::class);
+                $activities->whereHasMorph('subject', Transaction::class, function ($q) use ($subject_type) {
+                    $q->where('type', $subject_type);
+                });
+            }
+        }
+
+        $sell_statuses = Transaction::sell_statuses();
+        $sales_order_statuses = Transaction::sales_order_statuses(true);
+        $purchase_statuses = $this->transactionUtil->orderStatuses();
+        $shipping_statuses = $this->transactionUtil->shipping_statuses();
+
+        $statuses = array_merge($sell_statuses, $sales_order_statuses, $purchase_statuses);
+        
+        $activities = $activities->map(function ($row) use ($statuses, $shipping_statuses) {
+            $html = '';
+
+            $subject_type = '';
+            if ($row->subject_type == \App\Contact::class) {
+                $subject_type = __('contact.contact');
+            } elseif ($row->subject_type == \App\User::class) {
+                $subject_type = __('report.user');
+            } elseif ($row->subject_type == \App\Transaction::class && ! empty($row->subject->type)) {
+                $subject_type = isset($transaction_types[$row->subject->type]) ? $transaction_types[$row->subject->type] : '';
+            } elseif (($row->subject_type == \App\TransactionPayment::class)) {
+                $subject_type = __('lang_v1.payment');
+            }
+    
+            if (!empty($row->subject?->ref_no)) {
+                $html .= __('purchase.ref_no') . ': ' . $row->subject->ref_no . '<br>';
+            }
+    
+            if (!empty($row->subject?->invoice_no)) {
+                $html .= __('sale.invoice_no') . ': ' . $row->subject->invoice_no . '<br>';
+            }
+    
+            if ($row->subject_type === \App\Models\Transaction::class && in_array($row->subject?->type, ['sell', 'purchase'])) {
+                $html .= view('sale_pos.partials.activity_row', [
+                    'activity' => $row,
+                    'statuses' => $statuses,
+                    'shipping_statuses' => $shipping_statuses
+                ])->render();
+            } else {
+                $update_note = $row->getExtraProperty('update_note');
+                if (!empty($update_note) && !is_array($update_note)) {
+                    $html .= $update_note;
+                }
+            }
+    
+            if ($row->description === 'contact_deleted') {
+                $html .= $row->getExtraProperty('supplier_business_name') ?? '';
+                $html .= '<br>';
+            }
+    
+            if (!empty($row->getExtraProperty('name'))) {
+                $html .= __('user.name') . ': ' . $row->getExtraProperty('name') . '<br>';
+            }
+    
+            if (!empty($row->getExtraProperty('id'))) {
+                $html .= 'ID: ' . $row->getExtraProperty('id') . '<br>';
+            }
+    
+            if (!empty($row->getExtraProperty('invoice_no'))) {
+                $html .= __('sale.invoice_no') . ': ' . $row->getExtraProperty('invoice_no') . '<br>';
+            }
+    
+            if (!empty($row->getExtraProperty('ref_no'))) {
+                $html .= __('purchase.ref_no') . ': ' . $row->getExtraProperty('ref_no');
+            }
+
+            $row['note'] = $html; 
+            $row['subject_type'] = $subject_type;
+            return $row;
+        });
+        return $activities;
+    }
+
+
 }

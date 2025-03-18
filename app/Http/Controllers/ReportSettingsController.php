@@ -43,13 +43,10 @@ class ReportSettingsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function getReportTypes()
     {
-        if (! auth()->user()->can('report_settings.access')) {
-            abort(403, 'Unauthorized action.');
-        }
-        $users = User::all()->pluck('first_name', 'id');
-        $reportTypes = [
+        return [
+            'profit_or_loss_report' => 'Profit / Loss Report',
             'profit_or_loss_report' => 'Profit / Loss Report',
             'purchase_n_sell_report' => 'Purchase & Sell Report',
             'contacts_report' => 'Contacts Report',
@@ -59,7 +56,16 @@ class ReportSettingsController extends Controller
             'sales_representative' => 'Sales Representative Report',
             'register_report' => 'Register Report',
             'expense_report' => 'Expense Report',
+            'activity_log' => 'Activity Log',
         ];
+    }
+    public function create()
+    {
+        if (! auth()->user()->can('report_settings.access')) {
+            abort(403, 'Unauthorized action.');
+        }
+        $users = User::all()->pluck('first_name', 'id');
+        $reportTypes = $this->getReportTypes();
         $intervals = ['daily'=>'Daily', 'weekly'=>'Weekly', 'monthly'=>'Monthly', 'yearly'=>'Yearly'];
         return view('report_settings.create', compact('users', 'reportTypes', 'intervals'));
     }
@@ -122,16 +128,8 @@ class ReportSettingsController extends Controller
 
         $business_id = request()->session()->get('user.business_id');
         $users = User::all()->pluck('first_name', 'id');
-        $report_type = [
-            'purchase_n_sell_report' => 'Purchase & Sell Report',
-            'contacts_report' => 'Contacts Report',
-            'stock_report' => 'Stock Report',
-            'tax_report' => 'Tax Report',
-            'trending_product_report' => 'Trending Product Report',
-            'sales_representative' => 'Sales Representative Report',
-            'register_report' => 'Register Report',
-            'expense_report' => 'Expense Report',
-        ];
+        $report_type = $this->getReportTypes();
+            
         $intervals = ['daily'=>'Daily', 'weekly'=>'Weekly', 'monthly'=>'Monthly', 'yearly'=>'Yearly'];
         $report_settings = ReportSettings::with('user')->where('business_id', $business_id)->find($id);
         return view('report_settings.edit')->with(compact('report_settings', 'users','report_type','intervals'));
