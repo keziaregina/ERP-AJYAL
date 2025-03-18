@@ -5,6 +5,7 @@ namespace App\Console\Commands\SendReportMail;
 use App\User;
 use App\Contact;
 use App\TaxRate;
+use App\Transaction;
 use App\Mail\Reporting;
 use App\ReportSettings;
 use App\Mail\Reporting2;
@@ -78,7 +79,7 @@ class Monthly extends Command
                     $type = 'contact';
                     $data['report_type'] = 'Contacts Summary';
                     break;
-                    // TODO: fix tax data
+                    // FIXME: fix tax data
                 case 'tax_report':
                     $type = 'tax';
                     $data['report_type'] = 'Tax';
@@ -86,16 +87,26 @@ class Monthly extends Command
                     break;
                     
                 case 'customer_n_supplier_report':
-                    Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->");
+                    // FIXME: fix customer & supplier report arabic and logo
+                    // Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->");
                     $type = 'customer_n_supplier';
                     $data['report_type'] = 'Customer & Supplier';
                     $report = $this->getCustomerSupplierReport($user, $dates['start_date'], $dates['end_date']);
                     break;
                     
+                case 'customer_group_report':
+                    // FIXME: fix customer group report arabic and logo
+                    $type = 'customer_group';
+                    $data['report_type'] = 'Customer Group';
+                    $report = $this->getCustomerGroupReport($user, $dates['start_date'], $dates['end_date']);
+                    break;
+
                 case 'stock_report':
                     $type = 'stock';
                     $data['report_type'] = 'Stock';
                     $report = $this->getStockValue($user, $dates['start_date'], $dates['end_date']);
+                    Log::info("STOCK -------------------------------------------------->");
+                    Log::info(json_encode($report,JSON_PRETTY_PRINT));
                     break;
 
                 case 'trending_product_report':
@@ -232,6 +243,8 @@ class Monthly extends Command
         $tax_report_tabs = $this->moduleUtil->getModuleData('getTaxReportViewTabs');
 
 
+        Auth::logout();
+
         return [
             'tax_diff' => $tax_diff,
             'taxes' => $taxes,
@@ -242,6 +255,9 @@ class Monthly extends Command
 
     public function getStockValue(User $user, $start_date = null, $end_date = null, $location_id = null)
     {
+
+        Auth::login($user);
+
         $business_id = $user->business_id;
         $location_id = $location_id;
         $filters = request()->only(['category_id', 'sub_category_id', 'brand_id', 'unit_id']);
@@ -269,6 +285,7 @@ class Monthly extends Command
         $potential_profit = $closing_stock_by_sp - $closing_stock_by_pp;
         $profit_margin = empty($closing_stock_by_sp) ? 0 : ($potential_profit / $closing_stock_by_sp) * 100;
 
+        Auth::logout();
         return [
             'closing_stock_by_pp' => $closing_stock_by_pp,
             'closing_stock_by_sp' => $closing_stock_by_sp,
@@ -279,6 +296,8 @@ class Monthly extends Command
 
     public function getCustomerSupplierReport(User $user, $start_date = null, $end_date = null)
     {
+        Auth::login($user);
+
         $business_id = $user->business_id;
         // $location_id = 10;
         $contact_id = null;
@@ -357,9 +376,60 @@ class Monthly extends Command
         
             $row->due = $due_formatted;
         }
+
+        Auth::logout();
         Log::info("CONTACT -------------------------------------------------->");
         Log::info(json_encode($contacts,JSON_PRETTY_PRINT));
 
         return $contacts;
+    }
+
+    public function getCustomerGroupReport(User $user, $start_date = null, $end_date = null)
+    {
+        $business_id = $user->business_id;
+        // $location_id = 10;
+        Auth::login($user);
+
+        $contact_id = null;
+
+        $query = Transaction::leftjoin('customer_groups AS CG', 'transactions.customer_group_id', '=', 'CG.id')
+        ->where('transactions.business_id', $business_id)
+        ->where('transactions.type', 'sell')
+        ->where('transactions.status', 'final')
+        ->groupBy('transactions.customer_group_id')
+        ->select(DB::raw('SUM(final_total) as total_sell'), 'CG.name');
+
+        // $group_id = $request->get('customer_group_id', null);
+        $group_id = null;
+        if (! empty($group_id)) {
+        $query->where('transactions.customer_group_id', $group_id);
+        }
+
+        $permitted_locations = auth()->user()->permitted_locations();
+        if ($permitted_locations != 'all') {
+        $query->whereIn('transactions.location_id', $permitted_locations);
+        }
+
+        // $location_id = $request->get('location_id', null);
+        // if (! empty($location_id)) {
+        // $query->where('transactions.location_id', $location_id);
+        // }
+
+        // $start_date = $request->get('start_date');
+        // $end_date = $request->get('end_date');
+
+        if (! empty($start_date) && ! empty($end_date)) {
+        $query->whereBetween(DB::raw('date(transaction_date)'), [$start_date, $end_date]);
+        }
+
+        $customer_group = $query->get();
+
+        Auth::logout();
+        Log::info("CUSTOMER GROUP -------------------------------------------------->");
+        Log::info(json_encode($customer_group,JSON_PRETTY_PRINT));
+
+        return $customer_group;
+
+        
     }
 }

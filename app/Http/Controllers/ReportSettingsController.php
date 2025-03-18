@@ -53,6 +53,7 @@ class ReportSettingsController extends Controller
             'purchase_n_sell_report' => 'Purchase & Sell Report',
             'contacts_report' => 'Contacts Report',
             'customer_n_supplier_report' => 'Customer & Supplier Report',
+            'customer_group_report' => 'Customer Group Report',
             'stock_report' => 'Stock Report',
             'tax_report' => 'Tax Report',
             'trending_product_report' => 'Trending Product Report',
