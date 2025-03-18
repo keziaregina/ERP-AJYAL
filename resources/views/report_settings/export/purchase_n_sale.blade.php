@@ -81,7 +81,7 @@
         }
         .arabic {
             direction: rtl;
-            text-align: right;
+            /* text-align: right; */
             font-family: 'Amiri', sans-serif;
         }
 
@@ -92,6 +92,7 @@
     <header>
         <img src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina</h1>
+        <span class="arabic">{{ env('APP_TITLE') }}</span>
     </header>
     <main>
         <div class="container">
