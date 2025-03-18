@@ -34,11 +34,15 @@
             background-color: #f8f9fa;
             font-weight: bold;
         }
+        .logo {
+            width: 100px;
+            height: 100px;
+        }
     </style>
 </head>
 <body>
 
-    <img src="{{ 'data:image/png;base64,' . base64_encode(file_get_contents(@$logo)) }}" alt="logo">
+    <img class="logo" src="{{ $logo }}" alt="logo">
     <h1>Ajyal Al - Madina</h1>
 
     {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
