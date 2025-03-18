@@ -199,6 +199,9 @@ return [
         ConsoleTVs\Charts\ChartsServiceProvider::class,
         Nwidart\Menus\MenusServiceProvider::class,
         Knox\Pesapal\PesapalServiceProvider::class,
+
+        Barryvdh\DomPDF\ServiceProvider::class,
+        Barryvdh\Snappy\ServiceProvider::class,
     ],
 
     /*

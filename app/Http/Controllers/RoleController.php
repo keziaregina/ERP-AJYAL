@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\SellingPriceGroup;
 use App\Utils\ModuleUtil;
+use App\SellingPriceGroup;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\Facades\DataTables;
 
 class RoleController extends Controller
@@ -99,6 +100,10 @@ class RoleController extends Controller
 
         $common_settings = ! empty(session('business.common_settings')) ? session('business.common_settings') : [];
 
+        $data = compact('selling_price_groups', 'module_permissions', 'common_settings');
+        // Log::info("DATA====================>");
+        // Log::info(json_encode($data,JSON_PRETTY_PRINT));
+
         return view('role.create')
                 ->with(compact('selling_price_groups', 'module_permissions', 'common_settings'));
     }
@@ -111,6 +116,10 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
+
+        Log::info("REQUEST====================>");
+        Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+
         if (! auth()->user()->can('roles.create')) {
             abort(403, 'Unauthorized action.');
         }
@@ -207,13 +216,16 @@ class RoleController extends Controller
         }
 
         $selling_price_groups = SellingPriceGroup::where('business_id', $business_id)
-                                    ->active()
-                                    ->get();
-
+        ->active()
+        ->get();
+        
         $module_permissions = $this->moduleUtil->getModuleData('user_permissions');
-
+    
         $common_settings = ! empty(session('business.common_settings')) ? session('business.common_settings') : [];
 
+        $datas = compact('role', 'role_permissions', 'selling_price_groups', 'module_permissions', 'common_settings');
+        Log::info(json_encode($datas,JSON_PRETTY_PRINT));
+        
         return view('role.edit')
             ->with(compact('role', 'role_permissions', 'selling_price_groups', 'module_permissions', 'common_settings'));
     }
@@ -227,6 +239,7 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         if (! auth()->user()->can('roles.update')) {
             abort(403, 'Unauthorized action.');
         }

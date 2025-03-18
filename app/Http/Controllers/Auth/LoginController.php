@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Rules\ReCaptcha;
+use App\Utils\ModuleUtil;
+use App\Utils\BusinessUtil;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
-use App\Utils\BusinessUtil;
-use App\Utils\ModuleUtil;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Http\Request;
-use App\Rules\ReCaptcha;
 
 
 class LoginController extends Controller

@@ -71,7 +71,7 @@
                             <th>@lang('report.total_sell')</th>
                             <th>@lang('lang_v1.total_sell_return')</th>
                             <th>@lang('lang_v1.opening_balance_due')</th>
-                            <th>@lang('report.total_due') &nbsp;&nbsp;<i class="fa fa-info-circle text-info no-print" data-toggle="tooltip" data-placement="bottom" data-html="true" data-original-title="{{ __('messages.due_tooltip')}}" aria-hidden="true"></i></th>
+                            <th>@lang('report.total_due') @show_tooltip(__('messages.due_tooltip'))</th>
                         </tr>
                     </thead>
                     <tfoot>

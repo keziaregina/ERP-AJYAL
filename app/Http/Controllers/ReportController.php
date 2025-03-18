@@ -138,7 +138,13 @@ class ReportController extends Controller
 
             $location_id = $request->get('location_id');
 
-            $purchase_details = $this->transactionUtil->getPurchaseTotals($business_id, $start_date, $end_date, $location_id);
+            $purchase_details = $this->transactionUtil->getPurchaseTotals
+            (
+                $business_id, 
+                $start_date,
+                $end_date,
+                $location_id
+            );
 
             $sell_details = $this->transactionUtil->getSellTotals(
                 $business_id,
