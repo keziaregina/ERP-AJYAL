@@ -10,6 +10,7 @@ use App\Utils\TransactionUtil;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class Daily extends Command
 {
@@ -53,7 +54,7 @@ class Daily extends Command
         foreach ($datas as $data) {
             $report = null;
             
-            $filename = storage_path("app/public/pdf/report/{$data->user_id}_{$data->type}_" . now()->format('Ymd_His') . ".pdf");
+            $filename = "pdf/report/{$data->user_id}_{$data->type}_" . now()->format('Ymd_His') . ".pdf";
             $user = User::find($data->user_id);
             $directory = dirname($filename);
 
@@ -102,8 +103,8 @@ class Daily extends Command
                     'dates' => $dates,
                     'currency' => 'ر.س'
                 ]);
-            $pdf->save($filename);
-
+            // $pdf->save(Storage::disk('public')->path($filename));
+            $file=Storage::disk('public')->put($filename, $pdf->output()); 
             Mail::to($user->email)
                 ->queue(new Reporting($data, $filename));
         }

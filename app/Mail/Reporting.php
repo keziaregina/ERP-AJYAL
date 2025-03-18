@@ -54,6 +54,9 @@ class Reporting extends Mailable implements ShouldQueue
     {
         return new Content(
             view: 'emails.report_setting',
+            with: [
+                'path' => $this->path,
+            ],
         );
     }
 
@@ -65,10 +68,8 @@ class Reporting extends Mailable implements ShouldQueue
     public function attachments()
     {
         return [
-            // Attachment::fromStorageDisk('public','report\target.pdf'),
-            // Attachment::fromStorageDisk('public','report\target2.JPG'),
-            // Attachment::fromStorageDisk('public','report\real.pdf'),
-            Attachment::fromStorageDisk('public',$this->path),
+            Attachment::fromStorageDisk('public',$this->path)->as(basename($this->path)) 
+            ->withMime('application/pdf'), 
         ];
     }
 }
