@@ -9,40 +9,61 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            text-align: left;
+        }
+        .report-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
 
-        header img {
-            width: 100px;
-        }
-
-        header h1 {
-            font-size: 12px;
+        .header-box{
+            margin-left: 20px;
         }
 
         .box {
             border: 1px solid #ddd;
             border-radius: 8px;
-            padding: 15px;
             background-color: #f8fafc;
+        }
+
+        .box table {
+            margin-bottom: 10px;
+            margin-left: 10px;
+            border: none;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .box th, .box td {
+            border: none;
+            text-align: left;
+            padding: 10px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 10px;
         }
-
         th, td {
-            text-align: left;
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
         }
-
         th {
-            background-color: #6b7280
+            background-color: #2C3E50;
+            color: white;
+            font-weight: bold;
         }
-
-        td{
-            background-color: #c2c2c2
+        .total-row {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
         }
 
         .label {
@@ -76,30 +97,36 @@
 
 <body>
     <header>
-        <img src="{{ $logo }}" alt="logo">
+        <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina</h1>
-        <span class="arabic">{{ env('APP_TITLE') }}</span>
+
+        {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
+        {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
+
+        <div class="report-title">
+            Sales Representative Report - AJYAL AL-MADINA AL ASRIA
+        </div>
     </header>
     <main>
         <div class="container">
-            <h3 style="text-center">
+            <p>
                 Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
-            </h3>
+            </p>
             
             <div class="box">
                 <table border="0">
                     <tr>
                         <td>
                             <div class="label">Closing stock (By purchase price)</div>
-                            <div class="value">{{ number_format($report['stock_value']['closing_stock_by_pp'], 3) }} {{ $currency }}</div>
+                            <div class="value">{{ number_format($report['stock_value']['closing_stock_by_pp'], 3) }} SAR</div>
                         </td>
                         <td>
                             <div class="label">Closing stock (By sale price)</div>
-                            <div class="value">{{ number_format($report['stock_value']['closing_stock_by_sp'], 3) }} {{ $currency }}</div>
+                            <div class="value">{{ number_format($report['stock_value']['closing_stock_by_sp'], 3) }} SAR</div>
                         </td>
                         <td>
                             <div class="label">Potential profit</div>
-                            <div class="value">{{ number_format($report['stock_value']['potential_profit'], 3) }} {{ $currency }}</div>
+                            <div class="value">{{ number_format($report['stock_value']['potential_profit'], 3) }} SAR</div>
                         </td>
                         <td>
                             <div class="label">Profit Margin %</div>

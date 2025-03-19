@@ -20,6 +20,13 @@
             font-size: 12px;
         }
 
+        .report-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
         .box {
             border: 1px solid #dcdcdc;
             background-color: #ffffff;
@@ -45,19 +52,17 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 10px;
         }
-
         th, td {
-            text-align: left;
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
         }
-
         th {
-            background-color: #6b7280
-        }
-
-        td{
-            background-color: #c2c2c2
+            background-color: #2C3E50;
+            color: white;
+            font-weight: bold;
         }
         
         .label {
@@ -75,15 +80,26 @@
         .center {
             text-align: center;
         }
+        .logo {
+            width: 100px;
+            height: 100px;
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <img src="{{$logo }}" alt="logo">
-        <h1 class="header">Ajyal Al - Madina</h1>
+        <img class="logo" src="{{ $logo }}" alt="logo">
+        <h1>Ajyal Al - Madina</h1>
+
+        {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
+        {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
+
     </header>
     <main>
+        <div class="report-title">
+            Register Report - AJYAL AL-MADINA AL ASRIA
+        </div>
         <div class="container">
             <h3 style="text-center">
                 Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}

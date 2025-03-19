@@ -28,7 +28,7 @@ use App\Events\TransactionPaymentDeleted;
 use App\Events\TransactionPaymentUpdated;
 use App\TransactionSellLinesPurchaseLines;
 use App\Exceptions\AdvanceBalanceNotAvailable;
-
+use App\User;
 
 class TransactionUtil extends Util
 {
@@ -3927,6 +3927,41 @@ class TransactionUtil extends Util
         return $output;
     }
 
+    public function getTotalSellCommissionExport(User $user, $business_id, $start_date = null, $end_date = null, $location_id = null, $commission_agent = null)
+    {
+        //Query to sum total sell without line tax and order tax
+        $query = TransactionSellLine::leftjoin('transactions as t', 'transaction_sell_lines.transaction_id', '=', 't.id')
+                            ->where('t.business_id', $business_id)
+                            ->where('t.type', 'sell')
+                            ->where('t.status', 'final')
+                            ->select(DB::raw('SUM( (transaction_sell_lines.quantity - transaction_sell_lines.quantity_returned) * transaction_sell_lines.unit_price ) as final_total'));
+
+        //Check for permitted locations of a user
+        $permitted_locations = $user->permitted_locations();
+        if ($permitted_locations != 'all') {
+            $query->whereIn('t.location_id', $permitted_locations);
+        }
+
+        if (! empty($start_date) && ! empty($end_date)) {
+            $query->whereBetween(DB::raw('date(t.transaction_date)'), [$start_date, $end_date]);
+        }
+
+        //Filter by the location
+        if (! empty($location_id)) {
+            $query->where('t.location_id', $location_id);
+        }
+
+        if (! empty($commission_agent)) {
+            $query->where('t.commission_agent', $commission_agent);
+        }
+
+        $sell_details = $query->get();
+
+        $output['total_sales_with_commission'] = $sell_details->sum('final_total');
+
+        return $output;
+    }
+
     public function getTotalPaymentWithCommission($business_id, $start_date = null, $end_date = null, $location_id = null, $commission_agent = null)
     {
         $query = TransactionPayment::join('transactions as t',
@@ -3938,6 +3973,41 @@ class TransactionUtil extends Util
 
         //Check for permitted locations of a user
         $permitted_locations = auth()->user()->permitted_locations();
+        if ($permitted_locations != 'all') {
+            $query->whereIn('t.location_id', $permitted_locations);
+        }
+
+        if (! empty($start_date) && ! empty($end_date)) {
+            $query->whereBetween(DB::raw('date(paid_on)'), [$start_date, $end_date]);
+        }
+
+        //Filter by the location
+        if (! empty($location_id)) {
+            $query->where('t.location_id', $location_id);
+        }
+
+        if (! empty($commission_agent)) {
+            $query->where('t.commission_agent', $commission_agent);
+        }
+
+        $payment_details = $query->first();
+
+        $output['total_payment_with_commission'] = $payment_details->total_paid;
+
+        return $output;
+    }
+
+    public function getTotalPaymentWithCommissionExport(User $user, $business_id, $start_date = null, $end_date = null, $location_id = null, $commission_agent = null)
+    {
+        $query = TransactionPayment::join('transactions as t',
+            'transaction_payments.transaction_id', '=', 't.id')
+                            ->where('t.business_id', $business_id)
+                            ->where('t.type', 'sell')
+                            ->where('t.status', 'final')
+                            ->select(DB::raw('SUM(IF( is_return = 0, amount, amount*-1)) as total_paid'));
+
+        //Check for permitted locations of a user
+        $permitted_locations = $user->permitted_locations();
         if ($permitted_locations != 'all') {
             $query->whereIn('t.location_id', $permitted_locations);
         }

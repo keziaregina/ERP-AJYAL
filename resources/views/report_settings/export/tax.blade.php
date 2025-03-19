@@ -9,57 +9,26 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            text-align: left;
+        }
+        .report-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
 
-        header img {
-            width: 100px;
-        }
-
-        .header {
-            font-size: 12px;
+        .header-box{
+            margin-left: 20px;
         }
 
         .box {
-            border: 1px solid #dcdcdc;
-            background-color: #ffffff;
-            border-radius: 6px;
-            padding: 15px;
-            margin: 50px auto;
-            width: 90%;
-            max-width: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f8fafc;
         }
 
-        .title {
-            font-size: 12pt;
-            color: #333333;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .info-text {
-            font-size: 14pt;
-            color: #555555;
-            font-weight: normal;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 10px;
-        }
-
-        th {
-            background-color: #6b7280
-        }
-
-        td{
-            background-color: #c2c2c2
-        }
-        
         .label {
             margin-bottom: 10px;
             font-weight: bold;
@@ -72,6 +41,30 @@
             color: #1e293b;
         }
 
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #2C3E50;
+            color: white;
+            font-weight: bold;
+        }
+        .total-row {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+        }
+
         .center {
             text-align: center;
         }
@@ -80,26 +73,32 @@
 
 <body>
     <header>
-        <img src="{{ 'data:image/png;base64,' . base64_encode(file_get_contents(@$logo)) }}" alt="logo">
-        <h1 class="header">Ajyal Al - Madina</h1>
+        <img class="logo" src="{{ $logo }}" alt="logo">
+        <h3>Ajyal Al - Madina</h3>
+
+        {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
+        {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
     </header>
     <main>
+        <div class="report-title">
+            Tax Report - AJYAL AL-MADINA AL ASRIA
+        </div>
         <div class="container">
-            <h3 style="text-center">
+            <p>
                 Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
-            </h3>
+            </p>
             
             <div class="box">
-                <div class="title">
+                <div class="label">
                     Overall (Input - Output - Expense)
                 </div>
-                <div class="info-text">
+                <div class="value">
                     Output Tax - Input Tax - Expense Tax : {{ number_format($report['tax_diff']) }}
                 </div>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <h1 style="margin-bottom: 15px">Input Tax (Purchase)</h1>
+                <h3 style="margin-bottom: 15px">Input Tax (Purchase)</h3>
 
                 <table border="0">
                     <thead>
@@ -122,8 +121,8 @@
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->transaction_date }}</td>
                                 <td>{{ $item->ref_no }}</td>
-                                <td>{{ $item->c.name }}</td>
-                                <td>{{ $item->c.tax_number }}</td>
+                                <td>{{ $item->contact_name }}</td>
+                                <td>{{ $item->tax_number }}</td>
                                 <td>{{ $item->total_before_tax }}</td>
                                 <td>{{ $item->payment_methods }}</td>
                                 <td>{{ $item->discount_amount }}</td>
@@ -139,7 +138,7 @@
             </div>
 
             <div style="margin-bottom: 20px;">
-                <h1 style="margin-bottom: 15px">Output Tax (Sales)</h1>
+                <h3 style="margin-bottom: 15px">Output Tax (Sales)</h3>
 
                 <table border="0">
                     <thead>
@@ -162,8 +161,8 @@
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->transaction_date }}</td>
                                 <td>{{ $item->invoice_no }}</td>
-                                <td>{{ $item->c.name }}</td>
-                                <td>{{ $item->c.tax_number }}</td>
+                                <td>{{ $item->contact_name }}</td>
+                                <td>{{ $item->tax_number }}</td>
                                 <td>{{ $item->total_before_tax }}</td>
                                 <td>{{ $item->payment_methods }}</td>
                                 <td>{{ $item->discount_amount }}</td>
@@ -179,7 +178,7 @@
             </div>
 
             <div style="margin-bottom: 20px;">
-                <h1 style="margin-bottom: 15px">Expense Tax</h1>
+                <h3 style="margin-bottom: 15px">Expense Tax</h3>
 
                 <table border="0">
                     <thead>
@@ -201,7 +200,7 @@
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->transaction_date }}</td>
                                 <td>{{ $item->ref_no }}</td>
-                                <td>{{ $item->c.tax_number }}</td>
+                                <td>{{ $item->tax_number }}</td>
                                 <td>{{ $item->total_before_tax }}</td>
                                 <td>{{ $item->payment_methods }}</td>
                                 <td>{{ $item->discount_amount }}</td>
