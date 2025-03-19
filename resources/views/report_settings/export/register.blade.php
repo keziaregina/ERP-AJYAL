@@ -80,6 +80,11 @@
         .center {
             text-align: center;
         }
+
+        .total {
+            font-weight: bold;
+            background-color: #f4f7fa;
+        }
         .logo {
             width: 100px;
             height: 100px;
@@ -90,21 +95,19 @@
 <body>
     <header>
         <img class="logo" src="{{ $logo }}" alt="logo">
-        <h1>Ajyal Al - Madina</h1>
+        <h3>Ajyal Al - Madina</h3>
 
         {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
         {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
-
     </header>
     <main>
         <div class="report-title">
-            Register Report - AJYAL AL-MADINA AL ASRIA
+            Registers Report - AJYAL AL-MADINA AL ASRIA
         </div>
         <div class="container">
-            <h3 style="text-center">
+            <p>
                 Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
-            </h3>
-
+            </p>
             <div style="margin-bottom: 20px;">
                 <table border="0">
                     <thead>
@@ -133,7 +136,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($report as $index => $item)
+                        @forelse ($report as $index => $item)
                         @php
                             $total = $item->total_card_payment + $item->total_cheque_payment + $item->total_cash_payment + $item->total_bank_transfer_payment + $item->total_other_payment + $item->total_advance_payment + $item->total_custom_pay_1 + $item->total_custom_pay_2 + $item->total_custom_pay_3 + $item->total_custom_pay_4 + $item->total_custom_pay_5 + $item->total_custom_pay_6 + $item->total_custom_pay_7;;
                         @endphp
@@ -144,24 +147,69 @@
                             <td>{{ $item->status === 'close' ? $item->closed_at : '-' }}</td>
                             <td>{{ $item->location_name }}</td>
                             <td>{!! $item->user_name !!}</td>
-                            <td>{{ $item->total_card_payment }}</td>
-                            <td>{{ $item->total_cheque_payment }}</td>
-                            <td>{{ $item->total_cash_payment }}</td>
-                            <td>{{ $item->total_bank_transfer_payment }}</td>
-                            <td>{{ $item->total_advance_payment }}</td>
+                            <td>{{ number_format($item->total_card_payment ?: '0', 3) }}</td>
+                            <td>{{ number_format($item->total_cheque_payment ?: '0', 3) }}</td>
+                            <td>{{ number_format($item->total_cash_payment ?: '0', 3) }}</td>
+                            <td>{{ number_format($item->total_bank_transfer_payment ?: '0', 3) }}</td>
+                            <td>{{ number_format($item->total_advance_payment ?: '0', 3) }}</td>
                         </tr>
                         <tr>
-                            <td>{{ $item->total_custom_pay_1 }}</td>
-                            <td>{{ $item->total_custom_pay_2 }}</td>
-                            <td>{{ $item->total_custom_pay_3 }}</td>
-                            <td>{{ $item->total_custom_pay_4 }}</td>
-                            <td>{{ $item->total_custom_pay_5 }}</td>
-                            <td>{{ $item->total_custom_pay_6 }}</td>
-                            <td>{{ $item->total_custom_pay_7 }}</td>
-                            <td>{{ $item->total_other_payment }}</td>
-                            <td>{{ $total }}</td>
+                            <td>{{ number_format($item->total_custom_pay_1 ?: '0') }}</td>
+                            <td>{{ number_format($item->total_custom_pay_2 ?: '0') }}</td>
+                            <td>{{ number_format($item->total_custom_pay_3 ?: '0') }}</td>
+                            <td>{{ number_format($item->total_custom_pay_4 ?: '0') }}</td>
+                            <td>{{ number_format($item->total_custom_pay_5 ?: '0') }}</td>
+                            <td>{{ number_format($item->total_custom_pay_6 ?: '0') }}</td>
+                            <td>{{ number_format($item->total_custom_pay_7 ?: '0') }}</td>
+                            <td>{{ number_format($item->total_other_payment ?: '0') }}</td>
+                            <td>{{ number_format($total ?: '0') }}</td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="10">No Data Available</td>
+                        </tr>
+                        @endforelse
+                        <tr class="total">
+                            <td colspan="10">Total</td>
+                        </tr>
+                        <tr class="total">
+                            <td colspan="2">Total Card Slips</td>
+                            <td colspan="2">Total Cheques</td>
+                            <td>Total Cash</td>
+                            <td colspan="2">Total Bank Transfer</td>
+                            <td colspan="2">Total Advance Payment</td>
+                            <td>Cust. Payment 1</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">{{ number_format(collect($report)->sum('total_card_payment') ?: '0', 3) }} SAR</td>
+                            <td colspan="2">{{ number_format(collect($report)->sum('total_cheque_payment') ?: '0', 3) }} SAR</td>
+                            <td>{{ number_format(collect($report)->sum('total_cash_payment') ?: '0', 3) }} SAR</td>
+                            <td colspan="2">{{ number_format(collect($report)->sum('total_bank_transfer_payment') ?: '0', 3) }} SAR</td>
+                            <td colspan="2">{{ number_format(collect($report)->sum('total_advance_payment') ?: '0', 3) }} SAR</td>
+                            <td>{{ number_format(collect($report)->sum('total_custom_pay_1') ?: '0', 3) }} SAR</td>
+                        </tr>
+                        <tr class="total">
+                            <td colspan="2">Cust. Payment 2</td>
+                            <td colspan="2">Cust. Payment 3</td>
+                            <td>Cust. Payment 4</td>
+                            <td colspan="2">Cust. Payment 5</td>
+                            <td colspan="2">Cust. Payment 6</td>
+                            <td>Cust. Payment 7</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">{{ number_format(collect($report)->sum('total_custom_pay_2') ?: '0', 3) }} SAR</td>
+                            <td colspan="2">{{ number_format(collect($report)->sum('total_custom_pay_3') ?: '0', 3) }} SAR</td>
+                            <td>{{ number_format(collect($report)->sum('total_custom_pay_4') ?: '0', 3) }} SAR</td>
+                            <td colspan="2">{{ number_format(collect($report)->sum('total_custom_pay_5') ?: '0', 3) }} SAR</td>
+                            <td colspan="2">{{ number_format(collect($report)->sum('total_custom_pay_6') ?: '0', 3) }} SAR</td>
+                            <td>{{ number_format(collect($report)->sum('total_custom_pay_7') ?: '0', 3) }} SAR</td>
+                        </tr>
+                        <tr class="total">
+                            <td colspan="10">Subtotal</td>
+                        </tr>
+                        <tr>
+                            <td colspan="10">{{ number_format(collect($report)->sum('total') ?: '0', 3) }} SAR</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

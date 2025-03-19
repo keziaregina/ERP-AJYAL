@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
             font-family: Arial, sans-serif;
             text-align: left;
         }
+
         .report-title {
             text-align: center;
             font-size: 18px;
@@ -16,7 +18,7 @@
             margin-bottom: 20px;
         }
 
-        .header-box{
+        .header-box {
             margin-left: 20px;
         }
 
@@ -34,7 +36,8 @@
             border-collapse: collapse;
         }
 
-        .box th, .box td {
+        .box th,
+        .box td {
             border: none;
             text-align: left;
             padding: 10px;
@@ -57,69 +60,84 @@
             border-collapse: collapse;
             margin-top: 10px;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: center;
         }
+
         th {
             background-color: #2C3E50;
             color: white;
             font-weight: bold;
         }
+
         .total-row {
             background-color: #f8f9fa;
             font-weight: bold;
         }
+
         .logo {
             width: 100px;
             height: 100px;
         }
     </style>
 </head>
+
 <body>
 
-    <img class="logo" src="{{ $logo }}" alt="logo">
-    <h1>Ajyal Al - Madina</h1>
+    <header>
+        <img class="logo" src="{{ $logo }}" alt="logo">
+        <h3>Ajyal Al - Madina</h3>
 
-    {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
-    {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
+        {{ Log::info('CUSTOMER & SUPPLIER -------------------------------------------------->') }}
+        {{ Log::info(json_encode($report, JSON_PRETTY_PRINT)) }}
+    </header>
+    <main>
+        <div class="report-title">
+            Expenses Report - AJYAL AL-MADINA AL ASRIA
+        </div>
+        <div class="container">
+            <p>
+                Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+            </p>
 
-    <div class="report-title">
-        Expense Report - AJYAL AL-MADINA AL ASRIA
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Expense Categories</th>
-                <th>Total Expense</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php
-                $total_expense = 0;
-            @endphp
-                @forelse ($report as $index => $item)
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $item['category'] ?: '-' }}</td>
-                        <td>{{ $item['total_expense'] ?: '-' }}</td>
-                        @php
-                            $total_expense += $expense['total_expense'];
-                        @endphp
+                        <th>#</th>
+                        <th>Expense Categories</th>
+                        <th>Total Expense</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="3">No data available in table</td>
+                </thead>
+                <tbody>
+                    @php
+                        $total_expense = 0;
+                    @endphp
+                    @forelse ($report as $index => $item)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $item['category'] ?: '-' }}</td>
+                            <td>{{ $item['total_expense'] ?: '-' }}</td>
+                            @php
+                                $total_expense += $expense['total_expense'];
+                            @endphp
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3">No data available in table</td>
+                        </tr>
+                    @endforelse
+                    <tr class="total-row">
+                        <td colspan="2">Total:</td>
+                        <td>{{ number_format($total_expense, 3) }} SAR</td>
                     </tr>
-                @endforelse
-                <tr class="total-row">
-                    <td colspan="2">Total:</td>
-                    <td>{{ number_format($total_expense, 3) }} SAR</td>
-                </tr>
-        </tbody>
-    </table>
+                </tbody>
+            </table>
+        </div>
+    </main>
 </body>
+
 </html>

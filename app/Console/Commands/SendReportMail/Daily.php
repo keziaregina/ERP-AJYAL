@@ -70,7 +70,7 @@ class Daily extends Command
 
     public function getDay()
     {
-        $start_date = now()->toDateString();
+        $start_date = now()->subDay()->toDateString();
         $end_date = now()->toDateString();
 
         return [

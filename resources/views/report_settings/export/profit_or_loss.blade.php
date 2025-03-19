@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Profit / Loss Report    </title>
+    <title>Profit / Loss Report</title>
 
     <style>
         body {
@@ -20,6 +20,12 @@
             font-size: 15px;
         }
 
+        .report-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
         .card {
             background-color: #f4f7fa;
             border-radius: 8px;
@@ -47,7 +53,7 @@
         }
 
         .label {
-            font-weight: bold;
+            font-size: 16px;
         }
 
         .info {
@@ -102,15 +108,22 @@
 
 <body>
     <header>
-        <img src="{{ $logo }}" alt="logo">
+        <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina</h1>
-        <span class="arabic">{{ env('APP_TITLE') }}</span>
     </header>
+
+    {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
+    {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
+
+    <div class="report-title">
+        Profit / Loss Report - AJYAL AL-MADINA AL ASRIA
+    </div>
+
+    <p>
+        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    </p>
     <main>
         <div class="container">
-            <h3 style="text-center">
-                Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
-            </h3>
             <div class="card">
                 <h3>Purchases</h3>
                 <table>
@@ -122,7 +135,7 @@
                             </div>
                         </td>
 
-                        <td>{{ $report['opening_stock']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ $report['opening_stock']}} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -133,10 +146,10 @@
                         </td>
                         <td>
                             @if(isset($report['opening_stock_by_sp']))
-                                <span class="display_currency" data-currency_symbol="true">{{ $report['opening_stock_by_sp']? $report['opening_stock_by_sp'] : 0 }}</span>
+                                <span class="display_currency" data-currency_symbol="true">{{ number_format($report['opening_stock_by_sp'] ?: 0, 3) }}</span>
                             @else
                                  <span id="opening_stock_by_sp"><i class="fa fa-sync fa-spin fa-fw "></i></span>
-                            @endif<span class="arabic">0</span><span class="arabic">{{ $currency }}</span></td>
+                            @endif<span class="arabic">0</span> SAR</td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -146,7 +159,7 @@
                             </div>
                         </td>
 
-                        <td>{{ $report['total_purchase']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_purchase'] ?: '0', 3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Opening Stock
@@ -155,10 +168,10 @@
                             </div>
                         </td>
                         <td> @if(isset($report['opening_stock_by_sp']))
-                            <span class="display_currency" data-currency_symbol="true">{{ $report['opening_stock_by_sp']? $report['opening_stock_by_sp'] : 0 }}</span>
+                            <span class="display_currency" data-currency_symbol="true">{{ number_format($report['opening_stock_by_sp'] ?: 0, 3) }}</span>
                         @else
                              <span id="opening_stock_by_sp"><i class="fa fa-sync fa-spin fa-fw "></i></span>
-                        @endif<span class="arabic">0</span><span class="arabic">{{ $currency }}</span></td>
+                        @endif<span class="arabic">0</span> SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Total purchase:
@@ -166,53 +179,53 @@
                                 (Exc. tax, Discount)
                             </div>
                         </td>
-                        <td>{{ $report['total_purchase']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_purchase'] ?: '0',3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Total Stock Adjustment: </td>
-                        <td>{{ $report['total_adjustment']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_adjustment'] ?: '0',3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Total Expense: </td>
-                        <td>{{ $report['total_expense']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_expense'] ?: '0',3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Total purchase shipping charge: </td>
-                        <td>{{ $report['total_purchase_shipping_charge']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_purchase_shipping_charge'] ?: '0',3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Purchase additional expenses:  </td>
-                        <td>{{ $report['total_purchase_additional_expense']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_purchase_additional_expense'] ?: '0',3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Total transfer shipping charge:  </td>
-                        <td>{{ $report['total_transfer_shipping_charges']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_transfer_shipping_charges'] ?: '0',3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Total Sell discount:   </td>
-                        <td>{{ $report['total_sell_discount']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_sell_discount'] ?: '0',3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Total customer reward:  </td>
-                        <td>{{ $report['total_reward_amount']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_reward_amount'] ?: '0',3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Total sell return:  </td>
-                        <td>{{ $report['total_sell_return']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_sell_return'] ?: '0',3) }} SAR</td>
                     </tr>
                     {{-- <tr>
                         <td class="label">Total Payroll: </td>
-                        <td>{{ $report['total_payroll']? $data['total_payroll'] : 0 }}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ $report['total_payroll']? $data['total_payroll'] : 0 }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Total Production Cost:  </td>
-                        <td>{{ $report['total_production_cost']? $data['total_production_cost'] : 0 }}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ $report['total_production_cost']? $data['total_production_cost'] : 0 }} SAR</td>
                     </tr> --}}
                      @foreach($report['left_side_module_data'] as $module_data)
                         <tr>
                             <td class="label">{{ $module_data['label'] }}:</td>
                             <td>
-                                <span class="display_currency" data-currency_symbol="true">{{ $module_data['value'] }}<span class="arabic">{{ $currency }}</span></span>
+                                <span class="display_currency" data-currency_symbol="true">{{ number_format($module_data['value'] ?: '0',3) }} SAR</span>
                             </td>
                         </tr>
                     @endforeach
@@ -229,7 +242,7 @@
                                 (By sale price):
                             </div>
                         </td>
-                        <td>{{ $data['closing_stock_by_sp']? $data['closing_stock_by_sp'] : 0 }}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($data['closing_stock_by_sp'] ?: 0, 3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Closing stock
@@ -237,21 +250,22 @@
                                 (By sale price):
                             </div>
                         </td>
-                        <td>{{ $data['closing_stock']? $data['closing_stock'] : 0 }}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($data['closing_stock'] ?: 0, 3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">Total Sales:
                             <div>
-                                (Exc. tax, Discount)
+                                (Exc. tax Discount)
                             </div>
                         </td>
                         <td>
-                            @if(count($report['total_sell_by_subtype']) > 1)
+                            {{ number_format($data['total_sell_by_subtype'] ?: 0, 3) }} SAR
+                            {{-- @if(count($report['total_sell_by_subtype']) > 1)
                             <ul>
                                 @foreach($report['total_sell_by_subtype'] as $sell)
                                     <li>
                                         <span class="display_currency" data-currency_symbol="true">
-                                            {{$sell->total_before_tax}}    
+                                            {{ number_format($sell->total_before_tax ?: '0', 3) }}    
                                         </span>
                                         @if(!empty($sell->sub_type))
                                             &nbsp;<small class="text-muted">({{ucfirst($sell->sub_type)}})</small>
@@ -259,51 +273,50 @@
                                     </li>
                                 @endforeach
                             </ul>
-                            @endif
-
-                            <span class="arabic">{{ $currency }}</span></td>
+                            @endif --}}
+                        </td>
                     </tr>
                     <tr>
                         <td class="label">
                             Total sell shipping charge
                         </td>
-                        <td>{{ $report['total_sell_shipping_charge']? $report['total_sell_shipping_charge'] : 0 }}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_sell_shipping_charge'] ?: '0', 3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">
                             Sell additional expenses
                         </td>
-                        <td>{{ $report['total_sell_additional_expense'] }}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_sell_additional_expense'] ?: '0', 3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">
                             Total Stock Recovered:
                         </td>
-                        <td>{{ $report['total_recovered']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_recovered'] ?: '0', 3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">
                             Total Purchase Return:
                         </td>
-                        <td>{{ $report['total_purchase_return']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_purchase_return'] ?: '0', 3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">
                             Total Purchase discount:
                         </td>
-                        <td>{{ $report['total_purchase_discount']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_purchase_discount'] ?: '0', 3) }} SAR</td>
                     </tr>
                     <tr>
                         <td class="label">
                             Total sell round off:
                         </td>
-                        <td>{{ $report['total_sell_round_off']}}<span class="arabic">{{ $currency }}</span></td>
+                        <td>{{ number_format($report['total_sell_round_off'] ?: '0', 3) }} SAR</td>
                     </tr>
                     @foreach($report['right_side_module_data'] as $module_data)
                         <tr>
                             <td class="label">{{ $module_data['label'] }}:</td>
                             <td>
-                                <span class="display_currency" data-currency_symbol="true">{{ $module_data['value'] }}<span class="arabic">{{ $currency }}</span></span>
+                                <span class="display_currency" data-currency_symbol="true">{{ number_format($module_data['value'] ?: '0', 3) }} SAR</span>
                             </td>
                         </tr>
                     @endforeach
@@ -311,12 +324,12 @@
             </div>
          </div>
           <div class="overall">
-            <h3>COGS: {{ ($report['opening_stock'] - $report['total_purchase'] + $report['closing_stock']) }} <span class="arabic">{{ $currency }}</span></h3>
+            <h3>COGS: {{ number_format(($report['opening_stock'] - $report['total_purchase'] + $report['closing_stock']), 3) }}  SAR</h3>
             <p>
                 Cost of Goods Sold = Starting inventory(opening stock) + purchases − ending inventory(closing stock)
             </p>
            
-            <h3>Gross Profit: {{$report['gross_profit']}} <span class="arabic">{{ $currency }}</span></h3>
+            <h3>Gross Profit: {{ number_format($report['gross_profit'], 3) }}  SAR</h3>
             <p>
                 (Total sell price - Total purchase price)
                 @if(!empty($report['gross_profit_label']))
@@ -326,12 +339,12 @@
                     @endforeach
                 @endif
             </p>
-            <h3>Net Profit: {{$report['net_profit']}} <span class="arabic">{{ $currency }}</span></h3>
+            <h3>Net Profit: {{ number_format($report['net_profit'], 3) }}  SAR</h3>
             <p>
                 Gross Profit + (Total sell shipping charge + Sell additional expenses + Total Stock Recovered + Total Purchase discount +
-Total sell round off )
-- ( Total Stock Adjustment + Total Expense + Total purchase shipping charge + Total transfer shipping charge + Purchase
-additional expenses + Total Sell discount + Total customer reward + Total Payroll + Total Production Cost )
+                Total sell round off )
+                - ( Total Stock Adjustment + Total Expense + Total purchase shipping charge + Total transfer shipping charge + Purchase
+                additional expenses + Total Sell discount + Total customer reward + Total Payroll + Total Production Cost )
             </p>
            {{-- <small class="help-block">@lang('lang_v1.gross_profit') + (@lang('lang_v1.total_sell_shipping_charge') + @lang('lang_v1.sell_additional_expense') + @lang('report.total_stock_recovered') + @lang('lang_v1.total_purchase_discount') + @lang('lang_v1.total_sell_round_off') 
             @foreach($report['right_side_module_data'] as $module_data)

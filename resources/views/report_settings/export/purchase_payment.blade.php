@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trending Products Summary</title>
+    <title>Purchase Payment Summary</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,7 +82,7 @@
     </header>
     <main>
         <div class="report-title">
-            Trending Products Report - AJYAL AL-MADINA AL ASRIA
+            Purchase Payments Report - AJYAL AL-MADINA AL ASRIA
         </div>
         <div class="container">
             <p>
@@ -92,28 +92,35 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Product</th>
-                        <th>SKU</th>
-                        <th>Unit</th>
-                        <th>Total Unit Sold</th>
+                        <th>Ref. No</th>
+                        <th>Paid on</th>
+                        <th>Amount</th>
+                        <th>Supplier</th>
+                        <th>Payment Method</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($report as $index => $item)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td>{{ $item->product }}</td>
-                        <td>{{ $item->sku }}</td>
-                        <td>{{ $item->unit }}</td>
-                        <td>{{ $item->total_unit_sold }}</td>
+                        <td>{{ $item->payment_ref_no }}</td>
+                        <td>{{ $item->paid_no ?: '-' }}</td>
+                        <td>{{ number_format($item->amount, 3) }} SAR</td>
+                        <td>{!! $item->supplier !!}</td>
+                        <td>{{ $item->method }}</td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="14">
+                        <td colspan="6">
                             No Data Available
                         </td>
                     </tr>
                     @endforelse
+                    <tr class="total">
+                        <td colspan="3">Total:</td>
+                        <td>{{ number_format(collect($report)->sum('amount'), 3) }} SAR</td>
+                        <td colspan="2"></td>
+                    </tr>
                 </tbody>
             </table>
         </div>

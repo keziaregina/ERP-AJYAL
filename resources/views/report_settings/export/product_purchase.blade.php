@@ -3,7 +3,69 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Items Summary</title>
+    <title>Product Purchase Summary</title>
+    {{-- <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            /* background-color: #f9f9f9; */
+        }
+
+        header img {
+            width: 100px;
+        }
+
+        header h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #fff;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        .total {
+            font-weight: bold;
+            background-color: #f4f7fa;
+        }
+
+        @font-face {
+            font-family: 'Amiri';
+            src: url("{{ asset('fonts/Amiri-Regular.ttf') }}") format("truetype");
+        }
+
+        .arabic {
+            direction: rtl;
+            text-align: right;
+            font-family: 'Amiri', sans-serif;
+            font-weight: normal;
+        }
+    </style> --}}
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,7 +144,7 @@
     </header>
     <main>
         <div class="report-title">
-            Items Report - AJYAL AL-MADINA AL ASRIA
+            Product Purchase Report - AJYAL AL-MADINA AL ASRIA
         </div>
         <div class="container">
             <p>
@@ -91,72 +153,44 @@
             <table>
                 <thead>
                     <tr>
-                        <th rowspan="2">#</th>
+                        <th>#</th>
                         <th>Product</th>
                         <th>SKU</th>
-                        <th>Purchase Date</th>
-                        <th>Purchase</th>
                         <th>Supplier</th>
-                        <th colspan="2">Purchase Price</th>
-                    </tr>
-                    <tr>
-                        <th>Sell Date</th>
-                        <th>Sale</th>
-                        <th>Customer</th>
-                        <th>Location</th>
-                        <th>Sell Quantity</th>
-                        <th>Selling Price</th>
+                        <th>Ref. No</th>
+                        <th>Date</th>
+                        <th>Quantity</th>
+                        <th>Total Unit Adjusted</th>
+                        <th>Unit Purchase Price</th>
                         <th>Subtotal</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($report as $index => $item)
-                    @php
-                        $sell_date = \Carbon\Carbon::parse($item->sell_date);
-                    @endphp
                     <tr>
-                        <td rowspan="2">{{ $index + 1 }}</td>
+                        <td>{{ $index + 1 }}</td>
                         <td>{{ $item->product_name }}</td>
-                        <td>{{ $item->sku }}</td>
-                        <td>{{ $item->purchase_date }}</td>
-                        <td>{{ $item->purchase_ref_no }}</td>
+                        <td>{{ $item->sub_sku }}</td>
                         <td>{{ $item->supplier }}</td>
-                        <td colspan="2">{{ number_format($item->purchase_price, 3) }} SAR</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {{ $sell_date->format('Y-m-d') }}
-                            <br>
-                            {{ $sell_date->format('H:i:s') }}
-                        </td>
-                        <td>{{ $item->sale_invoice_no }}</td>
-                        <td>{{ $item->customer }}</td>
-                        <td>{{ $item->location }}</td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>{{ number_format($item->selling_price, 3) }} SAR</td>
+                        <td>{{ $item->ref_no }}</td>
+                        <td>{{ $item->transaction_date }}</td>
+                        <td>{{ $item->purchase_qty }}</td>
+                        <td>{{ $item->quantity_adjusted }}</td>
+                        <td>{{ number_format($item->unit_purchase_price, 3) }} SAR</td>
                         <td>{{ number_format($item->subtotal, 3) }} SAR</td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="14">
+                        <td colspan="13">
                             No Data Available
                         </td>
                     </tr>
                     @endforelse
                     <tr class="total">
-                        <td colspan="8">Total:</td>
-                    </tr>
-                    <tr class="total">
-                        <td colspan="2">Purchase Price</td>
-                        <td colspan="2">Quantity</td>
-                        <td colspan="2">Selling Price</td>
-                        <td colspan="2">Subtotal</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">{{ number_format(collect($report)->sum('purchase_price'), 3) }} SAR</td>
-                        <td colspan="2">{{ collect($report)->sum('quantity') }}</td>
-                        <td colspan="2">{{ number_format(collect($report)->sum('row_selling_price'), 3) }} SAR</td>
-                        <td colspan="2">{{ number_format(collect($report)->sum('subtotal'), 3) }} SAR</td>
+                        <td colspan="6">Total:</td>
+                        <td>{{ number_format(collect($report)->sum('quantity_adjusted'), 3) }} SAR</td>
+                        <td colspan="2"></td>
+                        <td>{{ number_format(collect($report)->sum('subtotal'), 3) }} SAR</td>
                     </tr>
                 </tbody>
             </table>

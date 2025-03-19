@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Profit / Loss Report    </title>
+    <title>Activity Logs Report    </title>
 
     <style>
         body {
@@ -18,6 +18,13 @@
 
         header h1 {
             font-size: 15px;
+        }
+
+        .report-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
 
         .card {
@@ -110,6 +117,7 @@ table {
         th, td {
             padding: 10px;
             border: 1px solid #ddd;
+            text-align: center;
         }
 
         tbody tr:nth-child(even) {
@@ -128,35 +136,53 @@ table {
     <header>
         <img src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina</h1>
-        <span class="arabic">{{ env('APP_TITLE') }}</span>
+        {{-- <span class="arabic">{{ env('APP_TITLE') }}</span> --}}
+
+        {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
+        {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
     </header>
     <main>
+
+        <div class="report-title">
+            Activity Logs Report - AJYAL AL-MADINA AL ASRIA
+        </div>
+
+        <p>
+            Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+        </p>
+
         <div class="container">
-            <h3 style="text-center">
-                Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
-            </h3>
-        <h3>Activity Log</h3>
         <div class="table-responsive">
             <table class="table table-bordered table-striped" id="activity_log_table">
                 <thead>
                     <tr>
-                        <th>date</th>
-                        <th>subject type</th>
-                        <th>action</th>
-                        <th>by</th>
-                        <th>note</th>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Subject Type</th>
+                        <th>Action</th>
+                        <th>By</th>
+                        <th>Note</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($report as $activity)
+                    @forelse ($report as $index => $activity)
                     <tr>
-                        <td>{{ $activity->created_at }}</td>
+                        <td>{{ $index + 1 }}</td>
+                        <td>
+                            {{ $activity->created_at->format('Y-m-d') }}
+                            <br>
+                            {{ $activity->created_at->format('H:i:s') }}
+                        </td>
                         <td>{{ $activity->subject_type }}</td>
                         <td>{{ $activity->description }}</td>
                         <td>{{ $activity->created_by }}</td>
-                        <td class="arabic">{!! $activity->note !!}</td>
+                        <td class="arabic">{!! $activity->note ?: '-' !!}</td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td>No Data Available</td>
+                    </tr>
+                    @endforelse
                     
                 </tbody>
                 

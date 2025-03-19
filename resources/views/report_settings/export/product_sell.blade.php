@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trending Products Summary</title>
+    <title>Product Sell Summary</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,7 +82,7 @@
     </header>
     <main>
         <div class="report-title">
-            Trending Products Report - AJYAL AL-MADINA AL ASRIA
+            Product Sells Report - AJYAL AL-MADINA AL ASRIA
         </div>
         <div class="container">
             <p>
@@ -94,26 +94,48 @@
                         <th>#</th>
                         <th>Product</th>
                         <th>SKU</th>
-                        <th>Unit</th>
-                        <th>Total Unit Sold</th>
+                        <th>Customer Name</th>
+                        <th>Contact ID</th>
+                        <th>Invoice No.</th>
+                        <th>Date</th>
+                        <th>Unit Price</th>
+                        <th>Discount</th>
+                        <th>Tax</th>
+                        <th>Price (Inc. Tax)</th>
+                        <th>Total</th>
+                        <th>Payment Method</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($report as $index => $item)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td>{{ $item->product }}</td>
-                        <td>{{ $item->sku }}</td>
-                        <td>{{ $item->unit }}</td>
-                        <td>{{ $item->total_unit_sold }}</td>
+                        <td>{{ $item->product_name }}</td>
+                        <td>{{ $item->sub_sku }}</td>
+                        <td>{{ $item->customer }}</td>
+                        <td>{{ $item->contact_id }}</td>
+                        <td>{{ $item->invoice_no }}</td>
+                        <td>{{ $item->transaction_date }}</td>
+                        <td>{{ $item->sell_qty }}</td>
+                        <td>{{ $item->unit_price }}</td>
+                        <td>{{ $item->discount_amount }}</td>
+                        <td>{{ $item->tax }}</td>
+                        <td>{{ number_format($item->unit_sale_price, 3) }} SAR</td>
+                        <td>{{ number_format($item->subtotal, 3) }} SAR</td>
+                        <td>{{ $item->payment_methods }}</td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="14">
+                        <td colspan="13">
                             No Data Available
                         </td>
                     </tr>
                     @endforelse
+                    <tr class="total">
+                        <td colspan="11">Total:</td>
+                        <td>{{ number_format(collect($report)->sum('subtotal'), 3) }} SAR</td>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
         </div>

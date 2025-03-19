@@ -9,6 +9,13 @@
             font-family: Arial, sans-serif;
             text-align: left;
         }
+        header img {
+            width: 100px;
+        }
+
+        header h1 {
+            font-size: 15px;
+        }
         .report-title {
             text-align: center;
             font-size: 18px;
@@ -38,19 +45,33 @@
             width: 100px;
             height: 100px;
         }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
     </style>
 </head>
 <body>
 
-    <img class="logo" src="{{ $logo }}" alt="logo">
-    <h1>Ajyal Al - Madina</h1>
+    <header>
+        <img class="logo" src="{{ $logo }}" alt="logo">
+        <h1>Ajyal Al - Madina</h1>
+    </header>
 
-    {{-- {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
-    {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }} --}}
+    {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
+    {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
 
     <div class="report-title">
         Customer Group Report - AJYAL AL-MADINA AL ASRIA
     </div>
+
+    <p>
+        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    </p>
 
     <table>
         <thead>
@@ -63,11 +84,11 @@
             @forelse ($report as $item)
                 <tr>
                     <td>{{ $item['name'] }}</td>
-                    <td>{{ $item['total_sell'] }} SAR</td>
+                    <td>{{ number_format($item['total_sell'], 3) }} SAR</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="2">No data found</td>
+                    <td colspan="2">No Data Available</td>
                 </tr>
             @endforelse
             

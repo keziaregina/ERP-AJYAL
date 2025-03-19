@@ -2,15 +2,42 @@
 
 namespace App\Console\Commands\SendReportMail;
 
-use App\Mail\Reporting;
-use App\Mail\Reporting2;
-use App\ReportSettings;
 use App\User;
+use App\Mail\Reporting;
+use App\ReportSettings;
+use App\Mail\Reporting2;
+use App\Utils\ModuleUtil;
+use App\Utils\ProductUtil;
+use App\Utils\BusinessUtil;
+use App\Utils\TransactionUtil;
 use Illuminate\Console\Command;
+use App\Services\ReportEmailService;
 use Illuminate\Support\Facades\Mail;
 
 class Yearly extends Command
 {
+    public $transactionUtil;
+    public $productUtil;
+    public $businessUtil;
+    public $moduleUtil;
+    public $reportEmailService;
+
+    public $filename;
+    
+    public $logo;
+
+    public function __construct(TransactionUtil $transactionUtil, ModuleUtil $moduleUtil, ProductUtil $productUtil, BusinessUtil $businessUtil, ReportEmailService $reportEmailService)
+    {
+        parent::__construct();
+        $this->transactionUtil = $transactionUtil;
+        $this->moduleUtil = $moduleUtil;
+        $this->productUtil = $productUtil;
+        $this->businessUtil = $businessUtil;
+        $this->logo = public_path('img/logo-small.png');
+        $this->reportEmailService = $reportEmailService;
+        // $this->filename = storage_path('app/public/pdf/report/Ajyal Al-Madina.pdf');
+    }
+    
     /**
      * The name and signature of the console command.
      *
@@ -33,15 +60,20 @@ class Yearly extends Command
     public function handle()
     {
         $datas = ReportSettings::where('interval', 'yearly')->get();
-        foreach ($datas as $data) {
-            $email = User::find($data->user_id);
-            if ($data->type === 'tax_report') {
-                Mail::to($email)->queue(new Reporting($data));
-            } else {
-                Mail::to($email)->queue(new Reporting2($data));
-            }
-        }
 
-        return 'Berhasil';
+        foreach ($datas as $data) {
+            $this->reportEmailService->generateReportAttachment($data, $this->getDay(), $data->interval);
+        }
+    }
+
+    public function getDay()
+    {
+        $start_date = now()->startOfYear()->toDateString();
+        $end_date = now()->endOfYear()->toDateString();
+
+        return [
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+        ];
     }
 }
