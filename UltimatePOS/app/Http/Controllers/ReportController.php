@@ -30,6 +30,7 @@ use Datatables;
 use DB;
 use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
+use Illuminate\Support\Facades\Log;
 
 class ReportController extends Controller
 {
@@ -109,7 +110,9 @@ class ReportController extends Controller
             $data = $this->transactionUtil->getProfitLossDetails($business_id, $location_id, $start_date, $end_date, $user_id, $permitted_locations);
     
             // $data['closing_stock'] = $data['closing_stock'] - $data['total_sell_return'];
-
+ 
+            Log::info("PROFIT OR LOSS DATA PAGE -------------------------------------------------->");
+            Log::info(json_encode($data,JSON_PRETTY_PRINT));
             return view('report.partials.profit_loss_details', compact('data'))->render();
         }
 

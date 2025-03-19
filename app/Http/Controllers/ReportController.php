@@ -3335,7 +3335,7 @@ class ReportController extends Controller
 
             $only_mfg_products = request()->get('only_mfg_products', 0);
             if (! empty($only_mfg_products)) {
-                $query->where('purchase.type', 'production_purchase');
+                $query->where('purchase.type', 'prodgetproductPurchaseReportuction_purchase');
             }
 
             return Datatables::of($query)

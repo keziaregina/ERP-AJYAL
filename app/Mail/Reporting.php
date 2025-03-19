@@ -22,6 +22,8 @@ class Reporting extends Mailable implements ShouldQueue
     public $user;
     public $path;
     public $type;
+
+    public $report_type;
     /**
      * Create a new message instance.
      *
@@ -30,8 +32,9 @@ class Reporting extends Mailable implements ShouldQueue
     public function __construct(ReportSettings $report_settings, $filename,$type)
     {
         $this->data = $report_settings;
-        Log::info("data --->");
-        Log::info(json_encode($this->data,JSON_PRETTY_PRINT));
+        $this->report_type = $report_settings->report_type;
+        // Log::info("data inside mail--->");
+        // Log::info(json_encode($this->data,JSON_PRETTY_PRINT));
         $this->user = User::find($this->data->user_id);
         $this->path = $filename;
         $this->type = $type;
@@ -45,7 +48,7 @@ class Reporting extends Mailable implements ShouldQueue
     public function envelope()
     {
         return new Envelope(
-            subject: 'Reporting '.$this->type,
+            subject: 'Reporting '. $this->report_type,
             metadata: [
                 'type' => $this->type,
             ],
@@ -64,7 +67,7 @@ class Reporting extends Mailable implements ShouldQueue
             with: [
                 'path' => $this->path,
                 'interval' => $this->data->interval,
-                'report_type' => $this->data->report_type
+                'report_type' => $this->report_type
             ],
         );
     }
