@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+use App\User;
 use App\Contact;
 use App\Product;
 use App\TaxRate;
