@@ -63,7 +63,7 @@
             @forelse ($report as $item)
                 <tr>
                     <td>{{ $item['name'] }}</td>
-                    <td>{{ $item['total_sell'] }} SAR</td>
+                    <td>{{ number_format($item['total_sell'], 3) }} SAR</td>
                 </tr>
             @empty
                 <tr>

@@ -9,6 +9,7 @@ use App\Transaction;
 use App\PurchaseLine;
 use App\Mail\Reporting;
 use App\Utils\ModuleUtil;
+use App\SellingPriceGroup;
 use App\Utils\ProductUtil;
 use App\TransactionPayment;
 use App\Utils\BusinessUtil;
@@ -89,10 +90,14 @@ class ReportEmailService
                 $report = $this->getCustomerGroupReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
+            // DONE
             case 'stock_report':
                 $type = 'stock';
-                $data['report_type'] = 'Stock';
-                $report = $this->getStockValue($user, $dates['start_date'], $dates['end_date']);
+                $data['report_type'] = 'Stocks Summary';
+                    $report = [
+                        'stock_report' => $this->getStockReport($user, $dates['start_date'], $dates['end_date']),
+                        'stock_value' => $this->getStockValue($user, $dates['start_date'], $dates['end_date']),
+                    ];
                 break;
 
             // FIXME: data on pdf
@@ -114,36 +119,48 @@ class ReportEmailService
             //     $data['report_type'] = 'Contacts Summary';
             //     break;
 
-            // FIXME: data on pdf and layout
+            // DONE
             case 'items_report':
                 $type = 'items_report';
                 $data['report_type'] = 'Items Report';
                 $report = $this->getItemsReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
-            // FIXME: data on pdf and layout
+            // DONE
             case 'product_purchase_report':
-                $type = 'product_purchase_report';
+                $type = 'product_purchase';
                 $data['report_type'] = 'Product Purchase Report';
                 $report = $this->getProductPurchaseReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
-            // FIXME: data on pdf and layout
+            // DONE
             case 'product_sell_report':
-                $type = 'product_sell_report';
+                $type = 'product_sell';
                 $data['report_type'] = 'Product Sell Report';
                 $report = $this->getProductSellReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
-            // FIXME: data on pdf and layout
+            // DONE
             case 'purchase_payment_report':
-                $type = 'purchase_payment_report';
+                $type = 'purchase_payment';
                 $data['report_type'] = 'Purchase Payment Report';
                 $report = $this->getPurchasePaymentReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
+            // DONE
             case 'sales_representative':
                 $type = 'sales_representative';
+                $data['report_type'] = 'Sales Representative Summary';
+                    $report = [
+                        'overall' => [
+                            'sell' => $this->getSalesRepresentativeTotalSell($user, $dates['start_date'], $dates['end_date'], null),
+                            'expense' => $this->getSalesRepresentativeTotalExpense($user, $dates['start_date'], $dates['end_date'], null)
+                        ],
+                        'collection' => [
+                            'expense' => $this->getSalesRepresentativeExpenseCollection($user, $dates['start_date'], $dates['end_date'], null)->get(),
+                            'sales' => $this->getSalesRepresentativeSalesCollection($user, $dates['start_date'], $dates['end_date'], null)->get(),
+                        ]
+                    ];
                 break;
 
             case 'register_report':
@@ -152,11 +169,14 @@ class ReportEmailService
                 $report = $this->getRegisterReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
+            // need chart
             case 'expense_report':
                 $type = 'expense';
-                $data['report_type'] = 'Expense';
+                $data['report_type'] = 'Expenses Summary';
+                $report = $this->getExpenseReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
+            // DONE
             case 'activity_log':
                 $type = 'activity_log';
                 $data['report_type'] = 'Activity Log';
@@ -248,7 +268,7 @@ class ReportEmailService
                 $html .= __('sale.invoice_no') . ': ' . $row->subject->invoice_no . '<br>';
             }
     
-            if ($row->subject_type === \App\Models\Transaction::class && in_array($row->subject?->type, ['sell', 'purchase'])) {
+            if ($row->subject_type === \App\Transaction::class && in_array($row->subject?->type, ['sell', 'purchase'])) {
                 $html .= view('sale_pos.partials.activity_row', [
                     'activity' => $row,
                     'statuses' => $statuses,
@@ -335,6 +355,36 @@ class ReportEmailService
             'total_sell_return' => $total_sell_return_inc_tax,
             'difference' => $difference,
         ];
+    }
+
+    public function getStockReport(User $user, $start_date = null, $end_date = null)
+    {
+        $business_id = $user->business_id;
+
+        $selling_price_groups = SellingPriceGroup::where('business_id', $business_id)->get();
+        $allowed_selling_price_group = false;
+        foreach ($selling_price_groups as $selling_price_group) {
+            if ($user->can('selling_price_group.'.$selling_price_group->id)) {
+                $allowed_selling_price_group = true;
+                break;
+            }
+        }
+        if ($this->moduleUtil->isModuleInstalled('Manufacturing') && ($user->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'manufacturing_module'))) {
+            $show_manufacturing_data = 1;
+        } else {
+            $show_manufacturing_data = 0;
+        }
+        $filters = request()->only(['location_id', 'category_id', 'sub_category_id', 'brand_id', 'unit_id', 'tax_id', 'type',
+            'only_mfg_products', 'active_state',  'not_for_selling', 'repair_model_id', 'product_id', 'active_state', ]);
+
+        $filters['not_for_selling'] = isset($filters['not_for_selling']) && $filters['not_for_selling'] == 'true' ? 1 : 0;
+
+        $filters['show_manufacturing_data'] = $show_manufacturing_data;
+
+
+        $products = $this->productUtil->getProductStockDetailsReport($user, $business_id, $filters);
+
+        return $products;
     }
 
     public function getStockValue(User $user, $start_date = null, $end_date = null, $location_id = null)
@@ -905,5 +955,184 @@ class ReportEmailService
 
         
     }
+
+    public function getSalesRepresentativeTotalSell(User $user, $start_date = null, $end_date = null, $location_id = null, $contact_id = null)
+    {
+        $business_id = $user->business_id;
+
+        $start_date = $start_date;
+        $end_date = $end_date;
+
+        $location_id = $location_id;
+        $created_by = null;
+
+        $sell_details = $this->transactionUtil->getSellTotals($business_id, $start_date, $end_date, $location_id, $created_by);
+
+        //Get Sell Return details
+        $transaction_types = [
+            'sell_return',
+        ];
+        $sell_return_details = $this->transactionUtil->getTransactionTotals(
+            $business_id,
+            $transaction_types,
+            $start_date,
+            $end_date,
+            $location_id,
+            $created_by
+        );
+
+        $total_sell_return = ! empty($sell_return_details['total_sell_return_exc_tax']) ? $sell_return_details['total_sell_return_exc_tax'] : 0;
+        $total_sell = $sell_details['total_sell_exc_tax'] - $total_sell_return;
+
+        return [
+            'total_sell_exc_tax' => $sell_details['total_sell_exc_tax'],
+            'total_sell_return_exc_tax' => $total_sell_return,
+            'total_sell' => $total_sell,
+        ];
+    }
+
+    public function getSalesRepresentativeTotalExpense(User $user, $start_date = null, $end_date = null, $location_id = null, $contact_id = null)
+    {
+        $business_id = $user->business_id;
+
+        $filters = [
+            'location_id' => $location_id,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+        ];
+
+        $total_expense = $this->transactionUtil->getExpenseReport($business_id, $filters, 'total');
+
+        return $total_expense;
+    }
+
+    public function getSalesRepresentativeTotalCommission(User $user, $start_date = null, $end_date = null, $location_id = null, $contact_id = null)
+    {
+        $business_id = $user->business_id;
+
+        $start_date = $start_date;
+        $end_date = $end_date;
+
+        $location_id = $location_id;
+        $commission_agent = null;
+
+        $business_details = $this->businessUtil->getDetails($business_id);
+        $pos_settings = empty($business_details->pos_settings) ? $this->businessUtil->defaultPosSettings() : json_decode($business_details->pos_settings, true);
+
+        $commsn_calculation_type = empty($pos_settings['cmmsn_calculation_type']) || $pos_settings['cmmsn_calculation_type'] == 'invoice_value' ? 'invoice_value' : $pos_settings['cmmsn_calculation_type'];
+
+        $commission_percentage = $user->cmmsn_percent;
+
+        if ($commsn_calculation_type == 'payment_received') {
+            $payment_details = $this->transactionUtil->getTotalPaymentWithCommissionExport($user, $business_id, $start_date, $end_date, $location_id, $commission_agent);
+
+            //Get Commision
+            $total_commission = $commission_percentage * $payment_details['total_payment_with_commission'] / 100;
+
+            return ['total_payment_with_commission' => $payment_details['total_payment_with_commission'] ?? 0,
+                'total_commission' => $total_commission,
+                'commission_percentage' => $commission_percentage,
+            ];
+        }
+
+        $sell_details = $this->transactionUtil->getTotalSellCommissionExport($user, $business_id, $start_date, $end_date, $location_id, $commission_agent);
+
+        //Get Commision
+        $total_commission = $commission_percentage * $sell_details['total_sales_with_commission'] / 100;
+
+        return ['total_sales_with_commission' => $sell_details['total_sales_with_commission'],
+            'total_commission' => $total_commission,
+            'commission_percentage' => $commission_percentage,
+        ];
+    }
+
+    public function getSalesRepresentativeExpenseCollection(User $user, $start_date = null, $end_date = null, $location_id = null, $contact_id = null)
+    {
+        $business_id = $user->business_id;
+
+        $expenses = Transaction::leftJoin('expense_categories AS ec', 'transactions.expense_category_id', '=', 'ec.id')
+                    ->leftJoin('expense_categories AS esc', 'transactions.expense_sub_category_id', '=', 'esc.id')
+                    ->join(
+                        'business_locations AS bl',
+                        'transactions.location_id',
+                        '=',
+                        'bl.id'
+                    )
+                    ->leftJoin('tax_rates as tr', 'transactions.tax_id', '=', 'tr.id')
+                    ->leftJoin('users AS U', 'transactions.expense_for', '=', 'U.id')
+                    ->leftJoin('users AS usr', 'transactions.created_by', '=', 'usr.id')
+                    ->leftJoin('contacts AS c', 'transactions.contact_id', '=', 'c.id')
+                    ->leftJoin(
+                        'transaction_payments AS TP',
+                        'transactions.id',
+                        '=',
+                        'TP.transaction_id'
+                    )
+                    ->where('transactions.business_id', $business_id)
+                    ->whereIn('transactions.type', ['expense', 'expense_refund'])
+                    ->select(
+                        'transactions.id',
+                        'transactions.document',
+                        'transaction_date',
+                        'ref_no',
+                        'ec.name as category',
+                        'esc.name as sub_category',
+                        'payment_status',
+                        'additional_notes',
+                        'final_total',
+                        'transactions.is_recurring',
+                        'transactions.recur_interval',
+                        'transactions.recur_interval_type',
+                        'transactions.recur_repetitions',
+                        'transactions.subscription_repeat_on',
+                        'bl.name as location_name',
+                        DB::raw("CONCAT(COALESCE(U.surname, ''),' ',COALESCE(U.first_name, ''),' ',COALESCE(U.last_name,'')) as expense_for"),
+                        DB::raw("CONCAT(tr.name ,' (', tr.amount ,' )') as tax"),
+                        DB::raw('SUM(TP.amount) as amount_paid'),
+                        DB::raw("CONCAT(COALESCE(usr.surname, ''),' ',COALESCE(usr.first_name, ''),' ',COALESCE(usr.last_name,'')) as added_by"),
+                        'transactions.recur_parent_id',
+                        'c.name as contact_name',
+                        'transactions.type'
+                    )
+                    ->with(['recurring_parent'])
+                    ->groupBy('transactions.id');
+
+        $expenses->whereDate('transaction_date', '>=', $start_date)
+                ->whereDate('transaction_date', '<=', $end_date)
+                ->get();
+
+        return $expenses;
+    }
+
+    public function getSalesRepresentativeSalesCollection(User $user, $start_date = null, $end_date = null, $location_id = null, $contact_id = null)
+    {
+        $business_id = $user->business_id;
+        $sells = $this->transactionUtil->getListSells($business_id, null);
+
+        $permitted_locations = $user->permitted_locations();
+            if ($permitted_locations != 'all') {
+                $sells->whereIn('transactions.location_id', $permitted_locations);
+            }
+
+        $sells->whereDate('transactions.transaction_date', '>=', $start_date)
+                ->whereDate('transactions.transaction_date', '<=', $end_date);
+
+        return $sells;
+    }
     
+    public function getExpenseReport(User $user, $start_date = null, $end_date = null, $location_id = null, $contact_id = null)
+    {
+        $business_id = $user->business_id;
+
+        $start_date = $start_date;
+        $end_date = $end_date;
+
+        $filters = [
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+        ];
+        $expenses = $this->transactionUtil->getExpenseReport($business_id, $filters);
+
+        return $expenses;
+    }
 }

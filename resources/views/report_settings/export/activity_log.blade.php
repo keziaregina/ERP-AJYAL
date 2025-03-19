@@ -140,11 +140,11 @@ table {
             <table class="table table-bordered table-striped" id="activity_log_table">
                 <thead>
                     <tr>
-                        <th>date</th>
-                        <th>subject type</th>
-                        <th>action</th>
-                        <th>by</th>
-                        <th>note</th>
+                        <th>Date</th>
+                        <th>Subject Type</th>
+                        <th>Action</th>
+                        <th>By</th>
+                        <th>Note</th>
                     </tr>
                 </thead>
                 <tbody>

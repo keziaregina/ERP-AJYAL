@@ -29,7 +29,6 @@ use App\Events\TransactionPaymentDeleted;
 use App\Events\TransactionPaymentUpdated;
 use App\TransactionSellLinesPurchaseLines;
 use App\Exceptions\AdvanceBalanceNotAvailable;
-use App\User;
 
 class TransactionUtil extends Util
 {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Items Summary</title>
+    <title>Product Purchase Summary</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -81,16 +81,12 @@
                     <tr>
                         <th>Product</th>
                         <th>SKU</th>
-                        <th>Purchase Date</th>
-                        <th>Purchase</th>
                         <th>Supplier</th>
-                        <th>Purchase Price</th>
-                        <th>Sell Date</th>
-                        <th>Sale</th>
-                        <th>Customer</th>
-                        <th>Location</th>
-                        <th>Sell Quantity</th>
-                        <th>Selling Price</th>
+                        <th>Ref. No</th>
+                        <th>Date</th>
+                        <th>Quantity</th>
+                        <th>Total Unit Adjusted</th>
+                        <th>Unit Purchase Price</th>
                         <th>Subtotal</th>
                     </tr>
                 </thead>
@@ -98,17 +94,13 @@
                     @forelse ($report as $item)
                     <tr>
                         <td>{{ $item->product_name }}</td>
-                        <td>{{ $item->sku }}</td>
-                        <td>{{ $item->purchase_date }}</td>
-                        <td>{{ $item->purchase_ref_no }}</td>
+                        <td>{{ $item->sub_sku }}</td>
                         <td>{{ $item->supplier }}</td>
-                        <td>{{ number_format($item->purchase_price, 3) }} SAR</td>
-                        <td>{{ $item->sell_date }}</td>
-                        <td>{{ $item->sale_invoice_no }}</td>
-                        <td>{{ $item->customer }}</td>
-                        <td>{{ $item->location }}</td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>{{ number_format($item->selling_price, 3) }} SAR</td>
+                        <td>{{ $item->ref_no }}</td>
+                        <td>{{ $item->transaction_date }}</td>
+                        <td>{{ $item->purchase_qty }}</td>
+                        <td>{{ $item->quantity_adjusted }}</td>
+                        <td>{{ number_format($item->unit_purchase_price, 3) }} SAR</td>
                         <td>{{ number_format($item->subtotal, 3) }} SAR</td>
                     </tr>
                     @empty
@@ -119,11 +111,9 @@
                     </tr>
                     @endforelse
                     <tr class="total">
-                        <td colspan="7">Total:</td>
-                        <td>{{ number_format(collect($report)->sum('purchase_price'), 3) }} SAR</td>
-                        <td colspan="4"></td>
-                        <td>{{ collect($report)->sum('quantity') }}</td>
-                        <td>{{ number_format(collect($report)->sum('row_selling_price'), 3) }} SAR</td>
+                        <td colspan="5">Total:</td>
+                        <td>{{ number_format(collect($report)->sum('quantity_adjusted'), 3) }} SAR</td>
+                        <td colspan="2"></td>
                         <td>{{ number_format(collect($report)->sum('subtotal'), 3) }} SAR</td>
                     </tr>
                 </tbody>
