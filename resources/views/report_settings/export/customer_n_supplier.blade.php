@@ -9,6 +9,14 @@
             font-family: Arial, sans-serif;
             text-align: left;
         }
+
+        header img {
+            width: 100px;
+        }
+
+        header h1 {
+            font-size: 15px;
+        }
         .report-title {
             text-align: center;
             font-size: 18px;
@@ -38,12 +46,22 @@
             width: 100px;
             height: 100px;
         }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
     </style>
 </head>
 <body>
 
-    <img class="logo" src="{{ $logo }}" alt="logo">
-    <h1>Ajyal Al - Madina</h1>
+    <header>
+        <img class="logo" src="{{ $logo }}" alt="logo">
+        <h1>Ajyal Al - Madina</h1>
+    </header>
 
     {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
     {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
@@ -52,9 +70,14 @@
         Customers - Suppliers Report - AJYAL AL-MADINA AL ASRIA
     </div>
 
+    <p>
+        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    </p>
+
     <table>
         <thead>
             <tr>
+                <th>#</th>
                 <th>Contact</th>
                 <th>Total Purchase</th>
                 <th>Total Purchase Return</th>
@@ -65,8 +88,9 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($report as $item)
+            @forelse ($report as $index => $item)
                 <tr>
+                    <td>{{ $index + 1 }}</td>
                     <td>{{ $item['name'] }}</td>
                     <td>{{ number_format($item['total_purchase'], 3) }} SAR</td>
                     <td>{{ number_format($item['total_purchase_return'], 3) }} SAR</td>
@@ -75,11 +99,15 @@
                     <td>{{ number_format($item['opening_balance'], 3) }} SAR</td>
                     <td>{{ $item['due'] }} SAR</td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="8">No Data Available</td>
+                </tr>
+            @endforelse
             
             {{-- Total Row --}}
             <tr class="total-row">
-                <td>Total:</td>
+                <td colspan="2">Total:</td>
                 <td>{{ number_format(collect($report)->sum('total_purchase'), 3) }} SAR</td>
                 <td>{{ number_format(collect($report)->sum('total_purchase_return'), 3) }} SAR</td>
                 <td>{{ number_format(collect($report)->sum('total_invoice'), 3) }} SAR</td>

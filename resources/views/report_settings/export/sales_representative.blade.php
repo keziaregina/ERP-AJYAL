@@ -78,17 +78,21 @@
     </style>
 </head>
 <body>
+    <header>
+        <img class="logo" src="{{ $logo }}" alt="logo">
+        <h3>Ajyal Al - Madina</h3>
 
-    <img class="logo" src="{{ $logo }}" alt="logo">
-    <h1>Ajyal Al - Madina</h1>
+        {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
+        {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
+    </header>
+    <main>
+        <div class="report-title">
+            Slaes Representative Report - AJYAL AL-MADINA AL ASRIA
+        </div>
 
-    {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
-    {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
-
-    <div class="report-title">
-        Sales Representative Report - AJYAL AL-MADINA AL ASRIA
-    </div>
-
+        <p>
+            Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+        </p>
     <div>
         <div class="box">
             <h3 class="header-box">Summary</h3>
@@ -156,6 +160,7 @@
                         <div>Sell Due ~ {{ number_format(collect($report['collection']['sales'])->sum('payment_due'), 3) }} SAR</div>
                         <div>Sell Return Due ~ {{ number_format(collect($report['collection']['sales'])->sum('sell_return_due'), 3) }} SAR</div>
                     </td>
+                    <td></td>
                 </tr>
         </tbody>
     </table>
@@ -201,5 +206,6 @@
         </tbody>
     </table>
 
+    </main>
 </body>
 </html>

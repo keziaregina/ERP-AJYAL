@@ -56,19 +56,21 @@ class ReportEmailService
 
         switch ($data->type) {
             
-            // FIXME: data on pdf
+            // DONE (need table)
             case 'profit_or_loss_report':
                 $type = 'profit_or_loss';
                 $data['report_type'] = 'Profit / Loss';
                 $report = $this->getProfitOrLossReport($user, $dates['start_date'], $dates['end_date']);
                 break;
                 
+            // DONE
             case 'purchase_n_sell_report':
                 $type = 'purchase_n_sale';
                 $data['report_type'] = 'Purchase & Sales Summary';
                 $report = $this->getPurchaseSellReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
+            // DONE (Need check in last 3 headers )
             case 'tax_report':
                 $type = 'tax';
                 $data['report_type'] = 'Tax';
@@ -76,14 +78,14 @@ class ReportEmailService
                 break;
 
                 
-            // FIXME: fix customer & supplier report arabic and logo
+            // DONE
             case 'customer_n_supplier_report':
                 $type = 'customer_n_supplier';
                 $data['report_type'] = 'Customer & Supplier';
                 $report = $this->getCustomerSupplierReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
-            // FIXME: fix customer group report arabic and logo
+            // DONE
             case 'customer_group_report':
                 $type = 'customer_group';
                 $data['report_type'] = 'Customer Group';
@@ -100,24 +102,19 @@ class ReportEmailService
                     ];
                 break;
 
-            // FIXME: data on pdf
+            // DONE
             case 'stock_adjustment_report':
                 $type = 'stock_adjustment';
                 $data['report_type'] = 'Stock Adjustment';
                 $report = $this->getStockAdjustmentReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
-            // FIXME: data on pdf
+            // DONE
             case 'trending_product_report':
                 $type = 'trending_product';
                 $data['report_type'] = 'Trending Product';
                 $report = $this->getTrendingProducts($user, $dates['start_date'], $dates['end_date']);
                 break;
-
-            // case 'contacts_report':
-            //     $type = 'contact';
-            //     $data['report_type'] = 'Contacts Summary';
-            //     break;
 
             // DONE
             case 'items_report':
@@ -162,14 +159,14 @@ class ReportEmailService
                         ]
                     ];
                 break;
-
+            // DONE
             case 'register_report':
                 $type = 'register';
                 $data['report_type'] = 'Register';
-                $report = $this->getRegisterReport($user, $dates['start_date'], $dates['end_date']);
+                $report = $this->getRegisterReport($user, $dates['start_date'], $dates['end_date'])->get();
                 break;
 
-            // need chart
+            // DONE
             case 'expense_report':
                 $type = 'expense';
                 $data['report_type'] = 'Expenses Summary';
@@ -188,7 +185,7 @@ class ReportEmailService
         $pdf = Pdf::setPaper('a4', 'landscape')
             ->loadView($view, [
                 'data' => $data, 
-                'logo' => $this->logo, 
+                'logo' => $this->logo,
                 'user' => $user,
                 'report' => $report,
                 'dates' => $dates,
@@ -199,7 +196,7 @@ class ReportEmailService
         $data['interval'] = $interval;
 
 
-        $file = Storage::disk('public')->put($filename, $pdf->output()); 
+        Storage::disk('public')->put($filename, $pdf->output()); 
 
         Mail::to($user->email)
             ->send(new Reporting($data, $filename, $type));
@@ -220,92 +217,6 @@ class ReportEmailService
                                 )->whereDate('activity_log.created_at', '>=', $start_date)
                                 ->whereDate('activity_log.created_at', '<=', $end_date)->get();
 
-        if (! empty(request()->user_id)) {
-            $activities->where('causer_id', request()->user_id);
-        }
-
-        $subject_type = request()->subject_type;
-        if (! empty($subject_type)) {
-            if ($subject_type == 'contact') {
-                $activities->where('subject_type', \App\Contact::class);
-            } elseif ($subject_type == 'user') {
-                $activities->where('subject_type', \App\User::class);
-            } elseif (in_array($subject_type, ['sell', 'purchase',
-                'sales_order', 'purchase_order', 'sell_return', 'purchase_return', 'sell_transfer', 'expense', 'purchase_order', ])) {
-                $activities->where('subject_type', \App\Transaction::class);
-                $activities->whereHasMorph('subject', Transaction::class, function ($q) use ($subject_type) {
-                    $q->where('type', $subject_type);
-                });
-            }
-        }
-
-        $sell_statuses = Transaction::sell_statuses();
-        $sales_order_statuses = Transaction::sales_order_statuses(true);
-        $purchase_statuses = $this->transactionUtil->orderStatuses();
-        $shipping_statuses = $this->transactionUtil->shipping_statuses();
-
-        $statuses = array_merge($sell_statuses, $sales_order_statuses, $purchase_statuses);
-        
-        $activities = $activities->map(function ($row) use ($statuses, $shipping_statuses) {
-            $html = '';
-
-            $subject_type = '';
-            if ($row->subject_type == \App\Contact::class) {
-                $subject_type = __('contact.contact');
-            } elseif ($row->subject_type == \App\User::class) {
-                $subject_type = __('report.user');
-            } elseif ($row->subject_type == \App\Transaction::class && ! empty($row->subject->type)) {
-                $subject_type = isset($transaction_types[$row->subject->type]) ? $transaction_types[$row->subject->type] : '';
-            } elseif (($row->subject_type == \App\TransactionPayment::class)) {
-                $subject_type = __('lang_v1.payment');
-            }
-    
-            if (!empty($row->subject?->ref_no)) {
-                $html .= __('purchase.ref_no') . ': ' . $row->subject->ref_no . '<br>';
-            }
-    
-            if (!empty($row->subject?->invoice_no)) {
-                $html .= __('sale.invoice_no') . ': ' . $row->subject->invoice_no . '<br>';
-            }
-    
-            if ($row->subject_type === \App\Transaction::class && in_array($row->subject?->type, ['sell', 'purchase'])) {
-                $html .= view('sale_pos.partials.activity_row', [
-                    'activity' => $row,
-                    'statuses' => $statuses,
-                    'shipping_statuses' => $shipping_statuses
-                ])->render();
-            } else {
-                $update_note = $row->getExtraProperty('update_note');
-                if (!empty($update_note) && !is_array($update_note)) {
-                    $html .= $update_note;
-                }
-            }
-    
-            if ($row->description === 'contact_deleted') {
-                $html .= $row->getExtraProperty('supplier_business_name') ?? '';
-                $html .= '<br>';
-            }
-    
-            if (!empty($row->getExtraProperty('name'))) {
-                $html .= __('user.name') . ': ' . $row->getExtraProperty('name') . '<br>';
-            }
-    
-            if (!empty($row->getExtraProperty('id'))) {
-                $html .= 'ID: ' . $row->getExtraProperty('id') . '<br>';
-            }
-    
-            if (!empty($row->getExtraProperty('invoice_no'))) {
-                $html .= __('sale.invoice_no') . ': ' . $row->getExtraProperty('invoice_no') . '<br>';
-            }
-    
-            if (!empty($row->getExtraProperty('ref_no'))) {
-                $html .= __('purchase.ref_no') . ': ' . $row->getExtraProperty('ref_no');
-            }
-
-            $row['note'] = $html; 
-            $row['subject_type'] = $subject_type;
-            return $row;
-        });
         return $activities;
     }
 
@@ -458,6 +369,7 @@ class ReportEmailService
         $permitted_locations = $user->permitted_locations();
 
         $registers = $this->transactionUtil->registerReportExport($business_id, $permitted_locations, $start_date, $end_date, $user->id);
+
         return $registers;
     }
 
@@ -500,26 +412,6 @@ class ReportEmailService
         }
 
         $contacts = $contacts->get();
-
-        foreach ($contacts as $row) {
-            if (! empty($row->supplier_business_name)) {
-                $row->name .= ', '.$row->supplier_business_name;
-            }
-            
-            $total_ledger_discount_purchase = $row->total_ledger_discount_purchase ?? 0;
-            $total_ledger_discount_sell = $total_ledger_discount_sell ?? 0;
-            $due = ($row->total_invoice - $row->invoice_received - $total_ledger_discount_sell) - ($row->total_purchase - $row->purchase_paid - $total_ledger_discount_purchase) - ($row->total_sell_return - $row->sell_return_paid) + ($row->total_purchase_return - $row->purchase_return_received);
-
-            if ($row->contact_type == 'supplier') {
-                $due -= $row->opening_balance - $row->opening_balance_paid;
-            } else {
-                $due += $row->opening_balance - $row->opening_balance_paid;
-            }
-
-            $due_formatted = $this->transactionUtil->num_f($due, true);
-        
-            $row->due = $due_formatted;
-        }
 
         return $contacts;
     }
@@ -598,6 +490,9 @@ class ReportEmailService
             'tax_diff' => $tax_diff,
             'taxes' => $taxes,
             'tax_report_tabs' => $tax_report_tabs,
+            'input_tax_details' => $input_tax_details,
+            'output_tax_details' => $output_tax_details,
+            'expense_tax_details' => $expense_tax_details,
         ];
     }
 
@@ -621,10 +516,8 @@ class ReportEmailService
         if (! empty($start_date) && ! empty($end_date)) {
             $query->whereBetween(DB::raw('date(transaction_date)'), [$start_date, $end_date]);
         }
-        
-        if (! empty($location_id)) {
-            $query->where('location_id', $location_id);
-        }
+
+        $datas = $query->get();
 
         $stock_adjustment_details = $query->select(
             DB::raw('SUM(final_total) as total_amount'),
@@ -636,7 +529,10 @@ class ReportEmailService
         Log::info("STOCK ADJUSTMENT DETAILS -------------------------------------------------->");
         Log::info(json_encode($stock_adjustment_details,JSON_PRETTY_PRINT));
 
-        return $stock_adjustment_details;
+        return [
+            'collection' => $datas,
+            'details' => $stock_adjustment_details
+        ];
     }
 
     // GET TRENDING PRODUCT REPORT

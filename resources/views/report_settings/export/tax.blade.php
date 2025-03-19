@@ -93,7 +93,7 @@
                     Overall (Input - Output - Expense)
                 </div>
                 <div class="value">
-                    Output Tax - Input Tax - Expense Tax : {{ number_format($report['tax_diff']) }}
+                    Output Tax - Input Tax - Expense Tax : {{ number_format($report['tax_diff'], 3) }} SAR
                 </div>
             </div>
 
