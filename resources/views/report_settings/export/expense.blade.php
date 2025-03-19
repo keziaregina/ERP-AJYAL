@@ -3,74 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Expense Report</title>
     <style>
-        * {
-            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        body {
+            font-family: Arial, sans-serif;
+            text-align: left;
+        }
+        .report-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
 
-        header {
-            /* background-color: #f2f2f2; */
-            display: flex;
-            flex-direction: column;
+        .header-box{
+            margin-left: 20px;
+        }
+
+        .box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f8fafc;
+        }
+
+        .box table {
+            margin-bottom: 10px;
+            margin-left: 10px;
+            border: none;
             width: 100%;
+            border-collapse: collapse;
         }
 
-        header img {
-            width: 50px;
-            height: auto;
+        .box th, .box td {
+            border: none;
+            text-align: left;
+            padding: 10px;
         }
 
-        header h1 {
+        .label {
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        .value {
             font-size: 20px;
+            color: #1e293b;
         }
 
         table {
             width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
         }
-        thead {
-            background-color: #43019b;
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
         }
         th {
-            padding: 10px;
+            background-color: #2C3E50;
             color: white;
+            font-weight: bold;
         }
-        td {
-            padding: 10px;
+        .total-row {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <img src="{{'data:image/png;base64,' . base64_encode(file_get_contents(@$image)) }}" alt="logo">
-        <h1 >Ajyal Al - Madina</h1>
-    </header>
-    <main>
-        <table>
-            <thead>
-                <th>Header1</th>
-                <th>Header2</th>
-                <th>Header3</th>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Isi1</td>
-                    <td>Isi2</td>
-                    <td>Isi3</td>
+
+    <img class="logo" src="{{ $logo }}" alt="logo">
+    <h1>Ajyal Al - Madina</h1>
+
+    {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
+    {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
+
+    <div class="report-title">
+        Expense Report - AJYAL AL-MADINA AL ASRIA
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Expense Categories</th>
+                <th>Total Expense</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $total_expense = 0;
+            @endphp
+                @forelse ($report as $index => $item)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $item['category'] ?: '-' }}</td>
+                        <td>{{ $item['total_expense'] ?: '-' }}</td>
+                        @php
+                            $total_expense += $expense['total_expense'];
+                        @endphp
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3">No data available in table</td>
+                    </tr>
+                @endforelse
+                <tr class="total-row">
+                    <td colspan="2">Total:</td>
+                    <td>{{ number_format($total_expense, 3) }} SAR</td>
                 </tr>
-                <tr>
-                    <td>Isi1</td>
-                    <td>Isi2</td>
-                    <td>Isi3</td>
-                </tr>
-            </tbody>
-        </table>
-    </main>
-    <!-- <p>Data : {{ $data->id }}</p>
-    <p>Username : {{ $data->user_id }}</p>
-    <p>User Id : {{ $user->first_name . ' ' . $user->last_name }}</p>
-    <p>Type : {{ $data->type }}</p>
-    <p>Interval : {{ $data->interval }}</p> -->
+        </tbody>
+    </table>
 </body>
 </html>
