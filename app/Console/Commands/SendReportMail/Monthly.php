@@ -68,8 +68,8 @@ class Monthly extends Command
 
     public function getDay()
     {
-        $start_date = now()->subMonth()->toDateString();
-        $end_date = now()->toDateString();
+        $start_date = now()->subMonth()->startOfMonth()->toDateString();
+        $end_date = now()->subMonth()->endOfMonth()->toDateString();
 
         return [
             'start_date' => $start_date,
