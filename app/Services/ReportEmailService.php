@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
 use App\TransactionSellLinesPurchaseLines;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as pdh; 
 
 class ReportEmailService
 {
@@ -182,15 +183,28 @@ class ReportEmailService
             default:
         }
         $view = 'report_settings/export/' . $type;
-        $pdf = Pdf::setPaper('a4', 'landscape')
-            ->loadView($view, [
-                'data' => $data, 
-                'logo' => $this->logo,
-                'user' => $user,
-                'report' => $report,
-                'dates' => $dates,
-                'currency' => 'ر.س'
-            ]);
+        // $pdf = Pdf::setPaper('a4', 'landscape')
+        //     ->loadView($view, [
+        //         'data' => $data, 
+        //         'logo' => $this->logo,
+        //         'user' => $user,
+        //         'report' => $report,
+        //         'dates' => $dates,
+        //         'currency' => 'ر.س'
+        //     ]);
+
+        $pdf = pdh::loadView($view, [
+                    'data' => $data, 
+                    'logo' => $this->logo,
+                    'user' => $user,
+                    'report' => $report,
+                    'dates' => $dates,
+                    'currency' => 'ر.س'
+                    ],[
+                        'orientation' => 'L',
+                    ]);
+
+        // $pdf->download($filename)
 
             
         $data['interval'] = $interval;
@@ -198,10 +212,10 @@ class ReportEmailService
 
         Storage::disk('public')->put($filename, $pdf->output()); 
 
-        Mail::to($user->email)
-            ->send(new Reporting($data, $filename, $type));
+        // Mail::to($user->email)
+        //     ->send(new Reporting($data, $filename, $type));
 
-        Storage::disk('public')->delete($filename);
+        // Storage::disk('public')->delete($filename);
         return $filename;
     }
 

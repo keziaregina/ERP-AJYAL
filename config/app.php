@@ -201,6 +201,7 @@ return [
         Knox\Pesapal\PesapalServiceProvider::class,
 
         Barryvdh\DomPDF\ServiceProvider::class,
+        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class
     ],
 
     /*
@@ -226,5 +227,8 @@ return [
         'Redis' => Illuminate\Support\Facades\Redis::class,
         'Menu' => Nwidart\Menus\Facades\Menu::class,
         'Pesapal' => Knox\Pesapal\Facades\Pesapal::class,
+
+        
+        'PDH' => Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::class
     ])->toArray(),
 ];

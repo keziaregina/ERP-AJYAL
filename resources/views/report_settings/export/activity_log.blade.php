@@ -91,16 +91,17 @@
             /* font-weight: bold; */
         }
         
-        @font-face {
-    font-family: 'Amiri';
-    src: url("{{ asset('fonts/Amiri-Regular.ttf') }}") format("truetype");
-}
+        /* @font-face {
+            font-family: 'Amiri';
+            src: url('{{ public_path('fonts/Amiri/Amiri-Regular.ttf') }}') format("truetype");
+        } */
 
-.arabic {
-    direction: rtl;
-    font-family: 'Amiri', sans-serif;
-    font-weight: normal;
-}
+        /* .arabic {
+            direction: rtl;
+            font-family: 'Amiri', sans-serif;
+            font-weight: normal;
+            text-align: right;
+        } */
 
 table {
             width: 100%;
@@ -154,7 +155,7 @@ table {
         <div class="container">
         <div class="table-responsive">
             <table class="table table-bordered table-striped" id="activity_log_table">
-                <thead>
+                <thead style=" background-color: #243B55; color: white ">
                     <tr>
                         <th>#</th>
                         <th>Date</th>
