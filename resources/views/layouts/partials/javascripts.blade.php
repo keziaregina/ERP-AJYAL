@@ -17,6 +17,18 @@
     @endauth
 </script>
 
+@if (auth()->check())
+    <script>
+        // let currentUrl = window.location.pathname;
+
+        // if (currentUrl === '/login') {
+        //     console.log('Ini halaman login');
+        // } else {
+            window.canExport = {{ auth()->user()->can('view_export_buttons') ? 'true' : 'false' }};
+        // }
+    </script>
+@endif
+
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js?v=$asset_v"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js?v=$asset_v"></script>

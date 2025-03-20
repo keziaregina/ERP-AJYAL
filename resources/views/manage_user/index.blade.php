@@ -174,9 +174,9 @@ convertFontToBase64("{{ asset('fonts/Amiri/Amiri-Regular.ttf') }}", function(bas
                 } 
             ],
         ];
-
+        var export_button = {{ auth()->user()->can('view_export_buttons') ? 'true' : 'false' }};
         var users_table = $('#users_table').DataTable({
-            buttons: datatablesButton,
+            buttons: export_button ? datatablesButton : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,
