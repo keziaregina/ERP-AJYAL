@@ -7,44 +7,55 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: left;
+            margin: 20px;
         }
 
-        header img {
-            width: 100px;
+        .header {
+            text-align: center; 
+            margin-bottom: 20px;
         }
 
-        header h1 {
-            font-size: 15px;
+        .header h1 {
+            font-size: 12px;
+            margin: 5px 10px 0px;
         }
+
+        .logo {
+            width: 70px; 
+        }
+
         .report-title {
             text-align: center;
-            font-size: 18px;
+            font-size: 12px;
             font-weight: bold;
             margin-bottom: 20px;
         }
+
+        .date{
+            font-size: 11px;
+        }
+        .indexing {
+            width: 40px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            font-size: 11px;
         }
-        th, td {
-            border: 1px solid #ddd;
+
+        th,
+        td {
+            border: 0.5px solid #ddd;
             padding: 8px;
             text-align: center;
         }
+
         th {
             background-color: #2C3E50;
             color: white;
             font-weight: bold;
-        }
-        .total-row {
-            background-color: #f8f9fa;
-            font-weight: bold;
-        }
-        .logo {
-            width: 100px;
-            height: 100px;
         }
 
         tbody tr:nth-child(even) {
@@ -54,30 +65,38 @@
         tbody tr:nth-child(odd) {
             background-color: #ffffff;
         }
+
+        .total {
+            background-color: #c8c9ca;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-
-    <header>
+    <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
-        <h1>Ajyal Al - Madina</h1>
-    </header>
+        <h1>Ajyal Al - Madina Al - Asria</h1>
+        <span>{{ env('APP_TITLE') }}</span>
 
-    {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
-    {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
-
-    <div class="report-title">
-        Customers - Suppliers Report - AJYAL AL-MADINA AL ASRIA
+        {{ Log::info('CUSTOMER & SUPPLIER -------------------------------------------------->') }}
+        {{ Log::info(json_encode($report, JSON_PRETTY_PRINT)) }}
     </div>
 
-    <p>
+    <div class="report-title">
+        Customer and Supplier Report
+    </div>
+
+    <p class="date">
         Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
     </p>
 
     <table>
         <thead>
             <tr>
-                <th>#</th>
+                <th class="indexing">#</th>
                 <th>Contact</th>
                 <th>Total Purchase</th>
                 <th>Total Purchase Return</th>
@@ -90,14 +109,14 @@
         <tbody>
             @forelse ($report as $index => $item)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
+                    <td class="indexing">{{ $index + 1 }}</td>
                     <td>{{ $item['name'] }}</td>
-                    <td>{{ number_format($item['total_purchase'], 3) }} SAR</td>
-                    <td>{{ number_format($item['total_purchase_return'], 3) }} SAR</td>
-                    <td>{{ number_format($item['total_invoice'], 3) }} SAR</td>
-                    <td>{{ number_format($item['total_sell_return'], 3) }} SAR</td>
-                    <td>{{ number_format($item['opening_balance'], 3) }} SAR</td>
-                    <td>{{ $item['due'] }} SAR</td>
+                    <td>{{ number_format($item['total_purchase'], 3) ?: '0' }} {{ $currency }}</td>
+                    <td>{{ number_format($item['total_purchase_return'], 3) ?: '0' }} {{ $currency }}</td>
+                    <td>{{ number_format($item['total_invoice'], 3) ?: '0' }} {{ $currency }}</td>
+                    <td>{{ number_format($item['total_sell_return'], 3) ?: '0' }} {{ $currency }}</td>
+                    <td>{{ number_format($item['opening_balance'], 3) ?: '0' }} {{ $currency }}</td>
+                    <td>{{ $item['due'] }} {{ $currency }}</td>
                 </tr>
             @empty
                 <tr>
@@ -105,18 +124,18 @@
                 </tr>
             @endforelse
             
-            {{-- Total Row --}}
-            <tr class="total-row">
-                <td colspan="2">Total:</td>
-                <td>{{ number_format(collect($report)->sum('total_purchase'), 3) }} SAR</td>
-                <td>{{ number_format(collect($report)->sum('total_purchase_return'), 3) }} SAR</td>
-                <td>{{ number_format(collect($report)->sum('total_invoice'), 3) }} SAR</td>
-                <td>{{ number_format(collect($report)->sum('total_sell_return'), 3) }} SAR</td>
-                <td>{{ number_format(collect($report)->sum('opening_balance'), 3) }} SAR</td>
-                <td>{{ number_format(collect($report)->sum('due'), 3) }} SAR</td>
-            </tr>
         </tbody>
+        <tfoot>
+            <tr class="total">
+                <td class="bold" colspan="2">Total:</td>
+                <td>{{ number_format(collect($report)->sum('total_purchase'), 3) ?: '0' }} {{ $currency }}</td>
+                <td>{{ number_format(collect($report)->sum('total_purchase_return'), 3) ?: '0' }} {{ $currency }}</td>
+                <td>{{ number_format(collect($report)->sum('total_invoice'), 3) ?: '0' }} {{ $currency }}</td>
+                <td>{{ number_format(collect($report)->sum('total_sell_return'), 3) ?: '0' }} {{ $currency }}</td>
+                <td>{{ number_format(collect($report)->sum('opening_balance'), 3) ?: '0' }} {{ $currency }}</td>
+                <td>{{ number_format(collect($report)->sum('due'), 3) ?: '0' }} {{ $currency }}</td>
+            </tr>
+        </tfoot>
     </table>
-
 </body>
 </html>
