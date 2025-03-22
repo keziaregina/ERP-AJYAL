@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Report</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purchase Payment Summary</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: left;
         }
-
         .report-title {
             text-align: center;
             font-size: 18px;
@@ -18,29 +16,15 @@
             margin-bottom: 20px;
         }
 
-        .header-box {
+        .header-box{
             margin-left: 20px;
         }
 
         .box {
             border: 1px solid #ddd;
             border-radius: 8px;
+            padding: 20px;
             background-color: #f8fafc;
-        }
-
-        .box table {
-            margin-bottom: 10px;
-            margin-left: 10px;
-            border: none;
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .box th,
-        .box td {
-            border: none;
-            text-align: left;
-            padding: 10px;
         }
 
         .label {
@@ -60,84 +44,86 @@
             border-collapse: collapse;
             margin-top: 10px;
         }
-
-        th,
-        td {
+        th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: center;
         }
-
         th {
             background-color: #2C3E50;
             color: white;
             font-weight: bold;
         }
-
         .total-row {
             background-color: #f8f9fa;
             font-weight: bold;
         }
-
         .logo {
             width: 100px;
             height: 100px;
         }
+
+        .total {
+            font-weight: bold;
+            background-color: #f4f7fa;
+        }
+        .center {
+            text-align: center;
+        }
     </style>
 </head>
-
 <body>
-
     <header>
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h3>Ajyal Al - Madina</h3>
 
-        {{ Log::info('CUSTOMER & SUPPLIER -------------------------------------------------->') }}
-        {{ Log::info(json_encode($report, JSON_PRETTY_PRINT)) }}
+        {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
+        {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
     </header>
     <main>
         <div class="report-title">
-            Expenses Report - AJYAL AL-MADINA AL ASRIA
+            Purchase Payments Report - AJYAL AL-MADINA AL ASRIA
         </div>
         <div class="container">
             <p>
                 Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
             </p>
-
             <table>
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Expense Categories</th>
-                        <th>Total Expense</th>
+                        <th>Ref. No</th>
+                        <th>Paid on</th>
+                        <th>Amount</th>
+                        <th>Supplier</th>
+                        <th>Payment Method</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                        $total_expense = 0;
-                    @endphp
                     @forelse ($report as $index => $item)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $item['category'] ?: '-' }}</td>
-                            <td>{{ $item['total_expense'] ?: '-' }}</td>
-                            @php
-                                $total_expense += $expense['total_expense'];
-                            @endphp
-                        </tr>
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $item->payment_ref_no }}</td>
+                        <td>{{ $item->paid_no ?: '-' }}</td>
+                        <td>{{ number_format($item->amount, 3) }} SAR</td>
+                        <td>{!! $item->supplier !!}</td>
+                        <td>{{ $item->method }}</td>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="3">No data available in table</td>
-                        </tr>
+                    <tr>
+                        <td colspan="6">
+                            No Data Available
+                        </td>
+                    </tr>
                     @endforelse
-                    <tr class="total-row">
-                        <td colspan="2">Total:</td>
-                        <td>{{ number_format($total_expense, 3) }} SAR</td>
+                    <tr class="total">
+                        <td colspan="3">Total:</td>
+                        <td>{{ number_format(collect($report)->sum('amount'), 3) }} SAR</td>
+                        <td colspan="2"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
 </body>
-
 </html>

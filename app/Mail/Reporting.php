@@ -2,16 +2,17 @@
 
 namespace App\Mail;
 
-use App\ReportSettings;
 use App\User;
+use App\ReportSettings;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class Reporting extends Mailable implements ShouldQueue
 {
@@ -20,17 +21,23 @@ class Reporting extends Mailable implements ShouldQueue
     public $data;
     public $user;
     public $path;
+    public $type;
 
+    public $report_type;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(ReportSettings $report_settings)
+    public function __construct(ReportSettings $report_settings, $filename,$type)
     {
         $this->data = $report_settings;
+        $this->report_type = $report_settings->report_type;
+        // Log::info("data inside mail--->");
+        // Log::info(json_encode($this->data,JSON_PRETTY_PRINT));
         $this->user = User::find($this->data->user_id);
-        $this->path = 'pdf/report/Ajyal Al-Madina.pdf';
+        $this->path = $filename;
+        $this->type = $type;
     }
 
     /**
@@ -41,7 +48,10 @@ class Reporting extends Mailable implements ShouldQueue
     public function envelope()
     {
         return new Envelope(
-            subject: 'Reporting',
+            subject: 'Reporting '. $this->report_type,
+            metadata: [
+                'type' => $this->type,
+            ],
         );
     }
 
@@ -54,6 +64,11 @@ class Reporting extends Mailable implements ShouldQueue
     {
         return new Content(
             view: 'emails.report_setting',
+            with: [
+                'path' => $this->path,
+                'interval' => $this->data->interval,
+                'report_type' => $this->report_type
+            ],
         );
     }
 
@@ -65,10 +80,8 @@ class Reporting extends Mailable implements ShouldQueue
     public function attachments()
     {
         return [
-            // Attachment::fromStorageDisk('public','report\target.pdf'),
-            // Attachment::fromStorageDisk('public','report\target2.JPG'),
-            // Attachment::fromStorageDisk('public','report\real.pdf'),
-            Attachment::fromStorageDisk('public',$this->path),
+            Attachment::fromStorageDisk('public',$this->path)->as(basename($this->path)) 
+            ->withMime('application/pdf'), 
         ];
     }
 }

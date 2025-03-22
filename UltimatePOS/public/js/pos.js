@@ -1056,6 +1056,9 @@ $(document).ready(function() {
 
     $('button#submit-sell, button#save-and-print').click(function(e) {
         //Check if product is present or not.
+
+        console.log("here inside pos js")
+
         if ($('table#pos_table tbody').find('.product_row').length <= 0) {
             toastr.warning(LANG.no_products_added);
             return false;

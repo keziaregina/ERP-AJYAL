@@ -201,7 +201,6 @@ return [
         Knox\Pesapal\PesapalServiceProvider::class,
 
         Barryvdh\DomPDF\ServiceProvider::class,
-        Barryvdh\Snappy\ServiceProvider::class,
     ],
 
     /*

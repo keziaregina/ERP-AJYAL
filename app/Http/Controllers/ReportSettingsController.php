@@ -43,22 +43,35 @@ class ReportSettingsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function getReportTypes()
+    {
+        return [
+            'profit_or_loss_report' => 'Profit / Loss Report',
+            'purchase_n_sell_report' => 'Purchase & Sell Report',
+            'contacts_report' => 'Contacts Report',
+            'customer_n_supplier_report' => 'Customer & Supplier Report',
+            'customer_group_report' => 'Customer Group Report',
+            'stock_report' => 'Stock Report',
+            'stock_adjustment_report' => 'Stock Adjustment Report',
+            'tax_report' => 'Tax Report',
+            'trending_product_report' => 'Trending Product Report',
+            'items_report' => 'Items Report',
+            'product_purchase_report' => 'Product Purchase Report',
+            'product_sell_report' => 'Product Sell Report',
+            'purchase_payment_report' => 'Purchase Payment Report',
+            'sales_representative' => 'Sales Representative Report',
+            'register_report' => 'Register Report',
+            'expense_report' => 'Expense Report',
+            'activity_log' => 'Activity Log',
+        ];
+    }
     public function create()
     {
         if (! auth()->user()->can('report_settings.access')) {
             abort(403, 'Unauthorized action.');
         }
         $users = User::all()->pluck('first_name', 'id');
-        $reportTypes = [
-            'purchase_n_sell_report' => 'Purchase & Sell Report',
-            'contacts_report' => 'Contacts Report',
-            'stock_report' => 'Stock Report',
-            'tax_report' => 'Tax Report',
-            'trending_product_report' => 'Trending Product Report',
-            'sales_representative' => 'Sales Representative Report',
-            'register_report' => 'Register Report',
-            'expense_report' => 'Expense Report',
-        ];
+        $reportTypes = $this->getReportTypes();
         $intervals = ['daily'=>'Daily', 'weekly'=>'Weekly', 'monthly'=>'Monthly', 'yearly'=>'Yearly'];
         return view('report_settings.create', compact('users', 'reportTypes', 'intervals'));
     }
@@ -84,19 +97,6 @@ class ReportSettingsController extends Controller
             $report_settings->interval = $request->report_interval;
             $report_settings->business_id = $business_id;
             $report_settings->save();
-            
-            $image = public_path('img/logo-small.png');
-            $filename = storage_path('app/public/pdf/report/Ajyal Al-Madina.pdf');
-            $directory = dirname($filename);
-            if (!file_exists($directory)) {
-                mkdir($directory, 0777, true);
-            }
-
-            $pdf = Pdf::setPaper('a4', 'landscape')->loadView('pdf', ['data' => $report_settings, 'image' => $image, 'user' => $user ]);
-            
-            $pdf->save($filename);
-            // Mail::to($user->email)->queue(new Reporting($report_settings));
-
             $output = ['success' => true,
                 'msg' => __('report_settings.added_success'),
             ];
@@ -134,16 +134,8 @@ class ReportSettingsController extends Controller
 
         $business_id = request()->session()->get('user.business_id');
         $users = User::all()->pluck('first_name', 'id');
-        $report_type = [
-            'purchase_n_sell_report' => 'Purchase & Sell Report',
-            'contacts_report' => 'Contacts Report',
-            'stock_report' => 'Stock Report',
-            'tax_report' => 'Tax Report',
-            'trending_product_report' => 'Trending Product Report',
-            'sales_representative' => 'Sales Representative Report',
-            'register_report' => 'Register Report',
-            'expense_report' => 'Expense Report',
-        ];
+        $report_type = $this->getReportTypes();
+            
         $intervals = ['daily'=>'Daily', 'weekly'=>'Weekly', 'monthly'=>'Monthly', 'yearly'=>'Yearly'];
         $report_settings = ReportSettings::with('user')->where('business_id', $business_id)->find($id);
         return view('report_settings.edit')->with(compact('report_settings', 'users','report_type','intervals'));
