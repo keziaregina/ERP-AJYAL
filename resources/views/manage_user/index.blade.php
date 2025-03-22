@@ -202,9 +202,9 @@ convertFontToBase64("{{ asset('images/text.png') }}", function(base64) {
                 } 
             ],
         ];
-
+        var export_button = {{ auth()->user()->can('view_export_buttons') ? 'true' : 'false' }};
         var users_table = $('#users_table').DataTable({
-            buttons: datatablesButton,
+            buttons: export_button ? datatablesButton : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,

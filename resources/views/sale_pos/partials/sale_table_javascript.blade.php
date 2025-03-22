@@ -38,8 +38,9 @@
                 sell_table.ajax.reload();
             });
 
-        sell_table = $('#sell_table').DataTable({
-            buttons: [
+            
+        var datatablesButton = [
+            [
                 {
                     extend: 'csvHtml5',
                     text: '<i class="fa fa-file-csv"></i> Export CSV',
@@ -80,12 +81,11 @@
                                 alignment: 'center',
                                 margin: [0, 0, 0, 10]
                             });
-doc.pageMargins = [20, 50, 20, 30];
+                        doc.pageMargins = [20, 50, 20, 30];
                         var tableIndex = doc.content.findIndex(item => item.table);
-
                         if (tableIndex !== -1) {
                             doc.content.splice(tableIndex, 0, {
-                                text: 'Data',
+                                text: 'Users Data',
                                 alignment: 'left',
                                 fontSize: 12,
                                 margin: [10, 30, 0, 10]
@@ -118,6 +118,14 @@ doc.pageMargins = [20, 50, 20, 30];
                     }
                 } 
             ],
+        ];
+
+        // window.canExport initialized ini layout/app.blade.pho
+        console.log(window.canExport);
+        var export_button = window.canExport;
+
+        sell_table = $('#sell_table').DataTable({
+            buttons: export_button ? datatablesButton : [],
             processing: true,
             serverSide: true,
             fixedHeader: false,
