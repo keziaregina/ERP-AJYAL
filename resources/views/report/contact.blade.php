@@ -97,4 +97,21 @@
 
 @section('javascript')
     <script src="{{ asset('js/report.js?v=' . $asset_v) }}"></script>
+    <script>
+        $(document).ready(function() {
+            var pdfButton = document.querySelector('.buttons-pdf');
+            var target = document.querySelector('.hover-q');
+            var originalContent = target.getAttribute('data-content');
+
+            pdfButton.addEventListener('mouseenter', function () {
+                // console.log(target.getAttribute('data-content'));
+                target.setAttribute('data-content', 'test');
+                // console.log(target.getAttribute('data-content'));
+            });
+            pdfButton.addEventListener('mouseleave', function () {
+                target.setAttribute('data-content', originalContent);
+                // console.log(target.getAttribute('data-content'));
+            });
+        });
+    </script>
 @endsection
