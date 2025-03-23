@@ -20,9 +20,13 @@
                     @endcan
 
                     @canany(['manufacturing.access_production', 'manufacturing.access_price'])
-                        <li @if(request()->segment(2) == 'production') class="active" @endif><a href="{{action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'index'])}}">@lang('manufacturing::lang.production')</a></li>
+                        @can('manufacturing.access_production')
+                            <li @if(request()->segment(2) == 'production') class="active" @endif><a href="{{action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'index'])}}">@lang('manufacturing::lang.production')</a></li>
+                        @endcan
 
-                        <li @if(request()->segment(1) == 'manufacturing' && request()->segment(2) == 'settings') class="active" @endif><a href="{{action([\Modules\Manufacturing\Http\Controllers\SettingsController::class, 'index'])}}">@lang('messages.settings')</a></li>
+                        @can('manufacturing.access_settings')
+                            <li @if(request()->segment(1) == 'manufacturing' && request()->segment(2) == 'settings') class="active" @endif><a href="{{action([\Modules\Manufacturing\Http\Controllers\SettingsController::class, 'index'])}}">@lang('messages.settings')</a></li>
+                        @endcan
                             
                         @if (auth()->user()->can('manufacturing.access_production') && auth()->user()->can('manufacturing.access_price'))
                             <li @if(request()->segment(2) == 'report') class="active" @endif><a href="{{action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'getManufacturingReport'])}}">@lang('manufacturing::lang.manufacturing_report')</a></li>

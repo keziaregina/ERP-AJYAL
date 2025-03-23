@@ -34,6 +34,11 @@ class DataController extends Controller
     {
         return [
             [
+                'value' => 'manufacturing.access_manufacturing',
+                'label' => __('manufacturing::lang.access_manufacturing'),
+                'default' => false,
+            ],
+            [
                 'value' => 'manufacturing.access_recipe',
                 'label' => __('manufacturing::lang.access_recipe'),
                 'default' => false,
@@ -58,6 +63,11 @@ class DataController extends Controller
                 'label' => __('manufacturing::lang.access_price'),
                 'default' => false,
             ],
+            [
+                'value' => 'manufacturing.access_settings',
+                'label' => __('manufacturing::lang.access_settings'),
+                'default' => false,
+            ],
         ];
     }
 
@@ -72,7 +82,7 @@ class DataController extends Controller
         $module_util = new ModuleUtil();
         $is_mfg_enabled = (bool) $module_util->hasThePermissionInSubscription($business_id, 'manufacturing_module', 'superadmin_package');
 
-        if ($is_mfg_enabled && (auth()->user()->can('manufacturing.access_recipe') || auth()->user()->can('manufacturing.access_production'))) {
+        if ($is_mfg_enabled && (auth()->user()->can('manufacturing.access_manufacturing'))) {
             Menu::modify('admin-sidebar-menu', function ($menu) {
                 $menu->url(
                         action([\Modules\Manufacturing\Http\Controllers\RecipeController::class, 'index']),

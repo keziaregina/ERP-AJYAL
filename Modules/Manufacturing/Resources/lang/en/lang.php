@@ -33,6 +33,8 @@ return [
     'access_production' => 'Access Production',
     'access_recipe' => 'View Recipe',
     'access_price' => 'Access Price',
+    'access_settings' => 'Access Settings',
+    'access_manufacturing' => 'Access Manufacturing',
     'total_production_cost' => 'Total Production Cost',
     'wastage_tooltip' => 'Percentage of total output quantity wasted during production',
     'production_cost_tooltip' => 'Percentage of total ingredients cost',
