@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ReportSettings extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'type', 'interval', 'business_id'];
+    protected $fillable = ['user_id', 'type', 'interval', 'business_id', 'attachment_lang'];
 
     public function user()
     {
@@ -81,6 +81,7 @@ class ReportSettings extends Model
                     'id' => $reportSetting->id,
                     'user_name' => $reportSetting->user->first_name,
                     'type' => $reportSetting->getReportTypes(),
+                    'attachment_lang' => $reportSetting->attachment_lang,
                     'interval' => $reportSetting->getReportIntervals(),
                 ];
             });
