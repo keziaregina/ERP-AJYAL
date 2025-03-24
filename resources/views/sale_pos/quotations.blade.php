@@ -100,6 +100,10 @@ $(document).ready( function(){
         dateRangeSettings,
         function (start, end) {
             $('#sell_list_filter_date_range').val(start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format));
+            
+            window.startDate = start.format('YYYY-MM-DD');
+            window.endDate = end.format('YYYY-MM-DD');
+                
             sell_table.ajax.reload();
         }
     );
@@ -112,7 +116,7 @@ $(document).ready( function(){
     var export_button = window.canExport;
 
     sell_table = $('#sell_table').DataTable({
-        buttons: export_button ? pdfButtons('Quotations Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('Quotations Report') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,

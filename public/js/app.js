@@ -1506,6 +1506,10 @@ $(document).ready(function() {
                 $('#expense_date_range').val(
                     start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format)
                 );
+                
+                window.startDate = start.format('YYYY-MM-DD');
+                window.endDate = end.format('YYYY-MM-DD');
+
                 expense_table.ajax.reload();
             }
         );
@@ -1518,7 +1522,7 @@ $(document).ready(function() {
 
     //Expense table
     expense_table = $('#expense_table').DataTable({
-        buttons : export_button ? pdfButtons('Expenses Report') : [],
+        buttons : export_button ? pdfButtonsWithDate('Expenses Report') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -2651,9 +2655,15 @@ function updateProfitLoss(start = null, end = null, location_id = null, selector
         var start = $('#profit_loss_date_filter')
                     .data('daterangepicker')
                     .startDate.format('YYYY-MM-DD');
+        window.startDate = $('#profit_loss_date_filter')
+                    .data('daterangepicker')
+                    .startDate.format('YYYY-MM-DD');
     }
     if(end == null){
         var end = $('#profit_loss_date_filter')
+                    .data('daterangepicker')
+                    .endDate.format('YYYY-MM-DD');
+        window.endDate = $('#profit_loss_date_filter')
                     .data('daterangepicker')
                     .endDate.format('YYYY-MM-DD');
     }

@@ -231,7 +231,7 @@
             var export_button = window.canExport;
 
             attendance_table = $('#attendance_table').DataTable({
-                buttons: export_button ? pdfButtons('Attendances Report') : [],                
+                buttons: export_button ? pdfButtonsWithDate('Attendances Report') : [],                
                 processing: true,
                 serverSide: true,
                 ajax: {
@@ -269,6 +269,9 @@
                 dateRangeSettings,
                 function (start, end) {
                     $('#date_range').val(start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format));
+                    window.startDate = start.format('YYYY-MM-DD');
+                    window.endDate = end.format('YYYY-MM-DD');
+                    attendance_table.ajax.reload();
                 }
             );
             $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
