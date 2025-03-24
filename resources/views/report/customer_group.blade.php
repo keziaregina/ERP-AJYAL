@@ -86,6 +86,10 @@
                     dateRangeSettings,
                     function (start, end) {
                         $('#cg_date_range').val(start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format));
+                        
+                        window.startDate = start.format('YYYY-MM-DD');
+                        window.endDate = end.format('YYYY-MM-DD');
+
                         cg_report_table.ajax.reload();
                     }
                 );
@@ -100,7 +104,7 @@
             var export_button = window.canExport;
 
             cg_report_table = $('#cg_report_table').DataTable({
-                buttons: export_button ? pdfButtons('Customer Groups Report') : [],
+                buttons: export_button ? pdfButtonsWithDate('Customer Groups Report') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,

@@ -284,7 +284,7 @@
         var export_button = window.canExport;
 
         input_tax_table = $('#input_tax_table').DataTable({
-            buttons: export_button ? pdfButtons('Input Taxes Report') : [],
+            buttons: export_button ? pdfButtonsWithDate('Input Taxes Report') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,

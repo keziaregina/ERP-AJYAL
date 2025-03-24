@@ -96,7 +96,7 @@
             var export_button = window.canExport;
 
             holidays_table = $('#holidays_table').DataTable({
-                buttons: export_button ? pdfButtons('Holidays Report') : [],                
+                buttons: export_button ? pdfButtonsWithDate('Holidays Report') : [],                
                 processing: true,
                 serverSide: true,
                 ajax: {
@@ -138,6 +138,11 @@
                 dateRangeSettings,
                 function (start, end) {
                     $('#holiday_filter_date_range').val(start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format));
+                    
+                    window.startDate = start.format('YYYY-MM-DD');
+                    window.endDate = end.format('YYYY-MM-DD');
+
+                    holidays_table.ajax.reload();
                 }
             );
             $('#holiday_filter_date_range').on('cancel.daterangepicker', function(ev, picker) {

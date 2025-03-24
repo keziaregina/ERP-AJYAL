@@ -5,7 +5,7 @@
 
     <!-- Content Header (Page header) -->
     <section class="content-header no-print">
-        <h1  class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">@lang('sale.sells')
+        <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">@lang('sale.sells')
         </h1>
     </section>
 
@@ -123,7 +123,7 @@
 
     <!-- This will be printed -->
     <section class="invoice print_section" id="receipt_section">
-        </section> 
+    </section>
 
 @stop
 
@@ -131,17 +131,17 @@
     <script type="text/javascript">
         $(document).ready(function() {
             function saveColumnVisibility(tableId, storageKey) {
-                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                $('#' + tableId).on('column-visibility.dt', function(e, settings, column, state) {
                     let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
                     colvisState[column] = state;
                     localStorage.setItem(storageKey, JSON.stringify(colvisState));
                 });
             }
-            
+
             function loadColumnVisibility(tableId, storageKey) {
                 let colvisState = JSON.parse(localStorage.getItem(storageKey));
                 if (colvisState) {
-                    $.each(colvisState, function (index, state) {
+                    $.each(colvisState, function(index, state) {
                         $('#' + tableId).DataTable().column(index).visible(state);
                     });
                 }
@@ -153,6 +153,10 @@
                 function(start, end) {
                     $('#sell_list_filter_date_range').val(start.format(moment_date_format) + ' ~ ' + end.format(
                         moment_date_format));
+
+                    window.startDate = start.format('YYYY-MM-DD');
+                    window.endDate = end.format('YYYY-MM-DD');
+
                     sell_table.ajax.reload();
                 }
             );
@@ -165,10 +169,10 @@
             var export_button = window.canExport;
 
             sell_table = $('#sell_table').DataTable({
-                buttons: export_button ? pdfButtons('Sales Report') : [],
+                buttons: export_button ? pdfButtonsWithDate('Sales Report') : [],
                 processing: true,
                 serverSide: true,
-                fixedHeader:false,
+                fixedHeader: false,
                 aaSorting: [
                     [1, 'desc']
                 ],

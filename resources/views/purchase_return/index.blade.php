@@ -40,7 +40,7 @@
                         {{-- <a class="btn btn-block btn-primary" href="{{action([\App\Http\Controllers\CombinedPurchaseReturnController::class, 'create'])}}">
                     <i class="fa fa-plus"></i> @lang('messages.add')</a> --}}
                         <a class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right"
-                            href="{{action([\App\Http\Controllers\CombinedPurchaseReturnController::class, 'create'])}}">
+                            href="{{ action([\App\Http\Controllers\CombinedPurchaseReturnController::class, 'create']) }}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
@@ -72,17 +72,17 @@
     <script>
         $(document).ready(function() {
             function saveColumnVisibility(tableId, storageKey) {
-                $('#' + tableId).on('column-visibility.dt', function (e, settings, column, state) {
+                $('#' + tableId).on('column-visibility.dt', function(e, settings, column, state) {
                     let colvisState = JSON.parse(localStorage.getItem(storageKey)) || {};
                     colvisState[column] = state;
                     localStorage.setItem(storageKey, JSON.stringify(colvisState));
                 });
             }
-            
+
             function loadColumnVisibility(tableId, storageKey) {
                 let colvisState = JSON.parse(localStorage.getItem(storageKey));
                 if (colvisState) {
-                    $.each(colvisState, function (index, state) {
+                    $.each(colvisState, function(index, state) {
                         $('#' + tableId).DataTable().column(index).visible(state);
                     });
                 }
@@ -93,6 +93,10 @@
                 function(start, end) {
                     $('#purchase_list_filter_date_range').val(start.format(moment_date_format) + ' ~ ' + end
                         .format(moment_date_format));
+
+                    window.startDate = start.format('YYYY-MM-DD');
+                    window.endDate = end.format('YYYY-MM-DD');
+                    
                     purchase_return_table.ajax.reload();
                 }
             );
@@ -105,10 +109,10 @@
             var export_button = window.canExport;
             //Purchase table
             purchase_return_table = $('#purchase_return_datatable').DataTable({
-                buttons: export_button ? pdfButtons('Purchase Returns Report') : [],
+                buttons: export_button ? pdfButtonsWithDate('Purchase Returns Report') : [],
                 processing: true,
                 serverSide: true,
-                fixedHeader:false,
+                fixedHeader: false,
                 aaSorting: [
                     [0, 'desc']
                 ],
@@ -196,16 +200,16 @@
             var target = document.querySelector('.hover-q');
             var originalContent = target.getAttribute('data-content');
 
-            pdfButton.addEventListener('mouseenter', function () {
+            pdfButton.addEventListener('mouseenter', function() {
                 // console.log(target.getAttribute('data-content'));
                 target.setAttribute('data-content', 'test');
                 // console.log(target.getAttribute('data-content'));
             });
-            pdfButton.addEventListener('mouseleave', function () {
+            pdfButton.addEventListener('mouseleave', function() {
                 target.setAttribute('data-content', originalContent);
                 // console.log(target.getAttribute('data-content'));
             });
-            
+
             saveColumnVisibility('purchase_return_datatable', 'colvisState_purchase_return');
             loadColumnVisibility('purchase_return_datatable', 'colvisState_purchase_return');
 
