@@ -21,8 +21,11 @@
 		$('#production_list_filter_date_range').daterangepicker(
         dateRangeSettings,
 	        function (start, end) {
+				window.startDate = start.format('YYYY-MM-DD');
+				window.endDate = end.format('YYYY-MM-DD');
+
 	            $('#production_list_filter_date_range').val(start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format));
-	            productions_table.ajax.reload();
+				productions_table.ajax.reload();
 	        }
 	    );
 	    $('#production_list_filter_date_range').on('cancel.daterangepicker', function(ev, picker) {
@@ -54,7 +57,7 @@
 	        ];
 		//Purchase table
 	    productions_table = $('#productions_table').DataTable({
-	        buttons: export_button ? pdfButtons('Productions Report') : [],
+	        buttons: export_button ? pdfButtonsWithDate('Productions Report') : [],
             processing: true,
 	        serverSide: true,
 	        aaSorting: [[0, 'desc']],
@@ -66,6 +69,8 @@
 	                    var end = $('#production_list_filter_date_range').data('daterangepicker').endDate.format('YYYY-MM-DD');
 	                    d.start_date = start;
 	                    d.end_date = end;
+						// console.log(startDate + " ~ " + endDate);
+						
 	                }
 	                d.location_id = $('#productstion_list_filter_location_id').val();
 	                if($('#production_list_is_final').is(':checked')) {

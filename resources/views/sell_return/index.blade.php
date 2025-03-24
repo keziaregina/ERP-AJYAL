@@ -80,6 +80,10 @@
             dateRangeSettings,
             function (start, end) {
                 $('#sell_list_filter_date_range').val(start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format));
+                
+                window.startDate = start.format('YYYY-MM-DD');
+                window.endDate = end.format('YYYY-MM-DD');
+                
                 sell_return_table.ajax.reload();
             }
         );
@@ -92,7 +96,7 @@
         var export_button = window.canExport;
 
         sell_return_table = $('#sell_return_table').DataTable({
-            buttons: export_button ? pdfButtons('Sell Returns Report') : [],
+            buttons: export_button ? pdfButtonsWithDate('Sell Returns Report') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,

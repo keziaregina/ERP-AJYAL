@@ -116,7 +116,7 @@
             var export_button = window.canExport;
 
             leaves_table = $('#leave_table').DataTable({
-                buttons: export_button ? pdfButtons('Leaves Report') : [],
+                buttons: export_button ? pdfButtonsWithDate('Leaves Report') : [],
                 processing: true,
                 serverSide: true,
                 ajax: {
@@ -160,6 +160,9 @@
                 dateRangeSettings,
                 function (start, end) {
                     $('#leave_filter_date_range').val(start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format));
+                    window.startDate = start.format('YYYY-MM-DD');
+                    window.endDate = end.format('YYYY-MM-DD');
+                    leaves_table.ajax.reload();
                 }
             );
             $('#leave_filter_date_range').on('cancel.daterangepicker', function(ev, picker) {

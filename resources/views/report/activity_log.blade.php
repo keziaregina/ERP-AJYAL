@@ -88,6 +88,10 @@
             $('#al_date_filter').val(
                 start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format)
             );
+            
+            window.startDate = start.format('YYYY-MM-DD');
+            window.endDate = end.format('YYYY-MM-DD');
+
             activity_log_table.ajax.reload();
         });
         $('#al_date_filter').on('cancel.daterangepicker', function(ev, picker) {
@@ -98,7 +102,7 @@
         var export_button = window.canExport;
 
         activity_log_table = $('#activity_log_table').DataTable({
-            buttons: export_button ? pdfButtons('Activity Logs Report') : [],
+            buttons: export_button ? pdfButtonsWithDate('Activity Logs Report') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,
