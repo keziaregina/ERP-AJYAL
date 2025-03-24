@@ -31,8 +31,13 @@ class ReportSettingsController extends Controller
             <button type="button" data-href="{{action(\'App\Http\Controllers\ReportSettingsController@destroy\', [$id])}}" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error delete_report_settings_button"><i class="glyphicon glyphicon-trash"></i> @lang("messages.delete")</button>&nbsp;  
                     '
                     )
+            ->editColumn('attachment_lang',
+            '<span class="tw-inline-flex tw-items-center tw-px-2 tw-py-1 tw-rounded-md tw-py-0.5 tw-text-xs tw-font-medium tw-bg-blue-500 tw-text-white">
+                {{ $attachment_lang }}
+            </span>'
+            )
                     ->removeColumn('id')
-                ->rawColumns([0, 3])
+                ->rawColumns([0, 4,2])
                 ->make(false);
         }
         return view('report_settings.index');
@@ -65,6 +70,7 @@ class ReportSettingsController extends Controller
             'activity_log' => 'Activity Log',
         ];
     }
+
     public function create()
     {
         if (! auth()->user()->can('report_settings.access')) {
@@ -96,6 +102,7 @@ class ReportSettingsController extends Controller
             $report_settings->type = $request->report_type;
             $report_settings->interval = $request->report_interval;
             $report_settings->business_id = $business_id;
+            $report_settings->attachment_lang = $request->attachment_lang;
             $report_settings->save();
             $output = ['success' => true,
                 'msg' => __('report_settings.added_success'),
@@ -158,6 +165,7 @@ class ReportSettingsController extends Controller
             $report_settings->user_id = $request->user_name;
             $report_settings->type = $request->report_type;
             $report_settings->interval = $request->report_interval;
+            $report_settings->attachment_lang = $request->attachment_lang;
             $report_settings->save();
             $output = ['success' => true,
                 'msg' => __('report_settings.updated_success'),

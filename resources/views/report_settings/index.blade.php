@@ -36,8 +36,8 @@
                 <thead>
                     <tr>
                         <th>@lang('report_settings.user_name')</th>
-                        
                         <th>@lang('report_settings.report_type')</th>
+                        <th>@lang('report_settings.attachment_lang')</th>
                         <th>@lang('report_settings.report_interval')</th>
                         <th>@lang('messages.action')</th>
                     </tr>

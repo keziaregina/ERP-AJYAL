@@ -11,7 +11,7 @@ return [
     'added_success' => 'Report setting added successfully',
     'updated_success' => 'Report setting updated successfully',
     'deleted_success' => 'Report setting deleted successfully',
-
+    'attachment_lang' => 'Attachment Language',
     'profit_or_loss_report' => 'Profit / Loss Report',
     'purchase_n_sell_report' => 'Purchase & Sell Report',
     'contacts_report' => 'Contacts Report',
