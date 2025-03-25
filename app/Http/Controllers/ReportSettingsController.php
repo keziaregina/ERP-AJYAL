@@ -46,28 +46,28 @@ class ReportSettingsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function getReportTypes()
     {
         return [
-            'profit_or_loss_report' => 'Profit / Loss Report',
-            'purchase_n_sell_report' => 'Purchase & Sell Report',
-            'contacts_report' => 'Contacts Report',
-            'customer_n_supplier_report' => 'Customer & Supplier Report',
-            'customer_group_report' => 'Customer Group Report',
-            'stock_report' => 'Stock Report',
-            'stock_adjustment_report' => 'Stock Adjustment Report',
-            'tax_report' => 'Tax Report',
-            'trending_product_report' => 'Trending Product Report',
-            'items_report' => 'Items Report',
-            'product_purchase_report' => 'Product Purchase Report',
-            'product_sell_report' => 'Product Sell Report',
-            'purchase_payment_report' => 'Purchase Payment Report',
-            'sales_representative' => 'Sales Representative Report',
-            'register_report' => 'Register Report',
-            'expense_report' => 'Expense Report',
-            'activity_log' => 'Activity Log',
+            'profit_or_loss_report'      => __('report_type.profit_or_loss_report'),
+            'purchase_n_sell_report'     => __('report_type.purchase_n_sell_report'),
+            'contacts_report'            => __('report_type.contacts_report'),
+            'customer_n_supplier_report' => __('report_type.customer_n_supplier_report'),
+            'customer_group_report'      => __('report_type.customer_group_report'),
+            'stock_report'               => __('report_type.stock_report'),
+            'stock_adjustment_report'    => __('report_type.stock_adjustment_report'),
+            'tax_report'                 => __('report_type.tax_report'),
+            'trending_product_report'    => __('report_type.trending_product_report'),
+            'items_report'               => __('report_type.items_report'),
+            'product_purchase_report'    => __('report_type.product_purchase_report'),
+            'product_sell_report'        => __('report_type.product_sell_report'),
+            'purchase_payment_report'    => __('report_type.purchase_payment_report'),
+            'sales_representative'       => __('report_type.sales_representative'),
+            'register_report'            => __('report_type.register_report'),
+            'expense_report'             => __('report_type.expense_report'),
+            'activity_log'               => __('report_type.activity_log'),
         ];
     }
 

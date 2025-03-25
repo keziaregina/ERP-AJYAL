@@ -19,39 +19,39 @@ class ReportSettings extends Model
     {
         switch($this->type){
             case 'profit_or_loss_report':
-                return 'Profit / Loss Report';
+                return __('report_type.profit_or_loss_report');
             case 'purchase_n_sell_report':
-                return 'Purchase & Sell Report';
+                return __('report_type.purchase_n_sell_report');
             case 'contacts_report':
-                return 'Contacts Report';
+                return __('report_type.contacts_report');
             case 'customer_n_supplier_report':
-                return 'Customer & Supplier Report';
+                return __('report_type.customer_n_supplier_report');
             case 'customer_group_report':
-                return 'Customer Group Report';
+                return __('report_type.customer_group_report');
             case 'stock_report':
-                return 'Stock Report';
+                return __('report_type.stock_report');
             case 'stock_adjustment_report':
-                return 'Stock Adjustment Report';
+                return __('report_type.stock_adjustment_report');
             case 'tax_report':
-                return 'Tax Report';
+                return __('report_type.tax_report');
             case 'trending_product_report':
-                return 'Trending Product Report';
+                return __('report_type.trending_product_report');
             case 'items_report':
-                return 'Items Report';
+                return __('report_type.items_report');
             case 'product_purchase_report':
-                return 'Product Purchase Report';
+                return __('report_type.product_purchase_report');
             case 'product_sell_report':
-                return 'Product Sell Report';
+                return __('report_type.product_sell_report');
             case 'purchase_payment_report':
-                return 'Purchase Payment Report';
+                return __('report_type.purchase_payment_report');
             case 'sales_representative':
-                return 'Sales Representative Report';
+                return __('report_type.sales_representative');
             case 'register_report':
-                return 'Register Report';
+                return __('report_type.register_report');
             case 'expense_report':
-                return 'Expense Report';
+                return __('report_type.expense_report');
             case 'activity_log':
-                return 'Activity Log';
+                return __('report_type.activity_log');
         }
     }
 
