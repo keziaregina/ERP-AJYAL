@@ -6,7 +6,6 @@ use App\Jobs\SendReportEmailJob;
 use App\User;
 use App\Mail\Reporting;
 use App\ReportSettings;
-use App\ReportSettings;
 use App\Mail\Reporting2;
 use App\Services\ReportEmailService;
 use App\Services\ReportService;

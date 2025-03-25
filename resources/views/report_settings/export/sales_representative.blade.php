@@ -4,16 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Representative Report</title>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: left;
+            margin: 20px;
         }
+
+        .header {
+            text-align: center; 
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 12px;
+            margin: 5px 10px 0px;
+        }
+
+        .logo {
+            width: 70px; 
+        }
+
         .report-title {
             text-align: center;
-            font-size: 18px;
+            font-size: 12px;
             font-weight: bold;
             margin-bottom: 20px;
+        }
+
+        .date{
+            font-size: 11px;
+        }
+        .indexing {
+            width: 40px;
         }
 
         .header-box{
@@ -27,8 +50,6 @@
         }
 
         .box table {
-            margin-bottom: 10px;
-            margin-left: 10px;
             border: none;
             width: 100%;
             border-collapse: collapse;
@@ -40,63 +61,85 @@
             padding: 10px;
         }
 
-        .label {
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #6b7280;
-            font-size: 15px;
-        }
-
-        .value {
-            font-size: 20px;
-            color: #1e293b;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            font-size: 11px;
         }
-        th, td {
-            border: 1px solid #ddd;
+
+        th,
+        td {
+            border: 0.5px solid #ddd;
             padding: 8px;
             text-align: center;
         }
+
         th {
             background-color: #2C3E50;
             color: white;
             font-weight: bold;
         }
-        .total-row {
-            background-color: #f8f9fa;
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        .box {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f8fafc;
+            padding: 10px;
+        }
+        .label {
+            font-weight: bold;
+            font-size: 12px
+        }
+
+        .title {
+            font-size: 13px;
             font-weight: bold;
         }
-        .logo {
-            width: 100px;
-            height: 100px;
+
+        .value{
+            font-size: 11px;
+        }
+
+        .total {
+            background-color: #c8c9ca;
+        }
+
+        .bold {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <header>
+    <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
-        <h3>Ajyal Al - Madina</h3>
+        <h1>Ajyal Al - Madina Al - Asria</h1>
+        <span>{{ env('APP_TITLE') }}</span>
 
-        {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
-        {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
-    </header>
-    <main>
-        <div class="report-title">
-            Slaes Representative Report - AJYAL AL-MADINA AL ASRIA
-        </div>
+        {{ Log::info('CUSTOMER & SUPPLIER -------------------------------------------------->') }}
+        {{ Log::info(json_encode($report, JSON_PRETTY_PRINT)) }}
+    </div>
 
-        <p>
-            Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
-        </p>
+    <div class="report-title">
+        Sales Representatives Report
+    </div>
+
+    <p class="date">
+        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    </p>
+
     <div>
+        <p class="label">Summary</p>
         <div class="box">
-            <h3 class="header-box">Summary</h3>
-            <table border="0">
+            <table>
                 <tr>
                     <td>
                         <div class="label">Total Sale - Total Sales Return :</div>
@@ -105,8 +148,6 @@
                             {{ number_format($report['overall']['sell']['total_sell_return_exc_tax'], 3) ?: '0' }} SAR = 
                             {{ number_format($report['overall']['sell']['total_sell'], 3) ?: '0' }} SAR</div>
                     </td>
-                </tr>
-                <tr>
                     <td>
                         <div class="label">Total Expense : 
                         </div>
@@ -123,7 +164,7 @@
     <table>
         <thead>
             <tr>
-                <th>#</th>
+                <th class="indexing">#</th>
                 <th>Date</th>
                 <th>Invoice No.</th>
                 <th>Customer Name</th>
@@ -137,39 +178,41 @@
         <tbody>
                 @forelse ($report['collection']['sales'] as $index => $item)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
+                    <td class="indexing">{{ $index + 1 }}</td>
                     <td>{{ $item->transaction_date ?: '-' }}</td>
                     <td>{{ $item->invoice_no ?: '-' }}</td>
                     <td>{{ $item->conatct_name ?: '-' }}</td>
                     <td>{{ $item->business_location ?: '-' }}</td>
                     <td>{{ $item->payment_status ?: '-' }}</td>
-                    <td>{{ number_format($item->final_total, 3) ?: '0' }} SAR</td>
-                    <td>{{ number_format($item->total_paid, 3) ?: '0' }} SAR</td>
-                    <td>{{ number_format($item->total_remaining, 3) ?: '0' }} SAR</td>
+                    <td>{{ number_format($item->final_total, 3) ?: '0' }} {{ $currency }}</td>
+                    <td>{{ number_format($item->total_paid, 3) ?: '0' }} {{ $currency }}</td>
+                    <td>{{ number_format($item->total_remaining, 3) ?: '0' }} {{ $currency }}</td>
                 </tr>
                 @empty
                 <tr>
                     <td colspan="9">No data available in table</td>
                 </tr>
                 @endforelse
-                <tr class="total-row">
-                    <td colspan="5">Total:</td>
-                    <td>{{ number_format(collect($report['collection']['sales'])->sum('final_total'), 3) }} SAR</td>
-                    <td>{{ number_format(collect($report['collection']['sales'])->sum('total_paid'), 3) }} SAR</td>
-                    <td>
-                        <div>Sell Due ~ {{ number_format(collect($report['collection']['sales'])->sum('payment_due'), 3) }} SAR</div>
-                        <div>Sell Return Due ~ {{ number_format(collect($report['collection']['sales'])->sum('sell_return_due'), 3) }} SAR</div>
-                    </td>
-                    <td></td>
-                </tr>
         </tbody>
+        <tfoot>
+            <tr class="total">
+                <td class="bold" colspan="5">Total:</td>
+                <td>{{ number_format(collect($report['collection']['sales'])->sum('final_total'), 3) }} {{ $currency }}</td>
+                <td>{{ number_format(collect($report['collection']['sales'])->sum('total_paid'), 3) }} {{ $currency }}</td>
+                <td>
+                    <div><span class="bold">Sell Due </span>~ {{ number_format(collect($report['collection']['sales'])->sum('payment_due'), 3) }} {{ $currency }}</div>
+                    <div><span class="bold">Sell Return Due</span> ~ {{ number_format(collect($report['collection']['sales'])->sum('sell_return_due'), 3) }} {{ $currency }}</div>
+                </td>
+                <td></td>
+            </tr>
+        </tfoot>
     </table>
 
     <h3 class="label">Expense</h3>
     <table>
         <thead>
             <tr>
-                <th>#</th>
+                <th class="indexing">#</th>
                 <th>Date</th>
                 <th>Reference No.</th>
                 <th>Expense Category</th>
@@ -183,13 +226,13 @@
         <tbody>
                 @forelse ($report['collection']['expense'] as $index => $item)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
+                    <td class="indexing">{{ $index + 1 }}</td>
                     <td>{{ $item->transaction_date ?: '-' }}</td>
                     <td>{{ $item->ref_no ?: '-' }}</td>
                     <td>{{ $item->category ?: '-' }}</td>
                     <td>{{ $item->location_name ?: '-' }}</td>
                     <td>{{ $item->payment_status ?: '-' }}</td>
-                    <td>{{ number_format($item->final_total, 3) ?: '0' }}</td>
+                    <td>{{ number_format($item->final_total, 3) ?: '0' }} {{ $currency }}</td>
                     <td>{{ $item->expense_for ?: '-' }}</td>
                     <td>{{ $item->additional_notes ?: '-' }}</td>
                 </tr>
@@ -198,12 +241,14 @@
                     <td colspan="9">No data available in table</td>
                 </tr>
                 @endforelse
-                <tr class="total-row">
-                    <td colspan="6">Total:</td>
-                    <td>{{ number_format(collect($report['collection']['expense'])->sum('final_total'), 3) }} SAR</td>
-                    <td colspan="2"></td>
-                </tr>
         </tbody>
+        <tfoot>
+            <tr class="total">
+                <td class="bold" colspan="6">Total:</td>
+                <td>{{ number_format(collect($report['collection']['expense'])->sum('final_total'), 3) }} {{ $currency }}</td>
+                <td colspan="2"></td>
+            </tr>
+        </tfoot>
     </table>
 
     </main>
