@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\User;
 use App\Contact;
+use App\Jobs\SendReportEmailJob;
 use App\TaxRate;
 use App\Transaction;
 use App\PurchaseLine;
@@ -23,12 +24,12 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
 use App\TransactionSellLinesPurchaseLines;
+use Illuminate\Support\Facades\App;
 
 class ReportEmailService
 {
     public $transactionUtil;
     public $productUtil;
-    public $filename;
     public $businessUtil;
     public $logo;
     public $moduleUtil;
@@ -39,7 +40,6 @@ class ReportEmailService
         $this->businessUtil = $businessUtil;
         $this->moduleUtil = $moduleUtil;
         $this->logo = public_path('img/logo-small.png');
-        // $this->filename = storage_path('app/public/pdf/report/Ajyal Al-Madina.pdf');
     }
 
     public function generateReportAttachment($data,$dates,$interval)
@@ -190,9 +190,8 @@ class ReportEmailService
                 'report' => $report,
                 'dates' => $dates,
                 'currency' => 'ر.س'
-            ]);
-
-            
+        ]);
+        
         $data['interval'] = $interval;
 
 
@@ -201,7 +200,6 @@ class ReportEmailService
         Mail::to($user->email)
             ->send(new Reporting($data, $filename, $type));
 
-        Storage::disk('public')->delete($filename);
         return $filename;
     }
 

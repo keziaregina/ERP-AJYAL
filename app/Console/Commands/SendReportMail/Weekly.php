@@ -2,20 +2,21 @@
 
 namespace App\Console\Commands\SendReportMail;
 
-use App\Mail\Reporting;
-use App\ReportSettings;
-use App\SellingPriceGroup;
-use App\Services\ReportEmailService;
+use App\User;
 use App\TaxRate;
 use App\Transaction;
-use App\User;
-use App\Utils\BusinessUtil;
+use App\Mail\Reporting;
+use App\ReportSettings;
 use App\Utils\ModuleUtil;
+use App\SellingPriceGroup;
 use App\Utils\ProductUtil;
+use App\Utils\BusinessUtil;
 use App\Utils\TransactionUtil;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\Command;
+use App\Jobs\SendReportEmailJob;
 use Illuminate\Support\Facades\DB;
+use App\Services\ReportEmailService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
@@ -70,6 +71,8 @@ class Weekly extends Command
         foreach ($datas as $data) {
             $this->reportEmailService->generateReportAttachment($data, $this->getDay(), $data->interval);
         }
+        
+        SendReportEmailJob::dispatch();
     }
 
     public function getDay()
