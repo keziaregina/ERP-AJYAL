@@ -54,7 +54,7 @@
         }
 
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -74,10 +74,22 @@
         .bold {
             font-weight: bold;
         }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
-
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -88,22 +100,22 @@
     </div>
 
     <div class="report-title">
-        Purchase Payment Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table>
+    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th class="indexing">#</th>
-                <th>Ref. No</th>
-                <th>Paid on</th>
-                <th>Amount</th>
-                <th>Supplier</th>
-                <th>Payment Method</th>
+                <th>{{ __('attachment.purchase_payment.th_ref_no') }}</th>
+                <th>{{ __('attachment.purchase_payment.th_paid') }}</th>
+                <th>{{ __('attachment.purchase_payment.th_amount') }}</th>
+                <th>{{ __('attachment.purchase_payment.th_supplier') }}</th>
+                <th>{{ __('attachment.purchase_payment.th_payment_method') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -119,14 +131,14 @@
             @empty
                 <tr>
                     <td colspan="6">
-                        No Data Available
+                        {{ __('attachment.general.empty') }}
                     </td>
                 </tr>
             @endforelse
         </tbody>
         <tfoot>
             <tr class="total">
-                <td class="bold" colspan="3">Total:</td>
+                <td class="bold" colspan="3">{{ __('attachment.general.subtotal') }}</td>
                 <td>{{ number_format(collect($report)->sum('amount'), 3) }} {{ $currency }}</td>
                 <td colspan="2"></td>
             </tr>

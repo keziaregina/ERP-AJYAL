@@ -55,7 +55,7 @@
         }
 
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -75,10 +75,22 @@
         .bold {
             font-weight: bold;
         }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
-
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -89,32 +101,32 @@
     </div>
 
     <div class="report-title">
-        Items Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table>
+    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th class="indexing" rowspan="2">#</th>
-                <th>Product</th>
-                <th>SKU</th>
-                <th>Purchase Date</th>
-                <th>Purchase</th>
-                <th>Supplier</th>
-                <th colspan="2">Purchase Price</th>
+                <th>{{ __('attachment.items.th_product') }}</th>
+                <th>{{ __('attachment.items.th_sku') }}</th>
+                <th>{{ __('attachment.items.th_purchase_date') }}</th>
+                <th>{{ __('attachment.items.th_purchase') }}</th>
+                <th>{{ __('attachment.items.th_supplier') }}</th>
+                <th colspan="2">{{ __('attachment.items.th_purchase_price') }}</th>
             </tr>
             <tr>
-                <th>Sell Date</th>
-                <th>Sale</th>
-                <th>Customer</th>
-                <th>Location</th>
-                <th>Sell Quantity</th>
-                <th>Selling Price</th>
-                <th>Subtotal</th>
+                <th>{{ __('attachment.items.th_sell_date') }}</th>
+                <th>{{ __('attachment.items.th_sale') }}</th>
+                <th>{{ __('attachment.items.th_customer') }}</th>
+                <th>{{ __('attachment.items.th_location') }}</th>
+                <th>{{ __('attachment.items.th_sell_quantity') }}</th>
+                <th>{{ __('attachment.items.th_selling_price') }}</th>
+                <th>{{ __('attachment.items.th_subtotal') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -147,20 +159,20 @@
             @empty
                 <tr>
                     <td colspan="14">
-                        No Data Available
+                        {{ __('attachment.general.empty') }}
                     </td>
                 </tr>
             @endforelse
         </tbody>
         <tfoot>
             <tr class="total">
-                <td class="bold" colspan="8">Total:</td>
+                <td class="bold" colspan="8">{{ __('attachment.general.subtotal') }}</td>
             </tr>
             <tr class="total">
-                <td class="bold" colspan="2">Purchase Price</td>
-                <td class="bold" colspan="2">Quantity</td>
-                <td class="bold" colspan="2">Selling Price</td>
-                <td class="bold" colspan="2">Subtotal</td>
+                <td class="bold" colspan="2">{{ __('attachment.items.tf_purchase_price') }}</td>
+                <td class="bold" colspan="2">{{ __('attachment.items.tf_quantity') }}</td>
+                <td class="bold" colspan="2">{{ __('attachment.items.tf_selling_price') }}</td>
+                <td class="bold" colspan="2">{{ __('attachment.items.tf_subtotal') }}</td>
             </tr>
             <tr>
                 <td colspan="2">{{ number_format(collect($report)->sum('purchase_price'), 3) ?: '0' }} {{ $currency }}</td>

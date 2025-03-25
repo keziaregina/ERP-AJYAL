@@ -53,7 +53,7 @@
         }
 
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -73,9 +73,22 @@
         .bold {
             font-weight: bold;
         }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -86,28 +99,28 @@
     </div>
 
     <div class="report-title">
-        Product Purchases Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table>
+    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th class="indexing" rowspan="2">#</th>
-                <th>Product</th>
-                <th>SKU</th>
-                <th>Supplier</th>
-                <th>Ref. No</th>
-                <th>Date</th>
+                <th>{{ __('attachment.product_purchase.th_product') }}</th>
+                <th>{{ __('attachment.product_purchase.th_sku') }}</th>
+                <th>{{ __('attachment.product_purchase.th_supplier') }}</th>
+                <th>{{ __('attachment.product_purchase.th_ref_no') }}</th>
+                <th>{{ __('attachment.product_purchase.th_date') }}</th>
             </tr>
             <tr>
-                <th>Quantity</th>
-                <th>Total Unit Adjusted</th>
-                <th>Unit Purchase Price</th>
-                <th colspan="2">Subtotal</th>
+                <th>{{ __('attachment.product_purchase.th_quantity') }}</th>
+                <th>{{ __('attachment.product_purchase.th_tunit_adjusted') }}</th>
+                <th>{{ __('attachment.product_purchase.th_unit_purchase_price') }}</th>
+                <th colspan="2">{{ __('attachment.product_purchase.subtotal') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -129,18 +142,18 @@
             @empty
             <tr>
                 <td colspan="6">
-                    No Data Available
+                    {{ __('attachment.general.empty') }}
                 </td>
             </tr>
             @endforelse
         </tbody>
         <tfoot>
             <tr class="total">
-                <td class="bold" colspan="6">Total:</td>
+                <td class="bold" colspan="6">{{ __('attachment.general.subtotal') }}</td>
             </tr>
             <tr class="total">
-                <td class="bold" colspan="3">Unit Purchase Price</td>
-                <td class="bold" colspan="3">Subtotal</td>
+                <td class="bold" colspan="3">{{ __('attachment.product_purchase.tf_unit_purchase_price') }}</td>
+                <td class="bold" colspan="3">{{ __('attachment.product_purchase.subtotal') }}</td>
             </tr>
             <tr>
                 <td colspan="3">{{ number_format(collect($report)->sum('quantity_adjusted'), 3) ?: '0' }} {{ $currency }}</td>

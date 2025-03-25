@@ -95,10 +95,24 @@
         .bold {
             font-weight: bold;
         }
+
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
 
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -109,36 +123,38 @@
     </div>
 
     <div class="report-title">
-        Taxes Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
     <div class="box">
-        <div class="label">
-            Overall (Input - Output - Expense)
+        <div class="label {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+            {{ __('attachment.tax.overall_title') }}
         </div>
-        <div class="value">
-            Output Tax - Input Tax - Expense Tax : {{ number_format($report['tax_diff'], 3) }} SAR
+        <div class="value {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+            {{ __('attachment.tax.overall_value') }}
         </div>
     </div>
 
     <div style="margin-bottom: 20px;">
-        <h3 class="title" style="margin-bottom: 15px">Input Tax (Purchase)</h3>
+        <h3 class="title {{ $lang === 'ar' ? 'rtl' : 'ltr' }}" style="margin-bottom: 15px">
+            {{ __('attachment.tax.input_title') }}
+        </h3>
 
-        <table>
+        <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
             <thead>
                 <tr>
                     <th class="indexing">#</th>
-                    <th>Date</th>
-                    <th>Reference No.</th>
-                    <th>Supplier</th>
-                    <th>Tax Number</th>
-                    <th>Total Amount</th>
-                    <th>Payment Method</th>
-                    <th>Discount</th>
+                    <th>{{ __('attachment.tax.th_date') }}</th>
+                    <th>{{ __('attachment.tax.th_ref') }}</th>
+                    <th>{{ __('attachment.tax.th_supplier') }}</th>
+                    <th>{{ __('attachment.tax.th_taxnum') }}</th>
+                    <th>{{ __('attachment.tax.th_amount') }}</th>
+                    <th>{{ __('attachment.tax.th_payment_method') }}</th>
+                    <th>{{ __('attachment.tax.th_discount') }}</th>
                     @foreach ($report['taxes'] as $tax)
                         <th>{{ $tax['name'] }}</th>
                     @endforeach
@@ -160,7 +176,7 @@
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="11">No data available in table</td>
+                        <td colspan="11">{{ __('attachment.general.empty') }}</td>
                     </tr>
                 @endif
             </tbody>
@@ -168,19 +184,21 @@
     </div>
 
     <div style="margin-bottom: 20px;">
-        <h3 class="title" style="margin-bottom: 15px">Output Tax (Sales)</h3>
+        <h3 class="title {{ $lang === 'ar' ? 'rtl' : 'ltr' }}" style="margin-bottom: 15px">
+            {{ __('attachment.tax.output_title') }}
+        </h3>
 
-        <table>
+        <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
             <thead>
                 <tr>
                     <th class="indexing">#</th>
-                    <th>Date</th>
-                    <th>Invoice No.</th>
-                    <th>Customer</th>
-                    <th>Tax Number</th>
-                    <th>Total Amount</th>
-                    <th>Payment Method</th>
-                    <th>Discount</th>
+                    <th>{{ __('attachment.tax.th_date') }}</th>
+                    <th>{{ __('attachment.tax.th_ref') }}</th>
+                    <th>{{ __('attachment.tax.th_customer') }}</th>
+                    <th>{{ __('attachment.tax.th_taxnum') }}</th>
+                    <th>{{ __('attachment.tax.th_amount') }}</th>
+                    <th>{{ __('attachment.tax.th_payment_method') }}</th>
+                    <th>{{ __('attachment.tax.th_discount') }}</th>
                     @foreach ($report['taxes'] as $tax)
                         <th>{{ $tax['name'] }}</th>
                     @endforeach
@@ -202,7 +220,7 @@
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="11">No data available in table</td>
+                        <td colspan="11">{{ __('attachment.general.empty') }}</td>
                     </tr>
                 @endif
             </tbody>
@@ -210,18 +228,20 @@
     </div>
 
     <div style="margin-bottom: 20px;">
-        <h3 class="title" style="margin-bottom: 15px">Expense Tax</h3>
+        <h3 class="title {{ $lang === 'ar' ? 'rtl' : 'ltr' }}" style="margin-bottom: 15px">
+            {{ __('attachment.tax.expense_title') }}
+        </h3>
 
-        <table>
+        <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
             <thead>
                 <tr>
                     <th class="indexing">#</th>
-                    <th>Date</th>
-                    <th>Reference No.</th>
-                    <th>Tax Number</th>
-                    <th>Total Amount</th>
-                    <th>Payment Method</th>
-                    <th>Discount</th>
+                    <th>{{ __('attachment.tax.th_date') }}</th>
+                    <th>{{ __('attachment.tax.th_ref') }}</th>
+                    <th>{{ __('attachment.tax.th_taxnum') }}</th>
+                    <th>{{ __('attachment.tax.th_amount') }}</th>
+                    <th>{{ __('attachment.tax.th_payment_method') }}</th>
+                    <th>{{ __('attachment.tax.th_discount') }}</th>
                     @foreach ($report['taxes'] as $tax)
                         <th>{{ $tax['name'] }}</th>
                     @endforeach
@@ -242,7 +262,7 @@
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="10">No data available in table</td>
+                        <td colspan="10">{{ __('attachment.general.empty') }}</td>
                     </tr>
                 @endif
             </tbody>

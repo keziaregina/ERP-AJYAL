@@ -53,7 +53,7 @@
         }
 
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -73,9 +73,22 @@
         .bold {
             font-weight: bold;
         }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -86,30 +99,31 @@
     </div>
 
     <div class="report-title">
-        Product Sells Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
-    <table>
+
+    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th rowspan="2">#</th>
-                <th>Product</th>
-                <th>SKU</th>
-                <th>Customer Name</th>
-                <th>Contact ID</th>
-                <th>Invoice No.</th>
-                <th>Date</th>
+                <th>{{ __('attachment.product_sell.th_product') }}</th>
+                <th>{{ __('attachment.product_sell.th_sku') }}</th>
+                <th>{{ __('attachment.product_sell.th_customer_name') }}</th>
+                <th>{{ __('attachment.product_sell.th_contact_id') }}</th>
+                <th>{{ __('attachment.product_sell.th_invoice_no') }}</th>
+                <th>{{ __('attachment.product_sell.th_date') }}</th>
             </tr>
             <tr>
-                <th>Unit Price</th>
-                <th>Discount</th>
-                <th>Tax</th>
-                <th>Price (Inc. Tax)</th>
-                <th>Total</th>
-                <th>Payment Method</th>
+                <th>{{ __('attachment.product_sell.th_unit_price') }}</th>
+                <th>{{ __('attachment.product_sell.th_discount') }}</th>
+                <th>{{ __('attachment.product_sell.th_tax') }}</th>
+                <th>{{ __('attachment.product_sell.th_price_inctax') }}</th>
+                <th>{{ __('attachment.product_sell.th_total') }}</th>
+                <th>{{ __('attachment.product_sell.th_payment_method') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -135,15 +149,15 @@
             @empty
             <tr>
                 <td colspan="7">
-                    No Data Available
+                    {{ __('attachment.general.empty') }}
                 </td>
             </tr>
             @endforelse
         </tbody>
         <tfoot>
             <tr class="total">
-                <td class="bold" colspan="4">Total:</td>
-                <td class="bold" colspan="2">Subtotal</td>
+                <td class="bold" colspan="4">{{ __('attachment.general.subtotal') }}</td>
+                <td class="bold" colspan="2">{{ __('attachment.product_purchase.subtotal') }}</td>
                 <td>{{ number_format(collect($report)->sum('subtotal'), 3) ?: '0' }} {{ $currency }}</td>
             </tr>
         </tfoot>

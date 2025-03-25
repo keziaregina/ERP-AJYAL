@@ -186,14 +186,15 @@ class ReportEmailService
 
         $pdf = pdh::loadView($view, [
             'orientation' => 'L',
-        ],
-        [
+                ],
+                [
                     'data' => $data, 
                     'logo' => $this->logo,
                     'user' => $user,
                     'report' => $report,
                     'dates' => $dates,
-                    'currency' => 'ر.س'
+                    'currency' => 'ر.س',
+                    'lang' => $data->attachment_lang,
                     ]);            
         $data['interval'] = $interval;
 

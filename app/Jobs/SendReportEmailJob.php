@@ -38,6 +38,5 @@ class SendReportEmailJob implements ShouldQueue
     public function handle()
     {
         Storage::disk('public')->deleteDirectory('pdf/report');
-        Storage::disk('public')->makeDirectory('pdf/report');
     }
 }

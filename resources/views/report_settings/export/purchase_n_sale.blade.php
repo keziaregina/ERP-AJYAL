@@ -58,7 +58,7 @@
         }
 
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -90,10 +90,22 @@
             color: #e74c3c;
             font-weight: bold;
         }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
-
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -104,50 +116,50 @@
     </div>
 
     <div class="report-title">
-        Purchases and Sales Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table>
+    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
-                <th colspan="2">Purchases</th>
+                <th colspan="2">{{ __('attachment.purchase_n_sale.purchase') }}</th>
                 <th class="separator"></th>
-                <th colspan="2">Sales</th>
+                <th colspan="2">{{ __('attachment.purchase_n_sale.sales') }}</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td class="label">Total Purchase:</td>
+                <td class="label">{{ __('attachment.purchase_n_sale.total_purchase') }}</td>
                 <td>{{ number_format($report['purchase']['total_purchase_exc_tax'], 3) ?: '0' }} {{ $currency }}
                 </td>
                 <td class="separator"></td>
-                <td class="label">Total Sale:</td>
+                <td class="label">{{ __('attachment.purchase_n_sale.total_sales') }}</td>
                 <td>{{ number_format($report['sell']['total_sell_exc_tax'], 3) ?: '0' }} {{ $currency }}</td>
             </tr>
             <tr>
-                <td class="label">Purchase Including tax:</td>
+                <td class="label">{{ __('attachment.purchase_n_sale.purchase_inc_tax') }}</td>
                 <td>{{ number_format($report['purchase']['total_purchase_inc_tax'], 3) ?: '0' }}
                     {{ $currency }}</td>
                 <td class="separator"></td>
-                <td class="label">Sale Including tax:</td>
+                <td class="label">{{ __('attachment.purchase_n_sale.sale_inc_tax') }}</td>
                 <td>{{ number_format($report['sell']['total_sell_inc_tax'], 3) ?: '0' }} {{ $currency }}</td>
             </tr>
             <tr>
-                <td class="label">Total Purchase Return Including Tax:</td>
+                <td class="label">{{ __('attachment.purchase_n_sale.purchase_return_inc_tax') }}</td>
                 <td>{{ number_format($report['total_purchase_return'], 3) ?: '0' }} {{ $currency }}</td>
                 <td class="separator"></td>
-                <td class="label">Total Sell Return Including Tax:</td>
+                <td class="label">{{ __('attachment.purchase_n_sale.sale_return_inc_tax') }}</td>
                 <td>{{ number_format($report['total_sell_return'], 3) ?: '0' }} {{ $currency }}</td>
             </tr>
             <tr>
-                <td class="label">Purchase Due: </td>
+                <td class="label">{{ __('attachment.purchase_n_sale.purchase_due') }}</td>
                 <td>{{ number_format($report['purchase']['purchase_due'], 3) ?: '0' }} {{ $currency }}</td>
                 <td class="separator"></td>
-                <td class="label">Sale Due:</td>
+                <td class="label">{{ __('attachment.purchase_n_sale.sale_due') }}</td>
                 <td>{{ number_format($report['sell']['invoice_due'], 3) ?: '0' }} {{ $currency }}</td>
             </tr>
         </tbody>
@@ -155,14 +167,14 @@
 
     <br>
     <br>
-    <div class="overall">
-        <span class="overall-title">Overall</span>
-        <h4>(Sale - Sell Return) - (Purchase - Purchase Return)</h4>
+    <div class="overall {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        <span class="overall-title">{{ __('attachment.purchase_n_sale.overall') }}</span>
+        <h4>{{ __('attachment.purchase_n_sale.operation') }}</h4>
         <div>
-            Sale - Purchase : <span class="negative">{{ number_format($report['difference']['total'], 3) ?: '0' }} {{ $currency }}</span>
+            {{ __('attachment.purchase_n_sale.sale_purchase') }} <span class="negative">{{ number_format($report['difference']['total'], 3) ?: '0' }} {{ $currency }}</span>
         </div>
         <div>
-            Due Amount : <span class="negative">{{ number_format($report['difference']['due'], 3) ?: '0' }} {{ $currency }}</span>
+            {{ __('attachment.purchase_n_sale.due_amount') }}: <span class="negative">{{ number_format($report['difference']['due'], 3) ?: '0' }} {{ $currency }}</span>
         </div>
     </div>
 </body>
