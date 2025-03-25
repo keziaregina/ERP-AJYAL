@@ -22,11 +22,17 @@
             color: #333;
             margin-bottom: 20px;
         }
-        .content {
+        .content-ltr {
             font-size: 16px;
             color: #555;
             margin-bottom: 20px;
             text-align: left;
+        }
+        .content-rtl {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+            text-align: right;
         }
         .button {
             display: inline-block;
@@ -43,18 +49,32 @@
             font-size: 14px;
             color: #777;
         }
+
+        .rtl {
+            direction: rtl
+        }
+
+        .ltr {
+            direction: ltr
+        }
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <div class="header">Your {{ $interval }} report is ready</div>
-        <div class="content">
-            {{-- @dd($report_type) --}}
-            <p>Hi {{ $user->first_name }} {{ $user->last_name }},</p>
-            <p>Your latest {{ $report_type }} report is now available. Click the button below to download it.</p>
-            <a href="#" class="button">Download Report</a>
+    @php
+        if ($attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
+    <div class="email-container {{ $attachment_lang === 'ar' ? 'rtl' : 'ltr' }}">
+        <div class="header">{{ __('email_notification.title', ['interval' => __("interval.$interval")]) }}</div>
+        <div class="content-{{ $attachment_lang === 'ar' ? 'rtl' : 'ltr' }}">
+            <p>{{ __('email_notification.row_1', ['first_name' => $user->first_name, 'last_name' => $user->last_name]) }}</p>
+            <p>{{ __('email_notification.row_2', ['report_type' => __("report_type.$title")]) }}</p>
+            <a href="#" class="button">{{ __('email_notification.download_button') }}</a>
         </div>
-        <div class="footer">&copy; {{ date('Y') }} Your Company. All rights reserved.</div>
+        <div class="footer">&copy; {{ date('Y') }} {{ __('email_notification.copyright') }}</div>
     </div>
 </body>
 </html>
