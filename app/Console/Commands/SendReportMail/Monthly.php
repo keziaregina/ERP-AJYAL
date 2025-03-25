@@ -4,6 +4,7 @@ namespace App\Console\Commands\SendReportMail;
 
 use App\User;
 use App\Contact;
+use App\Jobs\SendReportEmailJob;
 use App\TaxRate;
 use App\Transaction;
 use App\Mail\Reporting;
@@ -64,6 +65,8 @@ class Monthly extends Command
         foreach ($datas as $data) {
             $this->reportEmailService->generateReportAttachment($data, $this->getDay(), $data->interval);
         }
+
+        SendReportEmailJob::dispatch();
     }
 
     public function getDay()
