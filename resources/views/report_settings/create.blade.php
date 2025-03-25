@@ -49,6 +49,13 @@
         </div>
       </div>
     </div>
+    <div class="col-sm-12">
+      <div class="form-group">
+        {!! Form::label('attachment_lang', __('report_settings.attachment_lang') . ':*') !!}
+          {!! Form::select('attachment_lang', ['All'=>'All Languages', 'en'=>'English', 'ar'=>'Arabic'], ['All'], ['class' => 'form-control',
+          'placeholder' => __('report_settings.attachment_lang'), 'required']); !!}
+      </div>
+    </div>
     <div class="col-sm-12 text-center">
       <button type="submit" class="tw-dw-btn tw-dw-btn-primary tw-dw-btn-lg tw-text-white">@lang('messages.save')</button>
     </div>

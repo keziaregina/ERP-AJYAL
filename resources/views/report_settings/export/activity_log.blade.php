@@ -136,7 +136,7 @@ table {
     <header>
         <img src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina</h1>
-        {{-- <span class="arabic">{{ env('APP_TITLE') }}</span> --}}
+        <span class="arabic">{{ env('APP_TITLE') }}</span>
 
         {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
         {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}

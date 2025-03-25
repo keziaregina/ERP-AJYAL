@@ -46,6 +46,13 @@
             </div>
           </div>
         </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            {!! Form::label('attachment_lang', __('report_settings.attachment_lang') . ':*') !!}
+              {!! Form::select('attachment_lang', ['All'=>'All Languages', 'en'=>'English', 'ar'=>'Arabic'], $report_settings->attachment_lang, ['class' => 'form-control',
+              'placeholder' => __('report_settings.attachment_lang'), 'required']); !!}
+          </div>
+        </div>
         <div class="clearfix"></div>
         <div class="col-sm-12 text-center">
           <button type="submit" class="btn btn-primary btn-big">@lang('messages.update')</button>

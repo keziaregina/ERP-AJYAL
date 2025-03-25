@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'report_settings' => 'Report Settings',
+    'report_settings' => 'Email Notification Settings',
     'manage_your_report_settings' => 'Manage your report settings',
     'all_your_report_settings' => 'All your report settings',
     'user_name' => 'User Name',
@@ -11,4 +11,27 @@ return [
     'added_success' => 'Report setting added successfully',
     'updated_success' => 'Report setting updated successfully',
     'deleted_success' => 'Report setting deleted successfully',
+    'attachment_lang' => 'Attachment Language',
+    'profit_or_loss_report' => 'Profit / Loss Report',
+    'purchase_n_sell_report' => 'Purchase & Sell Report',
+    'contacts_report' => 'Contacts Report',
+    'customer_n_supplier_report' => 'Customer & Supplier Report',
+    'customer_group_report' => 'Customer Group Report',
+    'stock_report' => 'Stock Report',
+    'stock_adjustment_report' => 'Stock Adjustment Report',
+    'tax_report' => 'Tax Report',
+    'trending_product_report' => 'Trending Product Report',
+    'items_report' => 'Items Report',
+    'product_purchase_report' => 'Product Purchase Report',
+    'product_sell_report' => 'Product Sell Report',
+    'purchase_payment_report' => 'Purchase Payment Report',
+    'sales_representative' => 'Sales Representative Report',
+    'register_report' => 'Register Report',
+    'expense_report' => 'Expense Report',
+    'activity_log' => 'Activity Log',
+
+    'daily' => 'Daily',
+    'weekly' => 'Weekly',
+    'monthly' => 'Monthly',
+    'yearly' => 'Yearly',
 ];

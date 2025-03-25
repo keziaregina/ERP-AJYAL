@@ -116,6 +116,7 @@
 					</div>
 				</div>
 			</div>
+			@can('manufacturing.access_price')
 			<div class="col-md-3">
 				<div class="form-group">
 					{!! Form::label('production_cost', __('manufacturing::lang.production_cost').':') !!} @show_tooltip(__('manufacturing::lang.production_cost_tooltip'))
@@ -131,7 +132,9 @@
 				<span id="total_production_cost" class="display_currency" data-currency_symbol="true">0</span></p>
 				</div>
 			</div>
+			@endcan
 		</div>
+		@can('manufacturing.access_price')
 		<div class="row">
 			<div class="col-md-3 col-md-offset-9">
 				{!! Form::hidden('final_total', 0, ['id' => 'final_total']); !!}
@@ -141,6 +144,7 @@
 				<span id="final_total_text" class="display_currency" data-currency_symbol="true">0</span>
 			</div>
 		</div>
+		@endcan
 		<div class="row">
 			<div class="col-md-3 col-md-offset-9">
 				<div class="form-group">
