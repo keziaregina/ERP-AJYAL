@@ -200,7 +200,6 @@ class ReportEmailService
         Mail::to($user->email)
             ->send(new Reporting($data, $filename, $type));
 
-        Storage::disk('public')->delete($filename);
         return $filename;
     }
 

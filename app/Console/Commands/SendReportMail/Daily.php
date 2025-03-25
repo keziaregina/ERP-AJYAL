@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\SendReportMail;
 
+use App\Jobs\SendReportEmailJob;
 use App\User;
 use App\Mail\Reporting;
 use App\ReportSettings;
@@ -66,6 +67,8 @@ class Daily extends Command
         foreach ($datas as $data) {
             $this->reportEmailService->generateReportAttachment($data, $this->getDay(), $data->interval);
         }
+
+        SendReportEmailJob::dispatch();
     }
 
     public function getDay()
