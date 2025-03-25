@@ -255,6 +255,11 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::get('/labels/add-product-row', [LabelsController::class, 'addProductRow']);
     Route::get('/labels/preview', [LabelsController::class, 'preview']);
 
+    // Route::get('/testing', function() {
+    //    $d = config('mail');
+    //    dd($d);
+    //    return;
+    // });
     //Reports...
     Route::get('/reports/gst-purchase-report', [ReportController::class, 'gstPurchaseReport']);
     Route::get('/reports/gst-sales-report', [ReportController::class, 'gstSalesReport']);

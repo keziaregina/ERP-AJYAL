@@ -9,7 +9,6 @@ use App\TaxRate;
 use App\Transaction;
 use App\Mail\Reporting;
 use App\ReportSettings;
-use App\Mail\Reporting2;
 use App\Services\ReportEmailService;
 use App\Utils\ModuleUtil;
 use App\Utils\TransactionUtil;

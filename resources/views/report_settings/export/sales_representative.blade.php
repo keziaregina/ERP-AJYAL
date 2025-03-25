@@ -76,7 +76,7 @@
         }
 
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -116,9 +116,22 @@
         .bold {
             font-weight: bold;
         }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -129,30 +142,31 @@
     </div>
 
     <div class="report-title">
-        Sales Representatives Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
+
     <div>
-        <p class="label">Summary</p>
+        <p class="label">{{ __('attachment.sales_representative.summary') }}</p>
         <div class="box">
-            <table>
+            <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
                 <tr>
                     <td>
-                        <div class="label">Total Sale - Total Sales Return :</div>
+                        <div class="label">{{ __('attachment.sales_representative.total_sale-return') }}</div>
                         <div class="value">
-                            {{ number_format($report['overall']['sell']['total_sell_exc_tax'], 3) ?: '0' }} SAR - 
-                            {{ number_format($report['overall']['sell']['total_sell_return_exc_tax'], 3) ?: '0' }} SAR = 
-                            {{ number_format($report['overall']['sell']['total_sell'], 3) ?: '0' }} SAR</div>
+                            {{ number_format($report['overall']['sell']['total_sell_exc_tax'], 3) ?: '0' }} {{ $currency }} - 
+                            {{ number_format($report['overall']['sell']['total_sell_return_exc_tax'], 3) ?: '0' }} {{ $currency }} = 
+                            {{ number_format($report['overall']['sell']['total_sell'], 3) ?: '0' }} {{ $currency }}</div>
                     </td>
                     <td>
-                        <div class="label">Total Expense : 
+                        <div class="label">{{ __('attachment.sales_representative.total_expense') }}
                         </div>
                         <div class="value">
-                            {{ number_format($report['overall']['expense']['total_expense'], 3) ?: '0' }} SAR
+                            {{ number_format($report['overall']['expense']['total_expense'], 3) ?: '0' }} {{ $currency }}
                         </div>
                     </td>
                 </tr>
@@ -160,19 +174,19 @@
         </div>
     </div>
 
-    <h3 class="label">Sales</h3>
+    <h3 class="label">{{ __('attachment.sales_representative.sales') }}</h3>
     <table>
         <thead>
             <tr>
                 <th class="indexing">#</th>
-                <th>Date</th>
-                <th>Invoice No.</th>
-                <th>Customer Name</th>
-                <th>Location</th>
-                <th>Payment Status</th>
-                <th>Total Amount</th>
-                <th>Total Paid</th>
-                <th>Total Remaining</th>
+                <th>{{ __('attachment.sales_representative.th_date') }}</th>
+                <th>{{ __('attachment.sales_representative.th_invoice_no') }}</th>
+                <th>{{ __('attachment.sales_representative.th_cust_name') }}</th>
+                <th>{{ __('attachment.sales_representative.th_location') }}</th>
+                <th>{{ __('attachment.sales_representative.th_payment_status') }}</th>
+                <th>{{ __('attachment.sales_representative.th_amount') }}</th>
+                <th>{{ __('attachment.sales_representative.th_paid') }}</th>
+                <th>{{ __('attachment.sales_representative.th_remaining') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -190,37 +204,37 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="9">No data available in table</td>
+                    <td colspan="9">{{ __('attachment.general.empty') }}</td>
                 </tr>
                 @endforelse
         </tbody>
         <tfoot>
             <tr class="total">
-                <td class="bold" colspan="5">Total:</td>
+                <td class="bold" colspan="5">{{ __('attachment.general.subtotal') }}</td>
                 <td>{{ number_format(collect($report['collection']['sales'])->sum('final_total'), 3) }} {{ $currency }}</td>
                 <td>{{ number_format(collect($report['collection']['sales'])->sum('total_paid'), 3) }} {{ $currency }}</td>
                 <td>
-                    <div><span class="bold">Sell Due </span>~ {{ number_format(collect($report['collection']['sales'])->sum('payment_due'), 3) }} {{ $currency }}</div>
-                    <div><span class="bold">Sell Return Due</span> ~ {{ number_format(collect($report['collection']['sales'])->sum('sell_return_due'), 3) }} {{ $currency }}</div>
+                    <div><span class="bold">{{ __('attachment.sales_representative.sell_due') }}</span> ~ {{ number_format(collect($report['collection']['sales'])->sum('payment_due'), 3) }} {{ $currency }}</div>
+                    <div><span class="bold">{{ __('attachment.sales_representative.sell_return_due') }}</span> ~ {{ number_format(collect($report['collection']['sales'])->sum('sell_return_due'), 3) }} {{ $currency }}</div>
                 </td>
                 <td></td>
             </tr>
         </tfoot>
     </table>
 
-    <h3 class="label">Expense</h3>
+    <h3 class="label">{{ __('attachment.sales_representative.expenses') }}</h3>
     <table>
         <thead>
             <tr>
                 <th class="indexing">#</th>
-                <th>Date</th>
-                <th>Reference No.</th>
-                <th>Expense Category</th>
-                <th>Location</th>
-                <th>Payment Status</th>
-                <th>Total Amount</th>
-                <th>Expense For</th>
-                <th>Expense Note</th>
+                <th>{{ __('attachment.sales_representative.th_date') }}</th>
+                <th>{{ __('attachment.sales_representative.th_ref_no') }}</th>
+                <th>{{ __('attachment.sales_representative.th_expense_cat') }}</th>
+                <th>{{ __('attachment.sales_representative.th_location') }}</th>
+                <th>{{ __('attachment.sales_representative.th_payment_status') }}</th>
+                <th>{{ __('attachment.sales_representative.th_amount') }}</th>
+                <th>{{ __('attachment.sales_representative.th_expense_for') }}</th>
+                <th>{{ __('attachment.sales_representative.th_expense_note') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -238,13 +252,13 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="9">No data available in table</td>
+                    <td colspan="9">{{ __('attachment.general.empty') }}</td>
                 </tr>
                 @endforelse
         </tbody>
         <tfoot>
             <tr class="total">
-                <td class="bold" colspan="6">Total:</td>
+                <td class="bold" colspan="6">{{ __('attachment.general.subtotal') }}</td>
                 <td>{{ number_format(collect($report['collection']['expense'])->sum('final_total'), 3) }} {{ $currency }}</td>
                 <td colspan="2"></td>
             </tr>

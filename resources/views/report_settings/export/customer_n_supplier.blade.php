@@ -53,7 +53,7 @@
         }
 
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -73,9 +73,22 @@
         .bold {
             font-weight: bold;
         }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -86,24 +99,24 @@
     </div>
 
     <div class="report-title">
-        Customer and Supplier Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table>
+    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th class="indexing">#</th>
-                <th>Contact</th>
-                <th>Total Purchase</th>
-                <th>Total Purchase Return</th>
-                <th>Total Sale</th>
-                <th>Total Sell Return</th>
-                <th>Opening Balance Due</th>
-                <th>Due Amount</th>
+                <th>{{ __('attachment.customer_supplier.th_contact') }}</th>
+                <th>{{ __('attachment.customer_supplier.th_tpurchase') }}</th>
+                <th>{{ __('attachment.customer_supplier.th_tpurchase_return') }}</th>
+                <th>{{ __('attachment.customer_supplier.th_tsale') }}</th>
+                <th>{{ __('attachment.customer_supplier.th_tsell_return') }}</th>
+                <th>{{ __('attachment.customer_supplier.th_opening_balance') }}</th>
+                <th>{{ __('attachment.customer_supplier.th_due_amount') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -120,14 +133,14 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8">No Data Available</td>
+                    <td colspan="8">{{ __('attachment.general.empty') }}</td>
                 </tr>
             @endforelse
             
         </tbody>
         <tfoot>
             <tr class="total">
-                <td class="bold" colspan="2">Total:</td>
+                <td class="bold" colspan="2">{{ __('attachment.general.subtotal') }}</td>
                 <td>{{ number_format(collect($report)->sum('total_purchase'), 3) ?: '0' }} {{ $currency }}</td>
                 <td>{{ number_format(collect($report)->sum('total_purchase_return'), 3) ?: '0' }} {{ $currency }}</td>
                 <td>{{ number_format(collect($report)->sum('total_invoice'), 3) ?: '0' }} {{ $currency }}</td>

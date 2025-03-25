@@ -54,7 +54,7 @@
         }
 
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -74,9 +74,22 @@
         .bold {
             font-weight: bold;
         }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -87,21 +100,21 @@
     </div>
 
     <div class="report-title">
-        Trending Products Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table>
+    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th class="indexing">#</th>
-                <th>Product</th>
-                <th>SKU</th>
-                <th>Unit</th>
-                <th>Total Unit Sold</th>
+                <th>{{ __('attachment.trending_product.th_product') }}</th>
+                <th>{{ __('attachment.trending_product.th_sku') }}</th>
+                <th>{{ __('attachment.trending_product.th_unit') }}</th>
+                <th>{{ __('attachment.trending_product.th_tunit_sold') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -116,7 +129,7 @@
             @empty
             <tr>
                 <td colspan="5">
-                    No Data Available
+                    {{ __('attachment.general.empty') }}
                 </td>
             </tr>
             @endforelse

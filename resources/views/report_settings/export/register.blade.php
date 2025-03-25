@@ -55,7 +55,7 @@
         }
 
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -75,10 +75,22 @@
         .bold {
             font-weight: bold;
         }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
-
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -89,37 +101,37 @@
     </div>
 
     <div class="report-title">
-        Registers Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table>
+    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th class="indexing" rowspan="2">#</th>
-                <th>Open At</th>
-                <th>Closed At</th>
-                <th>Location</th>
-                <th>User</th>
-                <th>Total Card Slips</th>
-                <th>Cheques</th>
-                <th>Cash</th>
-                <th>Bank Transfers</th>
-                <th>Advance Payments</th>
+                <th>{{ __('attachment.register.th_open') }}</th>
+                <th>{{ __('attachment.register.th_close') }}</th>
+                <th>{{ __('attachment.register.th_location') }}</th>
+                <th>{{ __('attachment.register.th_user') }}</th>
+                <th>{{ __('attachment.register.th_card') }}</th>
+                <th>{{ __('attachment.register.th_cheques') }}</th>
+                <th>{{ __('attachment.register.th_cash') }}</th>
+                <th>{{ __('attachment.register.th_bank') }}</th>
+                <th>{{ __('attachment.register.th_advance') }}</th>
             </tr>
             <tr>
-                <th>Cust Payment 1</th>
-                <th>Cust Payment 2</th>
-                <th>Cust Payment 3</th>
-                <th>Cust Payment 4</th>
-                <th>Cust Payment 5</th>
-                <th>Cust Payment 6</th>
-                <th>Cust Payment 7</th>
-                <th>Other Payment</th>
-                <th>Total</th>
+                <th>{{ __('attachment.register.th_cust_payment1') }}</th>
+                <th>{{ __('attachment.register.th_cust_payment2') }}</th>
+                <th>{{ __('attachment.register.th_cust_payment3') }}</th>
+                <th>{{ __('attachment.register.th_cust_payment4') }}</th>
+                <th>{{ __('attachment.register.th_cust_payment5') }}</th>
+                <th>{{ __('attachment.register.th_cust_payment6') }}</th>
+                <th>{{ __('attachment.register.th_cust_payment7') }}</th>
+                <th>{{ __('attachment.register.th_other_payment') }}</th>
+                <th>{{ __('attachment.register.th_total') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -166,22 +178,22 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="10">No Data Available</td>
+                    <td colspan="10">{{ __('attachment.general.empty') }}</td>
                 </tr>
             @endforelse
         </tbody>
         <tfoot>
             
             <tr class="total">
-                <td class="bold" colspan="10">Total</td>
+                <td class="bold" colspan="10">{{ __('attachment.general.subtotal') }}</td>
             </tr>
             <tr class="total">
-                <td class="bold" colspan="2">Total Card Slips</td>
-                <td class="bold" colspan="2">Total Cheques</td>
-                <td class="bold">Total Cash</td>
-                <td class="bold" colspan="2">Total Bank Transfer</td>
-                <td class="bold" colspan="2">Total Advance Payment</td>
-                <td class="bold">Cust. Payment 1</td>
+                <td class="bold" colspan="2">{{ __('attachment.register.tf_card') }}</td>
+                <td class="bold" colspan="2">{{ __('attachment.register.tf_cheques') }}</td>
+                <td class="bold">{{ __('attachment.register.tf_cash') }}</td>
+                <td class="bold" colspan="2">{{ __('attachment.register.tf_bank') }}</td>
+                <td class="bold" colspan="2">{{ __('attachment.register.tf_advance') }}</td>
+                <td class="bold">{{ __('attachment.register.tf_cust_payment1') }}</td>
             </tr>
             <tr>
                 <td colspan="2">{{ number_format(collect($report)->sum('total_card_payment') ?: '0', 3) }} {{ $currency }}
@@ -196,12 +208,12 @@
                 <td>{{ number_format(collect($report)->sum('total_custom_pay_1') ?: '0', 3) }} {{ $currency }}</td>
             </tr>
             <tr class="total">
-                <td class="bold" colspan="2">Cust. Payment 2</td>
-                <td class="bold" colspan="2">Cust. Payment 3</td>
-                <td class="bold">Cust. Payment 4</td>
-                <td class="bold" colspan="2">Cust. Payment 5</td>
-                <td class="bold" colspan="2">Cust. Payment 6</td>
-                <td class="bold">Cust. Payment 7</td>
+                <td class="bold" colspan="2">{{ __('attachment.register.tf_cust_payment2') }}</td>
+                <td class="bold" colspan="2">{{ __('attachment.register.tf_cust_payment3') }}</td>
+                <td class="bold">{{ __('attachment.register.tf_cust_payment4') }}</td>
+                <td class="bold" colspan="2">{{ __('attachment.register.tf_cust_payment5') }}</td>
+                <td class="bold" colspan="2">{{ __('attachment.register.tf_cust_payment6') }}</td>
+                <td class="bold">{{ __('attachment.register.tf_cust_payment7') }}</td>
             </tr>
             <tr>
                 <td colspan="2">{{ number_format(collect($report)->sum('total_custom_pay_2') ?: '0', 3) }} {{ $currency }}
@@ -216,7 +228,7 @@
                 <td>{{ number_format(collect($report)->sum('total_custom_pay_7') ?: '0', 3) }} {{ $currency }}</td>
             </tr>
             <tr class="total">
-                <td class="bold" colspan="10">Subtotal</td>
+                <td class="bold" colspan="10">{{ __('attachment.register.tf_subtotal') }}</td>
             </tr>
             <tr>
                 <td colspan="10">{{ number_format(collect($report)->sum('total') ?: '0', 3) }} {{ $currency }}</td>

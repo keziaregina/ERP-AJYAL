@@ -54,7 +54,7 @@
         }
 
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -74,10 +74,22 @@
         .bold {
             font-weight: bold;
         }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
     </style>
 </head>
-
 <body>
+    @php
+        if ($data->attachment_lang === 'ar') {
+            \App::setLocale('ar');
+        } else {
+            \App::setLocale('en');
+        }
+    @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
         <h1>Ajyal Al - Madina Al - Asria</h1>
@@ -88,19 +100,19 @@
     </div>
 
     <div class="report-title">
-        Expenses Report
+        {{ __("report_type.$data->type") }}
     </div>
 
-    <p class="date">
-        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    <p class="date {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table>
+    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th class="indexing">#</th>
-                <th>Expense Categories</th>
-                <th>Total Expense</th>
+                <th>{{ __('attachment.expense.th_categories') }}</th>
+                <th>{{ __('attachment.expense.th_total') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -118,13 +130,13 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="3">No data available in table</td>
+                    <td colspan="3">{{ __('attachment.general.empty') }}</td>
                 </tr>
             @endforelse
         </tbody>
         <tfoot>
             <tr class="total">
-                <td class="bold" colspan="2">Total:</td>
+                <td class="bold" colspan="2">{{ __('attachment.general.subtotal') }}</td>
                 <td>{{ number_format($total_expense, 3) ?: '0' }} {{ $currency }}</td>
             </tr>
         </tfoot>
