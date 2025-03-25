@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
 use App\TransactionSellLinesPurchaseLines;
 use Illuminate\Support\Facades\App;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as pdh; 
 
 class ReportEmailService
 {
@@ -182,18 +183,19 @@ class ReportEmailService
             default:
         }
         $view = 'report_settings/export/' . $type;
-        $pdf = Pdf::setPaper('a4', 'landscape')
-            ->loadView($view, [
-                'data' => $data, 
-                'logo' => $this->logo,
-                'user' => $user,
-                'report' => $report,
-                'dates' => $dates,
-                'currency' => 'ر.س'
-        ]);
-        
-        $data['interval'] = $interval;
 
+        $pdf = pdh::loadView($view, [
+            'orientation' => 'L',
+        ],
+        [
+                    'data' => $data, 
+                    'logo' => $this->logo,
+                    'user' => $user,
+                    'report' => $report,
+                    'dates' => $dates,
+                    'currency' => 'ر.س'
+                    ]);            
+        $data['interval'] = $interval;
 
         Storage::disk('public')->put($filename, $pdf->output()); 
 

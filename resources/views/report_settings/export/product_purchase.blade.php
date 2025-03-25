@@ -4,197 +4,149 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product Purchase Summary</title>
-    {{-- <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            /* background-color: #f9f9f9; */
-        }
-
-        header img {
-            width: 100px;
-        }
-
-        header h1 {
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 900px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background: #fff;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #3498db;
-            color: white;
-            font-weight: bold;
-        }
-
-        .total {
-            font-weight: bold;
-            background-color: #f4f7fa;
-        }
-
-        @font-face {
-            font-family: 'Amiri';
-            src: url("{{ asset('fonts/Amiri-Regular.ttf') }}") format("truetype");
-        }
-
-        .arabic {
-            direction: rtl;
-            text-align: right;
-            font-family: 'Amiri', sans-serif;
-            font-weight: normal;
-        }
-    </style> --}}
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: left;
+            margin: 20px;
         }
+
+        .header {
+            text-align: center; 
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 12px;
+            margin: 5px 10px 0px;
+        }
+
+        .logo {
+            width: 70px; 
+        }
+
         .report-title {
             text-align: center;
-            font-size: 18px;
+            font-size: 12px;
             font-weight: bold;
             margin-bottom: 20px;
         }
 
-        .header-box{
-            margin-left: 20px;
+        .date{
+            font-size: 11px;
         }
-
-        .box {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            background-color: #f8fafc;
-        }
-
-        .label {
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #6b7280;
-            font-size: 15px;
-        }
-
-        .value {
-            font-size: 20px;
-            color: #1e293b;
+        .indexing {
+            width: 40px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            font-size: 11px;
         }
-        th, td {
-            border: 1px solid #ddd;
+
+        th,
+        td {
+            border: 0.5px solid #ddd;
             padding: 8px;
             text-align: center;
         }
+
         th {
             background-color: #2C3E50;
             color: white;
             font-weight: bold;
         }
-        .total-row {
-            background-color: #f8f9fa;
-            font-weight: bold;
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
-        .logo {
-            width: 100px;
-            height: 100px;
+
+        tbody tr:nth-child(odd) {
+            background-color: #ffffff;
         }
 
         .total {
-            font-weight: bold;
-            background-color: #f4f7fa;
+            background-color: #c8c9ca;
         }
-        .center {
-            text-align: center;
+
+        .bold {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <header>
+    <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
-        <h3>Ajyal Al - Madina</h3>
+        <h1>Ajyal Al - Madina Al - Asria</h1>
+        <span>{{ env('APP_TITLE') }}</span>
 
-        {{ Log::info("CUSTOMER & SUPPLIER -------------------------------------------------->") }}
-        {{ Log::info(json_encode($report,JSON_PRETTY_PRINT)) }}
-    </header>
-    <main>
-        <div class="report-title">
-            Product Purchase Report - AJYAL AL-MADINA AL ASRIA
-        </div>
-        <div class="container">
-            <p>
-                Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
-            </p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Product</th>
-                        <th>SKU</th>
-                        <th>Supplier</th>
-                        <th>Ref. No</th>
-                        <th>Date</th>
-                        <th>Quantity</th>
-                        <th>Total Unit Adjusted</th>
-                        <th>Unit Purchase Price</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($report as $index => $item)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $item->product_name }}</td>
-                        <td>{{ $item->sub_sku }}</td>
-                        <td>{{ $item->supplier }}</td>
-                        <td>{{ $item->ref_no }}</td>
-                        <td>{{ $item->transaction_date }}</td>
-                        <td>{{ $item->purchase_qty }}</td>
-                        <td>{{ $item->quantity_adjusted }}</td>
-                        <td>{{ number_format($item->unit_purchase_price, 3) }} SAR</td>
-                        <td>{{ number_format($item->subtotal, 3) }} SAR</td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="13">
-                            No Data Available
-                        </td>
-                    </tr>
-                    @endforelse
-                    <tr class="total">
-                        <td colspan="6">Total:</td>
-                        <td>{{ number_format(collect($report)->sum('quantity_adjusted'), 3) }} SAR</td>
-                        <td colspan="2"></td>
-                        <td>{{ number_format(collect($report)->sum('subtotal'), 3) }} SAR</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </main>
+        {{ Log::info('CUSTOMER & SUPPLIER -------------------------------------------------->') }}
+        {{ Log::info(json_encode($report, JSON_PRETTY_PRINT)) }}
+    </div>
+
+    <div class="report-title">
+        Product Purchases Report
+    </div>
+
+    <p class="date">
+        Report : {{ $dates['start_date'] }} ~ {{ $dates['end_date'] }}
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="indexing" rowspan="2">#</th>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Supplier</th>
+                <th>Ref. No</th>
+                <th>Date</th>
+            </tr>
+            <tr>
+                <th>Quantity</th>
+                <th>Total Unit Adjusted</th>
+                <th>Unit Purchase Price</th>
+                <th colspan="2">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($report as $index => $item)
+            <tr>
+                <td class="indexing" rowspan="2">{{ $index + 1 }}</td>
+                <td>{{ $item->product_name }}</td>
+                <td>{{ $item->sub_sku }}</td>
+                <td>{{ $item->supplier }}</td>
+                <td>{{ $item->ref_no }}</td>
+                <td>{{ $item->transaction_date }}</td>
+            </tr>
+            <tr>
+                <td>{{ number_format($item->purchase_qty, 3) }}</td>
+                <td>{{ number_format($item->quantity_adjusted, 3) }}</td>
+                <td>{{ number_format($item->unit_purchase_price, 3) ?: '0' }} {{ $currency }}</td>
+                <td colspan="2">{{ number_format($item->subtotal, 3) ?: '0' }} {{ $currency }}</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="6">
+                    No Data Available
+                </td>
+            </tr>
+            @endforelse
+        </tbody>
+        <tfoot>
+            <tr class="total">
+                <td class="bold" colspan="6">Total:</td>
+            </tr>
+            <tr class="total">
+                <td class="bold" colspan="3">Unit Purchase Price</td>
+                <td class="bold" colspan="3">Subtotal</td>
+            </tr>
+            <tr>
+                <td colspan="3">{{ number_format(collect($report)->sum('quantity_adjusted'), 3) ?: '0' }} {{ $currency }}</td>
+                <td colspan="3">{{ number_format(collect($report)->sum('subtotal'), 3) ?: '0' }} {{ $currency }}</td>
+            </tr>
+        </tfoot>
+    </table>
 </body>
 </html>
