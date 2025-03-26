@@ -9,7 +9,7 @@
 </style>
 <!-- Content Header (Page header) -->
 <section class="content-header">
-    <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">@lang('barcode.edit_barcode_setting')</h1>
+    <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">@lang('report_settings.edit_setting')</h1>
 </section>
 {{-- @dd($report_settings->user_id) --}}
 <!-- Main content -->

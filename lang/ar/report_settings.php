@@ -8,6 +8,7 @@ return [
     'report_type' => 'نوع التقرير',
     'report_interval' => 'فترة التقرير',
     'add_new_setting' => 'إضافة إعداد جديد',
+    'edit_setting' => 'تعديل الإشعار البريدي للمستخدم',
     'added_success' => 'تم إضافة إعداد التقرير بنجاح',
     'updated_success' => 'تم تحديث إعداد التقرير بنجاح',
     'deleted_success' => 'تم حذف إعداد التقرير بنجاح',
