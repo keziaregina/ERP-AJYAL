@@ -21,6 +21,113 @@
     <br>
     <p>Report Start : <span id="startDateTax"></span></p>
     <p>Report End : <span id="endDateTax"></span></p>
+    <br>
+
+    <div>
+        <h4>{{ __('lang_v1.tax_overall') }}</h4>
+        <p class="text-muted">
+            {{ __('lang_v1.output_tax_minus_input_tax') }}: 
+            <span class="tax_diff">
+                <i class="fas fa-sync fa-spin fa-fw"></i>
+            </span>
+        </p>
+    </div>
+
+    <br>
+    <table class="table table-bordered table-striped" id="input_tax_table2">
+        <thead>
+            <tr>
+                <th>@lang('messages.date')</th>
+                <th>@lang('purchase.ref_no')</th>
+                <th>@lang('purchase.supplier')</th>
+                <th>@lang('contact.tax_no')</th>
+                <th>@lang('sale.total_amount')</th>
+                <th>@lang('lang_v1.payment_method')</th>
+                <th>@lang('receipt.discount')</th>
+                @foreach($taxes as $tax)
+                    <th>
+                        {{$tax['name']}}
+                    </th>
+                @endforeach
+            </tr>
+        </thead>
+        <tfoot>
+            <tr class="bg-gray font-17 text-center footer-total">
+                <td colspan="4"><strong>@lang('sale.total'):</strong></td>
+                <td><span class="display_currency" id="sell_total" data-currency_symbol ="true"></span></td>
+                <td class="input_payment_method_count"></td>
+                <td>&nbsp;</td>
+                @foreach($taxes as $tax)
+                    <td>
+                        <span class="display_currency" id="total_input_{{$tax['id']}}" data-currency_symbol ="true"></span>
+                    </td>
+                @endforeach
+            </tr>
+        </tfoot>
+    </table>
+    <br>
+    <table class="table table-bordered table-striped" id="output_tax_table2" width="100%">
+        <thead>
+            <tr>
+                <th>@lang('messages.date')</th>
+                <th>@lang('sale.invoice_no')</th>
+                <th>@lang('contact.customer')</th>
+                <th>@lang('contact.tax_no')</th>
+                <th>@lang('sale.total_amount')</th>
+                <th>@lang('lang_v1.payment_method')</th>
+                <th>@lang('receipt.discount')</th>
+                @foreach($taxes as $tax)
+                    <th>
+                        {{$tax['name']}}
+                    </th>
+                @endforeach
+            </tr>
+        </thead>
+        <tfoot>
+            <tr class="bg-gray font-17 text-center footer-total">
+                <td colspan="4"><strong>@lang('sale.total'):</strong></td>
+                <td><span class="display_currency" id="purchase_total" data-currency_symbol ="true"></span></td>
+                <td class="output_payment_method_count"></td>
+                <td>&nbsp;</td>
+                @foreach($taxes as $tax)
+                    <td>
+                        <span class="display_currency" id="total_output_{{$tax['id']}}" data-currency_symbol ="true"></span>
+                    </td>
+                @endforeach
+            </tr>
+        </tfoot>
+    </table>
+    <br>
+    <table class="table table-bordered table-striped" id="expense_tax_table2" width="100%">
+        <thead>
+            <tr>
+                <th>@lang('messages.date')</th>
+                <th>@lang('purchase.ref_no')</th>
+                <th>@lang('contact.tax_no')</th>
+                <th>@lang('sale.total_amount')</th>
+                <th>@lang('lang_v1.payment_method')</th>
+                @foreach($taxes as $tax)
+                    <th>
+                        {{$tax['name']}}
+                    </th>
+                @endforeach
+            </tr>
+        </thead>
+        <tfoot>
+            <tr class="bg-gray font-17 text-center footer-total">
+                <td colspan="3"><strong>@lang('sale.total'):</strong></td>
+                <td>
+                    <span class="display_currency" id="expense_total" data-currency_symbol ="true"></span>
+                </td> 
+                <td class="expense_payment_method_count"></td>
+                @foreach($taxes as $tax)
+                    <td>
+                        <span class="display_currency" id="total_expense_{{$tax['id']}}" data-currency_symbol ="true"></span>
+                    </td>
+                @endforeach
+            </tr>
+        </tfoot>
+    </table>
 </div>
 <!-- Main content -->
 <section class="content">
@@ -83,7 +190,7 @@
         </div>
     </div>--}}
 
-    <div class="row">
+    <div class="row no-print">
         <div class="col-xs-12">
             @component('components.widget')
                 @slot('title')
@@ -113,7 +220,7 @@
             </button>
         </div>
     </div>
-    <div class="row">
+    <div class="row no-print">
         <div class="col-md-12">
            <!-- Custom Tabs -->
             <div class="nav-tabs-custom">
@@ -294,37 +401,10 @@
                 );
             }
         );
-        
-        window.targetTrue = false;
-        initNormalInputTax();
 
-        var target = document.getElementById('print-btn');
-
-        if (target) {
-            target.addEventListener('mouseenter', function() {
-                console.log('Mouse masuk ke tombol print!');
-                window.targetTrue = true;
-                initInfoInputTax();
-            });
-            target.addEventListener('mouseleave', function() {
-                console.log('Mouse keluar dari tombol print!');
-                window.targetTrue = false;
-                initNormalInputTax();
-            });
-        }
-
-        function initInfoInputTax(){
-            if ($.fn.DataTable.isDataTable('#input_tax_table')) {
-                input_tax_table.destroy();
-            }
-            if ($.fn.DataTable.isDataTable('#output_tax_datatable')) {
-                output_tax_datatable.destroy();
-            }
-            if ($.fn.DataTable.isDataTable('#expense_tax_datatable')) {
-                expense_tax_datatable.destroy();
-            }
-
-            input_tax_table = $('#input_tax_table').DataTable({
+        initInfo();
+        function initInfo() {
+            input_tax_table2 = $('#input_tax_table2').DataTable({
                 dom: 'i',
                 processing: true,
                 serverSide: true,
@@ -374,137 +454,104 @@
                 },
             });
 
-            saveColumnVisibility('input_tax_table', 'colvisState_input_tax');
-            loadColumnVisibility('input_tax_table', 'colvisState_input_tax');
-
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                if ($(e.target).attr('href') == '#output_tax_tab') {
-                    if (typeof (output_tax_datatable) == 'undefined') {
-                        output_tax_datatable = $('#output_tax_table').DataTable({
-                            dom: 'i',
-                            processing: true,
-                            serverSide: true,
-                            fixedHeader:false,
-                            aaSorting: [[0, 'desc']],
-                            ajax: {
-                                url: '/reports/tax-details',
-                                data: function(d) {
-                                    d.type = 'sell';
-                                    d.location_id = $('#tax_report_location_id').val();
-                                    d.contact_id = $('#tax_report_contact_id').val();
-                                    var start = $('input#tax_report_date_range')
-                                        .data('daterangepicker')
-                                        .startDate.format('YYYY-MM-DD');
-                                    var end = $('input#tax_report_date_range')
-                                        .data('daterangepicker')
-                                        .endDate.format('YYYY-MM-DD');
-                                    d.start_date = start;
-                                    d.end_date = end;
-                                }
-                            },
-                            columns: [
-                                { data: 'transaction_date', name: 'transaction_date' },
-                                { data: 'invoice_no', name: 'invoice_no' },
-                                { data: 'contact_name', name: 'c.name' },
-                                { data: 'tax_number', name: 'c.tax_number' },
-                                { data: 'total_before_tax', name: 'total_before_tax' },
-                                { data: 'payment_methods', orderable: false, "searchable": false},
-                                { data: 'discount_amount', name: 'discount_amount' },
-                                @foreach($taxes as $tax)
-                                { data: "tax_{{$tax['id']}}", searchable: false, orderable: false },
-                                @endforeach
-                            ],
-                            "footerCallback": function ( row, data, start, end, display ) {
-                                $('.output_payment_method_count').html(__count_status(data, 'payment_methods'));
-                            },
-                            fnDrawCallback: function(oSettings) {
-                                $('#purchase_total').text(
-                                    sum_table_col($('#output_tax_table'), 'total_before_tax')
-                                );
-                                @foreach($taxes as $tax)
-                                    $("#total_output_{{$tax['id']}}").text(
-                                        sum_table_col($('#output_tax_table'), "tax_{{$tax['id']}}")
-                                    );
-                                @endforeach
-                                __currency_convert_recursively($('#output_tax_table'));
-                            },
-                        });
-
-                        saveColumnVisibility('output_tax_table', 'colvisState_output_tax');
-                        loadColumnVisibility('output_tax_table', 'colvisState_output_tax');
+            output_tax_datatable2 = $('#output_tax_table2').DataTable({
+                dom: 'i',
+                processing: true,
+                serverSide: true,
+                fixedHeader:false,
+                aaSorting: [[0, 'desc']],
+                ajax: {
+                    url: '/reports/tax-details',
+                    data: function(d) {
+                        d.type = 'sell';
+                        d.location_id = $('#tax_report_location_id').val();
+                        d.contact_id = $('#tax_report_contact_id').val();
+                        var start = $('input#tax_report_date_range')
+                            .data('daterangepicker')
+                            .startDate.format('YYYY-MM-DD');
+                        var end = $('input#tax_report_date_range')
+                            .data('daterangepicker')
+                            .endDate.format('YYYY-MM-DD');
+                        d.start_date = start;
+                        d.end_date = end;
                     }
-                } else if ($(e.target).attr('href') == '#expense_tax_tab') {
-                    if (typeof (expense_tax_datatable) == 'undefined') {
-                        expense_tax_datatable = $('#expense_tax_table').DataTable({
-                            dom: 'i',
-                            processing: true,
-                            serverSide: true,
-                            fixedHeader:false,
-                            ajax: {
-                                url: '/reports/tax-details',
-                                data: function(d) {
-                                    d.type = 'expense';
-                                    d.location_id = $('#tax_report_location_id').val();
-                                    d.contact_id = $('#tax_report_contact_id').val();
-                                    var start = $('input#tax_report_date_range')
-                                        .data('daterangepicker')
-                                        .startDate.format('YYYY-MM-DD');
-                                    var end = $('input#tax_report_date_range')
-                                        .data('daterangepicker')
-                                        .endDate.format('YYYY-MM-DD');
-                                    d.start_date = start;
-                                    d.end_date = end;
-                                }
-                            },
-                            columns: [
-                                { data: 'transaction_date', name: 'transaction_date' },
-                                { data: 'ref_no', name: 'ref_no' },
-                                { data: 'tax_number', name: 'c.tax_number' },
-                                { data: 'total_before_tax', name: 'total_before_tax' },
-                                { data: 'payment_methods', orderable: false, "searchable": false},
-                                @foreach($taxes as $tax)
-                                { data: "tax_{{$tax['id']}}", searchable: false, orderable: false },
-                                @endforeach
-                            ],
-                            "footerCallback": function ( row, data, start, end, display ) {
-                                $('.expense_payment_method_count').html(__count_status(data, 'payment_methods'));
-                            },
-                            fnDrawCallback: function(oSettings) {
-                                $('#expense_total').text(
-                                    sum_table_col($('#expense_tax_table'), 'total_before_tax')
-                                );
-                                @foreach($taxes as $tax)
-                                    $("#total_expense_{{$tax['id']}}").text(
-                                        sum_table_col($('#expense_tax_table'), "tax_{{$tax['id']}}")
-                                    );
-                                @endforeach
-                                __currency_convert_recursively($('#expense_tax_table'));
-                            },
-                        });
-                        
-                        saveColumnVisibility('expense_tax_table', 'colvisState_expense_tax');
-                        loadColumnVisibility('expense_tax_table', 'colvisState_expense_tax');
-                    }
-                }
+                },
+                columns: [
+                    { data: 'transaction_date', name: 'transaction_date' },
+                    { data: 'invoice_no', name: 'invoice_no' },
+                    { data: 'contact_name', name: 'c.name' },
+                    { data: 'tax_number', name: 'c.tax_number' },
+                    { data: 'total_before_tax', name: 'total_before_tax' },
+                    { data: 'payment_methods', orderable: false, "searchable": false},
+                    { data: 'discount_amount', name: 'discount_amount' },
+                    @foreach($taxes as $tax)
+                    { data: "tax_{{$tax['id']}}", searchable: false, orderable: false },
+                    @endforeach
+                ],
+                "footerCallback": function ( row, data, start, end, display ) {
+                    $('.output_payment_method_count').html(__count_status(data, 'payment_methods'));
+                },
+                fnDrawCallback: function(oSettings) {
+                    $('#purchase_total').text(
+                        sum_table_col($('#output_tax_table'), 'total_before_tax')
+                    );
+                    @foreach($taxes as $tax)
+                        $("#total_output_{{$tax['id']}}").text(
+                            sum_table_col($('#output_tax_table'), "tax_{{$tax['id']}}")
+                        );
+                    @endforeach
+                    __currency_convert_recursively($('#output_tax_table'));
+                },
+            });
 
-                // remove class from data table button
-                $('.btn-default').removeClass('btn-default');
-                $('.tw-dw-btn-outline').removeClass('btn');
+            expense_tax_datatable2 = $('#expense_tax_table2').DataTable({
+                dom: 'i',
+                processing: true,
+                serverSide: true,
+                fixedHeader:false,
+                ajax: {
+                    url: '/reports/tax-details',
+                    data: function(d) {
+                        d.type = 'expense';
+                        d.location_id = $('#tax_report_location_id').val();
+                        d.contact_id = $('#tax_report_contact_id').val();
+                        var start = $('input#tax_report_date_range')
+                            .data('daterangepicker')
+                            .startDate.format('YYYY-MM-DD');
+                        var end = $('input#tax_report_date_range')
+                            .data('daterangepicker')
+                            .endDate.format('YYYY-MM-DD');
+                        d.start_date = start;
+                        d.end_date = end;
+                    }
+                },
+                columns: [
+                    { data: 'transaction_date', name: 'transaction_date' },
+                    { data: 'ref_no', name: 'ref_no' },
+                    { data: 'tax_number', name: 'c.tax_number' },
+                    { data: 'total_before_tax', name: 'total_before_tax' },
+                    { data: 'payment_methods', orderable: false, "searchable": false},
+                    @foreach($taxes as $tax)
+                    { data: "tax_{{$tax['id']}}", searchable: false, orderable: false },
+                    @endforeach
+                ],
+                "footerCallback": function ( row, data, start, end, display ) {
+                    $('.expense_payment_method_count').html(__count_status(data, 'payment_methods'));
+                },
+                fnDrawCallback: function(oSettings) {
+                    $('#expense_total').text(
+                        sum_table_col($('#expense_tax_table'), 'total_before_tax')
+                    );
+                    @foreach($taxes as $tax)
+                        $("#total_expense_{{$tax['id']}}").text(
+                            sum_table_col($('#expense_tax_table'), "tax_{{$tax['id']}}")
+                        );
+                    @endforeach
+                    __currency_convert_recursively($('#expense_tax_table'));
+                },
             });
         }
-
-        function initNormalInputTax(){
-            if ($.fn.DataTable.isDataTable('#input_tax_table')) {
-                input_tax_table.destroy();
-            }
-            if ($.fn.DataTable.isDataTable('#output_tax_datatable')) {
-                output_tax_datatable.destroy();
-            }
-            if ($.fn.DataTable.isDataTable('#expense_tax_datatable')) {
-                expense_tax_datatable.destroy();
-            }
-            
-            input_tax_table = $('#input_tax_table').DataTable({
+        input_tax_table = $('#input_tax_table').DataTable({
                 buttons: export_button ? pdfButtonsWithDate('Input Taxes Report') : [],
                 processing: true,
                 serverSide: true,
@@ -554,249 +601,139 @@
                 },
             });
 
-            saveColumnVisibility('input_tax_table', 'colvisState_input_tax');
-            loadColumnVisibility('input_tax_table', 'colvisState_input_tax');
+        saveColumnVisibility('input_tax_table', 'colvisState_input_tax');
+        loadColumnVisibility('input_tax_table', 'colvisState_input_tax');
+        loadColumnVisibility('input_tax_table2', 'colvisState_input_tax');
 
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                if ($(e.target).attr('href') == '#output_tax_tab') {
-                    if (typeof (output_tax_datatable) == 'undefined') {
-                        output_tax_datatable = $('#output_tax_table').DataTable({
-                            buttons: export_button ? pdfButtons('Output Taxes Report') : [],
-                            processing: true,
-                            serverSide: true,
-                            fixedHeader:false,
-                            aaSorting: [[0, 'desc']],
-                            ajax: {
-                                url: '/reports/tax-details',
-                                data: function(d) {
-                                    d.type = 'sell';
-                                    d.location_id = $('#tax_report_location_id').val();
-                                    d.contact_id = $('#tax_report_contact_id').val();
-                                    var start = $('input#tax_report_date_range')
-                                        .data('daterangepicker')
-                                        .startDate.format('YYYY-MM-DD');
-                                    var end = $('input#tax_report_date_range')
-                                        .data('daterangepicker')
-                                        .endDate.format('YYYY-MM-DD');
-                                    d.start_date = start;
-                                    d.end_date = end;
-                                }
-                            },
-                            columns: [
-                                { data: 'transaction_date', name: 'transaction_date' },
-                                { data: 'invoice_no', name: 'invoice_no' },
-                                { data: 'contact_name', name: 'c.name' },
-                                { data: 'tax_number', name: 'c.tax_number' },
-                                { data: 'total_before_tax', name: 'total_before_tax' },
-                                { data: 'payment_methods', orderable: false, "searchable": false},
-                                { data: 'discount_amount', name: 'discount_amount' },
-                                @foreach($taxes as $tax)
-                                { data: "tax_{{$tax['id']}}", searchable: false, orderable: false },
-                                @endforeach
-                            ],
-                            "footerCallback": function ( row, data, start, end, display ) {
-                                $('.output_payment_method_count').html(__count_status(data, 'payment_methods'));
-                            },
-                            fnDrawCallback: function(oSettings) {
-                                $('#purchase_total').text(
-                                    sum_table_col($('#output_tax_table'), 'total_before_tax')
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            if ($(e.target).attr('href') == '#output_tax_tab') {
+                if (typeof (output_tax_datatable) == 'undefined') {
+                    output_tax_datatable = $('#output_tax_table').DataTable({
+                        buttons: export_button ? pdfButtons('Output Taxes Report') : [],
+                        processing: true,
+                        serverSide: true,
+                        fixedHeader:false,
+                        aaSorting: [[0, 'desc']],
+                        ajax: {
+                            url: '/reports/tax-details',
+                            data: function(d) {
+                                d.type = 'sell';
+                                d.location_id = $('#tax_report_location_id').val();
+                                d.contact_id = $('#tax_report_contact_id').val();
+                                var start = $('input#tax_report_date_range')
+                                    .data('daterangepicker')
+                                    .startDate.format('YYYY-MM-DD');
+                                var end = $('input#tax_report_date_range')
+                                    .data('daterangepicker')
+                                    .endDate.format('YYYY-MM-DD');
+                                d.start_date = start;
+                                d.end_date = end;
+                            }
+                        },
+                        columns: [
+                            { data: 'transaction_date', name: 'transaction_date' },
+                            { data: 'invoice_no', name: 'invoice_no' },
+                            { data: 'contact_name', name: 'c.name' },
+                            { data: 'tax_number', name: 'c.tax_number' },
+                            { data: 'total_before_tax', name: 'total_before_tax' },
+                            { data: 'payment_methods', orderable: false, "searchable": false},
+                            { data: 'discount_amount', name: 'discount_amount' },
+                            @foreach($taxes as $tax)
+                            { data: "tax_{{$tax['id']}}", searchable: false, orderable: false },
+                            @endforeach
+                        ],
+                        "footerCallback": function ( row, data, start, end, display ) {
+                            $('.output_payment_method_count').html(__count_status(data, 'payment_methods'));
+                        },
+                        fnDrawCallback: function(oSettings) {
+                            $('#purchase_total').text(
+                                sum_table_col($('#output_tax_table'), 'total_before_tax')
+                            );
+                            @foreach($taxes as $tax)
+                                $("#total_output_{{$tax['id']}}").text(
+                                    sum_table_col($('#output_tax_table'), "tax_{{$tax['id']}}")
                                 );
-                                @foreach($taxes as $tax)
-                                    $("#total_output_{{$tax['id']}}").text(
-                                        sum_table_col($('#output_tax_table'), "tax_{{$tax['id']}}")
-                                    );
-                                @endforeach
-                                __currency_convert_recursively($('#output_tax_table'));
-                            },
-                        });
+                            @endforeach
+                            __currency_convert_recursively($('#output_tax_table'));
+                        },
+                    });
 
-                        saveColumnVisibility('output_tax_table', 'colvisState_output_tax');
-                        loadColumnVisibility('output_tax_table', 'colvisState_output_tax');
-                    }
-                } else if ($(e.target).attr('href') == '#expense_tax_tab') {
-                    if (typeof (expense_tax_datatable) == 'undefined') {
-                        expense_tax_datatable = $('#expense_tax_table').DataTable({
-                            buttons: export_button ? pdfButtons('Expense Taxes Report') : [],
-                            processing: true,
-                            serverSide: true,
-                            fixedHeader:false,
-                            ajax: {
-                                url: '/reports/tax-details',
-                                data: function(d) {
-                                    d.type = 'expense';
-                                    d.location_id = $('#tax_report_location_id').val();
-                                    d.contact_id = $('#tax_report_contact_id').val();
-                                    var start = $('input#tax_report_date_range')
-                                        .data('daterangepicker')
-                                        .startDate.format('YYYY-MM-DD');
-                                    var end = $('input#tax_report_date_range')
-                                        .data('daterangepicker')
-                                        .endDate.format('YYYY-MM-DD');
-                                    d.start_date = start;
-                                    d.end_date = end;
-                                }
-                            },
-                            columns: [
-                                { data: 'transaction_date', name: 'transaction_date' },
-                                { data: 'ref_no', name: 'ref_no' },
-                                { data: 'tax_number', name: 'c.tax_number' },
-                                { data: 'total_before_tax', name: 'total_before_tax' },
-                                { data: 'payment_methods', orderable: false, "searchable": false},
-                                @foreach($taxes as $tax)
-                                { data: "tax_{{$tax['id']}}", searchable: false, orderable: false },
-                                @endforeach
-                            ],
-                            "footerCallback": function ( row, data, start, end, display ) {
-                                $('.expense_payment_method_count').html(__count_status(data, 'payment_methods'));
-                            },
-                            fnDrawCallback: function(oSettings) {
-                                $('#expense_total').text(
-                                    sum_table_col($('#expense_tax_table'), 'total_before_tax')
-                                );
-                                @foreach($taxes as $tax)
-                                    $("#total_expense_{{$tax['id']}}").text(
-                                        sum_table_col($('#expense_tax_table'), "tax_{{$tax['id']}}")
-                                    );
-                                @endforeach
-                                __currency_convert_recursively($('#expense_tax_table'));
-                            },
-                        });
-                        
-                        saveColumnVisibility('expense_tax_table', 'colvisState_expense_tax');
-                        loadColumnVisibility('expense_tax_table', 'colvisState_expense_tax');
-                    }
+                    saveColumnVisibility('output_tax_table', 'colvisState_output_tax');
+                    loadColumnVisibility('output_tax_table', 'colvisState_output_tax');
+                    loadColumnVisibility('output_tax_table2', 'colvisState_output_tax');
                 }
-
-                // remove class from data table button
-                $('.btn-default').removeClass('btn-default');
-                $('.tw-dw-btn-outline').removeClass('btn');
-            });
-        }
-
-        // $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        //     if ($(e.target).attr('href') == '#output_tax_tab') {
-        //         if (typeof (output_tax_datatable) == 'undefined') {
-        //             output_tax_datatable = $('#output_tax_table').DataTable({
-        //                 buttons: export_button ? pdfButtons('Output Taxes Report') : [],
-        //                 processing: true,
-        //                 serverSide: true,
-        //                 fixedHeader:false,
-        //                 aaSorting: [[0, 'desc']],
-        //                 ajax: {
-        //                     url: '/reports/tax-details',
-        //                     data: function(d) {
-        //                         d.type = 'sell';
-        //                         d.location_id = $('#tax_report_location_id').val();
-        //                         d.contact_id = $('#tax_report_contact_id').val();
-        //                         var start = $('input#tax_report_date_range')
-        //                             .data('daterangepicker')
-        //                             .startDate.format('YYYY-MM-DD');
-        //                         var end = $('input#tax_report_date_range')
-        //                             .data('daterangepicker')
-        //                             .endDate.format('YYYY-MM-DD');
-        //                         d.start_date = start;
-        //                         d.end_date = end;
-        //                     }
-        //                 },
-        //                 columns: [
-        //                     { data: 'transaction_date', name: 'transaction_date' },
-        //                     { data: 'invoice_no', name: 'invoice_no' },
-        //                     { data: 'contact_name', name: 'c.name' },
-        //                     { data: 'tax_number', name: 'c.tax_number' },
-        //                     { data: 'total_before_tax', name: 'total_before_tax' },
-        //                     { data: 'payment_methods', orderable: false, "searchable": false},
-        //                     { data: 'discount_amount', name: 'discount_amount' },
-        //                     @foreach($taxes as $tax)
-        //                     { data: "tax_{{$tax['id']}}", searchable: false, orderable: false },
-        //                     @endforeach
-        //                 ],
-        //                 "footerCallback": function ( row, data, start, end, display ) {
-        //                     $('.output_payment_method_count').html(__count_status(data, 'payment_methods'));
-        //                 },
-        //                 fnDrawCallback: function(oSettings) {
-        //                     $('#purchase_total').text(
-        //                         sum_table_col($('#output_tax_table'), 'total_before_tax')
-        //                     );
-        //                     @foreach($taxes as $tax)
-        //                         $("#total_output_{{$tax['id']}}").text(
-        //                             sum_table_col($('#output_tax_table'), "tax_{{$tax['id']}}")
-        //                         );
-        //                     @endforeach
-        //                     __currency_convert_recursively($('#output_tax_table'));
-        //                 },
-        //             });
-
-        //             saveColumnVisibility('output_tax_table', 'colvisState_output_tax');
-        //             loadColumnVisibility('output_tax_table', 'colvisState_output_tax');
-        //         }
-        //     } else if ($(e.target).attr('href') == '#expense_tax_tab') {
-        //         if (typeof (expense_tax_datatable) == 'undefined') {
-        //             expense_tax_datatable = $('#expense_tax_table').DataTable({
-        //                 buttons: export_button ? pdfButtons('Expense Taxes Report') : [],
-        //                 processing: true,
-        //                 serverSide: true,
-        //                 fixedHeader:false,
-        //                 ajax: {
-        //                     url: '/reports/tax-details',
-        //                     data: function(d) {
-        //                         d.type = 'expense';
-        //                         d.location_id = $('#tax_report_location_id').val();
-        //                         d.contact_id = $('#tax_report_contact_id').val();
-        //                         var start = $('input#tax_report_date_range')
-        //                             .data('daterangepicker')
-        //                             .startDate.format('YYYY-MM-DD');
-        //                         var end = $('input#tax_report_date_range')
-        //                             .data('daterangepicker')
-        //                             .endDate.format('YYYY-MM-DD');
-        //                         d.start_date = start;
-        //                         d.end_date = end;
-        //                     }
-        //                 },
-        //                 columns: [
-        //                     { data: 'transaction_date', name: 'transaction_date' },
-        //                     { data: 'ref_no', name: 'ref_no' },
-        //                     { data: 'tax_number', name: 'c.tax_number' },
-        //                     { data: 'total_before_tax', name: 'total_before_tax' },
-        //                     { data: 'payment_methods', orderable: false, "searchable": false},
-        //                     @foreach($taxes as $tax)
-        //                     { data: "tax_{{$tax['id']}}", searchable: false, orderable: false },
-        //                     @endforeach
-        //                 ],
-        //                 "footerCallback": function ( row, data, start, end, display ) {
-        //                     $('.expense_payment_method_count').html(__count_status(data, 'payment_methods'));
-        //                 },
-        //                 fnDrawCallback: function(oSettings) {
-        //                     $('#expense_total').text(
-        //                         sum_table_col($('#expense_tax_table'), 'total_before_tax')
-        //                     );
-        //                     @foreach($taxes as $tax)
-        //                         $("#total_expense_{{$tax['id']}}").text(
-        //                             sum_table_col($('#expense_tax_table'), "tax_{{$tax['id']}}")
-        //                         );
-        //                     @endforeach
-        //                     __currency_convert_recursively($('#expense_tax_table'));
-        //                 },
-        //             });
+            } else if ($(e.target).attr('href') == '#expense_tax_tab') {
+                if (typeof (expense_tax_datatable) == 'undefined') {
+                    expense_tax_datatable = $('#expense_tax_table').DataTable({
+                        buttons: export_button ? pdfButtons('Expense Taxes Report') : [],
+                        processing: true,
+                        serverSide: true,
+                        fixedHeader:false,
+                        ajax: {
+                            url: '/reports/tax-details',
+                            data: function(d) {
+                                d.type = 'expense';
+                                d.location_id = $('#tax_report_location_id').val();
+                                d.contact_id = $('#tax_report_contact_id').val();
+                                var start = $('input#tax_report_date_range')
+                                    .data('daterangepicker')
+                                    .startDate.format('YYYY-MM-DD');
+                                var end = $('input#tax_report_date_range')
+                                    .data('daterangepicker')
+                                    .endDate.format('YYYY-MM-DD');
+                                d.start_date = start;
+                                d.end_date = end;
+                            }
+                        },
+                        columns: [
+                            { data: 'transaction_date', name: 'transaction_date' },
+                            { data: 'ref_no', name: 'ref_no' },
+                            { data: 'tax_number', name: 'c.tax_number' },
+                            { data: 'total_before_tax', name: 'total_before_tax' },
+                            { data: 'payment_methods', orderable: false, "searchable": false},
+                            @foreach($taxes as $tax)
+                            { data: "tax_{{$tax['id']}}", searchable: false, orderable: false },
+                            @endforeach
+                        ],
+                        "footerCallback": function ( row, data, start, end, display ) {
+                            $('.expense_payment_method_count').html(__count_status(data, 'payment_methods'));
+                        },
+                        fnDrawCallback: function(oSettings) {
+                            $('#expense_total').text(
+                                sum_table_col($('#expense_tax_table'), 'total_before_tax')
+                            );
+                            @foreach($taxes as $tax)
+                                $("#total_expense_{{$tax['id']}}").text(
+                                    sum_table_col($('#expense_tax_table'), "tax_{{$tax['id']}}")
+                                );
+                            @endforeach
+                            __currency_convert_recursively($('#expense_tax_table'));
+                        },
+                    });
                     
-        //             saveColumnVisibility('expense_tax_table', 'colvisState_expense_tax');
-        //             loadColumnVisibility('expense_tax_table', 'colvisState_expense_tax');
-        //         }
-        //     }
+                    saveColumnVisibility('expense_tax_table', 'colvisState_expense_tax');
+                    loadColumnVisibility('expense_tax_table', 'colvisState_expense_tax');
+                    loadColumnVisibility('expense_tax_table2', 'colvisState_expense_tax');
+                }
+            }
 
-        //      // remove class from data table button
-        //      $('.btn-default').removeClass('btn-default');
-        //     $('.tw-dw-btn-outline').removeClass('btn');
-        // });
+             // remove class from data table button
+             $('.btn-default').removeClass('btn-default');
+            $('.tw-dw-btn-outline').removeClass('btn');
+        });
         
         $('#tax_report_date_range, #tax_report_location_id, #tax_report_contact_id').change( function(){
             if ($("#input_tax_tab").hasClass('active')) {
                 input_tax_table.ajax.reload();
+                input_tax_table2.ajax.reload();
             }
             if ($("#output_tax_tab").hasClass('active')) {
                 output_tax_datatable.ajax.reload();
+                output_tax_datatable2.ajax.reload();
             }
             if ($("#expense_tax_tab").hasClass('active')) {
                 expense_tax_datatable.ajax.reload();
+                expense_tax_datatable2.ajax.reload();
             }
             
         });
