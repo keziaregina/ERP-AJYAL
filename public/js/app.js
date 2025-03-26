@@ -2658,6 +2658,7 @@ function updateProfitLoss(start = null, end = null, location_id = null, selector
         window.startDate = $('#profit_loss_date_filter')
                     .data('daterangepicker')
                     .startDate.format('YYYY-MM-DD');
+        document.getElementById("startDateProfitLoss").innerText = window.startDate + ' 12.00 AM';
     }
     if(end == null){
         var end = $('#profit_loss_date_filter')
@@ -2666,6 +2667,7 @@ function updateProfitLoss(start = null, end = null, location_id = null, selector
         window.endDate = $('#profit_loss_date_filter')
                     .data('daterangepicker')
                     .endDate.format('YYYY-MM-DD');
+        document.getElementById("endDateProfitLoss").innerText = window.startDate + ' 11.59 PM';
     }
     if(location_id == null){
         var location_id = $('#profit_loss_location_filter').val();

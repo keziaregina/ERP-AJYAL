@@ -151,7 +151,7 @@
 
 
     <div>
-        <p class="label">{{ __('attachment.sales_representative.summary') }}</p>
+        <p class="label {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">{{ __('attachment.sales_representative.summary') }}</p>
         <div class="box">
             <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
                 <tr>
@@ -174,7 +174,7 @@
         </div>
     </div>
 
-    <h3 class="label">{{ __('attachment.sales_representative.sales') }}</h3>
+    <h3 class="label {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">{{ __('attachment.sales_representative.sales') }}</h3>
     <table>
         <thead>
             <tr>
@@ -222,7 +222,7 @@
         </tfoot>
     </table>
 
-    <h3 class="label">{{ __('attachment.sales_representative.expenses') }}</h3>
+    <h3 class="label {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">{{ __('attachment.sales_representative.expenses') }}</h3>
     <table>
         <thead>
             <tr>

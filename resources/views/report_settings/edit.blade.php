@@ -9,7 +9,7 @@
 </style>
 <!-- Content Header (Page header) -->
 <section class="content-header">
-    <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">@lang('barcode.edit_barcode_setting')</h1>
+    <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">@lang('report_settings.edit_setting')</h1>
 </section>
 {{-- @dd($report_settings->user_id) --}}
 <!-- Main content -->
@@ -49,7 +49,7 @@
         <div class="col-sm-12">
           <div class="form-group">
             {!! Form::label('attachment_lang', __('report_settings.attachment_lang') . ':*') !!}
-              {!! Form::select('attachment_lang', ['All'=>'All Languages', 'en'=>'English', 'ar'=>'Arabic'], $report_settings->attachment_lang, ['class' => 'form-control',
+              {!! Form::select('attachment_lang', $langs, $report_settings->attachment_lang, ['class' => 'form-control',
               'placeholder' => __('report_settings.attachment_lang'), 'required']); !!}
           </div>
         </div>

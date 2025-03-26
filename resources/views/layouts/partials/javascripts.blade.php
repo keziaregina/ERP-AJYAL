@@ -36,11 +36,16 @@
 
 <script>
     const now = new Date();
+    const hours = now.getHours();
     const formattedTime = now.getFullYear() + '-' +
     String(now.getMonth() + 1).padStart(2, '0') + '-' +
     String(now.getDate()).padStart(2, '0') + ' ' +
-    String(now.getHours()).padStart(2, '0') + ':' +
-    String(now.getMinutes()).padStart(2, '0');
+    String(hours % 12 || 12).padStart(2, '0') + ':' + // Ubah ke format 12 jam
+    String(now.getMinutes()).padStart(2, '0') + ' ' +
+    (hours >= 12 ? 'PM' : 'AM'); // Tambahkan AM/PM
+
+// console.log(formattedTime);
+
     
     window.pdfButtons = function(reportName) {
         var datatablesButton = [
@@ -134,18 +139,14 @@
 
                         const totalHeaderRows = Math.ceil(totalCols / maxColsPerRow);
 
-                        
                         if (fullBody.length === 1) {
                             const header = fullBody[0];
                             const colCount = header.length;
                         
-                            // Buat baris kosong dengan kolom `#` di kiri
                             const noDataRow = [];
                         
-                            // Kolom index
                             noDataRow.push({ text: '-', alignment: 'center' });
                         
-                            // Kolom lainnya isi 'No available data' di tengah 1x, sisanya kosong
                             if (colCount > 0) {
                             noDataRow.push({
                                 text: 'No available data',
@@ -154,22 +155,18 @@
                                 italics: true
                             });
                         
-                            // Tambah cell kosong untuk sisa colSpan
                             for (let i = 1; i < colCount; i++) {
                                 noDataRow.push('');
                             }
                             }
                         
-                            // Tambah kolom index ke header juga
                             header.unshift({ text: '#', style: 'tableHeader', alignment: 'center' });
                         
-                            // Set body baru
                             fullTable.body = [header, noDataRow];
                             fullTable.headerRows = 1;
-                        
-                            // Atur lebar kolom
+
                             const widths = Array(colCount + 1).fill('*');
-                            widths[0] = 'auto'; // kolom index
+                            widths[0] = 'auto';
                             fullTable.widths = widths;
                         
                             doc.content[tableIndex].layout = {
@@ -184,7 +181,7 @@
                                 };
 
                             doc.styles.tableHeader = {
-                                fillColor: '#2d4154',
+                                fillColor: '#083cb4',
                                 color: 'white',
                                 bold: true,
                                 alignment: 'center'
@@ -292,7 +289,7 @@
                         };
 
                         doc.styles.tableHeader = {
-                        fillColor: '#2d4154',
+                        fillColor: '#083cb4',
                         color: 'white',
                         bold: true,
                         alignment: 'center'
@@ -397,10 +394,17 @@
                         });
 
                         doc.content.splice(6, 0, {
-                            text: 'Date Range : ' + window.startDate + ' ~ ' + window.endDate,
+                            text: 'Date Start : ' + window.startDate + ' 12.00 AM',
                             alignment: 'left',
                             fontSize: 9,
-                            margin: [0, 10, 0, 10]
+                            margin: [0, 15, 0, 5]
+                        });
+
+                        doc.content.splice(7, 0, {
+                            text: 'Date End : ' + window.endDate + ' 11.59 PM',
+                            alignment: 'left',
+                            fontSize: 9,
+                            margin: [0, 0, 0, 10]
                         });
 
                         doc.pageMargins = [25, 25, 25, 25];
@@ -415,7 +419,6 @@
 
                         const totalHeaderRows = Math.ceil(totalCols / maxColsPerRow);
 
-                        
                         if (fullBody.length === 1) {
                             const header = fullBody[0];
                             const colCount = header.length;
@@ -458,7 +461,7 @@
                                 };
 
                             doc.styles.tableHeader = {
-                                fillColor: '#2d4154',
+                                fillColor: '#083cb4',
                                 color: 'white',
                                 bold: true,
                                 alignment: 'center'
@@ -566,7 +569,7 @@
                         };
 
                         doc.styles.tableHeader = {
-                        fillColor: '#2d4154',
+                        fillColor: '#083cb4',
                         color: 'white',
                         bold: true,
                         alignment: 'center'

@@ -204,7 +204,7 @@ return [
         'th_remaining' => 'Total Remaining',
 
         'th_ref_no' => 'Reference No.',
-        'th_expense_Cat' => 'Expense Category',
+        'th_expense_cat' => 'Expense Category',
         'th_expense_for' => 'Expense For',
         'th_expense_note' => 'Expense Note',
     ],
