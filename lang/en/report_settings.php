@@ -34,4 +34,8 @@ return [
     'weekly' => 'Weekly',
     'monthly' => 'Monthly',
     'yearly' => 'Yearly',
+
+    'all' => 'All Languange',
+    'en' => 'English',
+    'ar' => 'Arabic',
 ];

@@ -5,7 +5,9 @@
 			<th>@lang('manufacturing::lang.input_quantity')</th>
 			<th>@lang('manufacturing::lang.waste_percent')</th>
 			<th>@lang('manufacturing::lang.final_quantity') @show_tooltip(__('manufacturing::lang.final_quantity_tooltip'))</th>
+			@can('manufacturing.access_price')
 			<th>@lang('manufacturing::lang.total_price') @show_tooltip(__('manufacturing::lang.total_price_tooltip'))</th>
+			@endcan
 		</tr>
 	</thead>
 	<tbody>
@@ -33,6 +35,7 @@
 			@endforeach
 		@endif
 	</tbody>
+	@can('manufacturing.access_price')
 	<tfoot>
 		<tr>
 			<td colspan="4" style="text-align: right;"><strong>@lang('manufacturing::lang.ingredients_cost')</strong></td>
@@ -41,4 +44,5 @@
 			</td>
 		</tr>
 	</tfoot>
+	@endcan
 </table>

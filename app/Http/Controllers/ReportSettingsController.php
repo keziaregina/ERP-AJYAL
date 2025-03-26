@@ -78,8 +78,18 @@ class ReportSettingsController extends Controller
         }
         $users = User::all()->pluck('first_name', 'id');
         $reportTypes = $this->getReportTypes();
-        $intervals = ['daily'=>'Daily', 'weekly'=>'Weekly', 'monthly'=>'Monthly', 'yearly'=>'Yearly'];
-        return view('report_settings.create', compact('users', 'reportTypes', 'intervals'));
+        $intervals = [
+            'daily'=> __('report_settings.daily'), 
+            'weekly'=> __('report_settings.weekly'), 
+            'monthly'=> __('report_settings.monthly'), 
+            'yearly'=> __('report_settings.yearly')
+        ];
+        $langs = [
+            'All'=> __('report_settings.all'),
+            'en'=> __('report_settings.en'),
+            'ar'=> __('report_settings.ar'),
+        ];
+        return view('report_settings.create', compact('users', 'reportTypes', 'intervals', 'langs'));
     }
 
     /**
@@ -143,9 +153,19 @@ class ReportSettingsController extends Controller
         $users = User::all()->pluck('first_name', 'id');
         $report_type = $this->getReportTypes();
             
-        $intervals = ['daily'=>'Daily', 'weekly'=>'Weekly', 'monthly'=>'Monthly', 'yearly'=>'Yearly'];
+        $intervals = [
+            'daily'=> __('report_settings.daily'), 
+            'weekly'=> __('report_settings.weekly'), 
+            'monthly'=> __('report_settings.monthly'), 
+            'yearly'=> __('report_settings.yearly')
+        ];
+        $langs = [
+            'All'=> __('report_settings.all'),
+            'en'=> __('report_settings.en'),
+            'ar'=> __('report_settings.ar'),
+        ];
         $report_settings = ReportSettings::with('user')->where('business_id', $business_id)->find($id);
-        return view('report_settings.edit')->with(compact('report_settings', 'users','report_type','intervals'));
+        return view('report_settings.edit')->with(compact('report_settings', 'users','report_type','intervals', 'langs'));
     }
 
     /**

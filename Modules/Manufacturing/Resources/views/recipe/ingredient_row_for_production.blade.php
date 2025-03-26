@@ -82,8 +82,10 @@
 	<td>
 		<span class="row_final_quantity">{{@format_quantity($ingredient['final_quantity'])}}</span> <span class="row_unit_text">{{$ingredient['unit']}}</span>
 	</td>
+	@can('manufacturing.access_price')
 	<td>
 		<span class="ingredient_total_price display_currency" data-currency_symbol="true">{{@num_format($ingredient['total_price'])}}</span>
 		<input type="hidden" class="total_price" value="{{$ingredient['total_price']}}">
 	</td>
+	@endcan
 </tr>
