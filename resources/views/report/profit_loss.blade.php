@@ -12,7 +12,16 @@
     <!-- Main content -->
     <section class="content">
         <div class="print_section">
-            <h2>{{ session()->get('business.name') }} - @lang('report.profit_loss')</h2>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <img style="margin-bottom: 15px; height: 70px; border-radius: 8px;" src="{{ asset('img/logo-small.png') }}" alt="">
+                <h4 style="text-align: center; margin: 0; font-size: 18px">{{ session()->get('business.name') }}</h4>
+                <h4 style="text-align: center; margin: 0; font-size: 15px; font-weight: bold">@lang('report.profit_loss')</h4>
+            </div>
+            <br>
+            <p>Exported At : {{ date('Y-m-d h:i A') }}</p>
+            <br>
+            <p>Report Start : <span id="startDateProfitLoss"></span></p>
+            <p>Report End : <span id="endDateProfitLoss"></span></p>
         </div>
 
         <div class="row no-print">
@@ -171,11 +180,11 @@
                 }
             }
 
-    // window.canExport initialized ini layout/app.blade.pho
+    // window.canExport initialized ini layout/app.blade.php
     var export_button = window.canExport;
 
             profit_by_products_table = $('#profit_by_products_table').DataTable({
-                buttons: export_button ? pdfButtonsWithDate('Profit / Loss (By Products)Report') : [],
+                buttons: export_button ? pdfButtonsWithDate('Profit / Loss (By Products) Report') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,

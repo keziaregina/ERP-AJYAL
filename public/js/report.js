@@ -1873,20 +1873,23 @@ $(document).ready(function() {
         items_report_table.ajax.reload();
     });
 
-    // $('#trending_product_date_range').daterangepicker(dateRangeSettings, function(start, end) {
-    //     $('#trending_product_date_range').val(
-    //         start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format)
-    //     );
+    $('#trending_product_date_range').daterangepicker(dateRangeSettings, function(start, end) {
+        $('#trending_product_date_range').val(
+            start.format(moment_date_format) + ' ~ ' + end.format(moment_date_format)
+        );
         
-    //     window.startDate = start.format('YYYY-MM-DD');
-    //     window.endDate = end.format('YYYY-MM-DD');
-
-    //     expense_report_table.ajax.reload();
-    // });
-    // $('#trending_product_date_range').on('cancel.daterangepicker', function(ev, picker) {
-    //     $('#trending_product_date_range').val('');
-    //     expense_report_table.ajax.reload();
-    // });
+        window.startDate = start.format('YYYY-MM-DD');
+        window.endDate = end.format('YYYY-MM-DD');
+        
+        document.getElementById("startDateTrendingProducts").innerText = window.startDate + ' 12.00 AM';
+        document.getElementById("endDateTrendingProducts").innerText = window.endDate + ' 11.59 PM';
+        
+        // expense_report_table.ajax.reload();
+    });
+    $('#trending_product_date_range').on('cancel.daterangepicker', function(ev, picker) {
+        $('#trending_product_date_range').val('');
+        expense_report_table.ajax.reload();
+    });
 
     expense_report_table = $('#expense_report_table').DataTable();
     // expense_report_table = $('#expense_report_table').DataTable({
@@ -1935,13 +1938,25 @@ $(document).ready(function() {
     });
 });
 
-function updatePurchaseSell() {
-    var start = $('#purchase_sell_date_filter')
-        .data('daterangepicker')
-        .startDate.format('YYYY-MM-DD');
-    var end = $('#purchase_sell_date_filter')
-        .data('daterangepicker')
-        .endDate.format('YYYY-MM-DD');
+function updatePurchaseSell(start = null, end = null) {
+    if(start == null){
+        var start = $('#purchase_sell_date_filter')
+            .data('daterangepicker')
+            .startDate.format('YYYY-MM-DD');
+        window.startDate = $('#purchase_sell_date_filter')
+                    .data('daterangepicker')
+                    .startDate.format('YYYY-MM-DD');
+        document.getElementById("startDatePurchaseSell").innerText = window.startDate + ' 12.00 AM';
+    }
+    if(end == null){
+        var end = $('#purchase_sell_date_filter')
+            .data('daterangepicker')
+            .endDate.format('YYYY-MM-DD');
+        window.startDate = $('#purchase_sell_date_filter')
+                        .data('daterangepicker')
+                        .endDate.format('YYYY-MM-DD');
+        document.getElementById("endDatePurchaseSell").innerText = window.startDate + ' 11.59 PM';
+    }
     var location_id = $('#purchase_sell_location_filter').val();
 
     var data = { start_date: start, end_date: end, location_id: location_id };
@@ -2293,6 +2308,8 @@ function updateTaxReport() {
     window.endDate = $('#tax_report_date_range')
         .data('daterangepicker')
         .endDate.format('YYYY-MM-DD');
+    document.getElementById("startDateTax").innerText = window.startDate + ' 12.00 AM'
+    document.getElementById("endDateTax").innerText = window.endDate + ' 11.59 AM'
     var location_id = $('#tax_report_location_id').val();
     var contact_id = $('#tax_report_contact_id').val();
     var data = { start_date: start, end_date: end, location_id: location_id, contact_id: contact_id };

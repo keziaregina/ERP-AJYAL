@@ -8,6 +8,18 @@
     <h1>{{ __('report.trending_products')}}</h1>
 </section>
 
+<div class="print_section">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <img style="margin-bottom: 15px; height: 70px; border-radius: 8px;" src="{{ asset('img/logo-small.png') }}" alt="">
+        <h4 style="text-align: center; margin: 0; font-size: 18px">{{ session()->get('business.name') }}</h4>
+        <h4 style="text-align: center; margin: 0; font-size: 15px; font-weight: bold">@lang('report.trending_products')</h4>
+    </div>
+    <br>
+    <p>Exported At : {{ date('Y-m-d h:i A') }}</p>
+    <br>
+    <p>Report Start : <span id="startDateTrendingProducts"></span></p>
+    <p>Report End : <span id="endDateTrendingProducts"></span></p>
+</div>
 <!-- Main content -->
 <section class="content">
     <div class="row no-print">

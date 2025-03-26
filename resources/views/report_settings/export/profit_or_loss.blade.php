@@ -238,7 +238,8 @@
                     </td>
                     <td class="separator"></td>
                     <td>
-                        {{ __('attachment.profit_loss.td_tstock_recovered') }}
+                        {{-- {{ __('attachment.profit_loss.td_tstock_recovered') }} --}}
+                        Total Payroll
                     </td>
                     <td>
                         {{ number_format($report['total_recovered'], 3) ?: '0' }} {{ $currency }}

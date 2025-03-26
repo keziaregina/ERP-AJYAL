@@ -12,7 +12,18 @@
 
 <!-- Main content -->
 <section class="content">
-    <div class="print_section"><h2>{{session()->get('business.name')}} - @lang( 'report.purchase_sell' )</h2></div>
+    <div class="print_section">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <img style="margin-bottom: 15px; height: 70px; border-radius: 8px;" src="{{ asset('img/logo-small.png') }}" alt="">
+            <h4 style="text-align: center; margin: 0; font-size: 18px">{{ session()->get('business.name') }}</h4>
+            <h4 style="text-align: center; margin: 0; font-size: 15px; font-weight: bold">@lang('report.purchase_sell')</h4>
+        </div>
+        <br>
+        <p>Exported At : {{ date('Y-m-d h:i A') }}</p>
+        <br>
+        <p>Report Start : <span id="startDatePurchaseSell"></span></p>
+        <p>Report End : <span id="endDatePurchaseSell"></span></p>
+    </div>
     <div class="row no-print">
         <div class="col-md-3 col-md-offset-7 col-xs-6">
             <div class="input-group">
@@ -126,14 +137,30 @@
                     ((@lang('business.sale') - @lang('lang_v1.sell_return')) - (@lang('lang_v1.purchase') - @lang('lang_v1.purchase_return')) ) 
                     @show_tooltip(__('tooltip.over_all_sell_purchase'))
                 @endslot
-                <h3 class="text-muted">
+
+                <div class="print_section">
+                    <h4>
+                        {{ __('report.sell_minus_purchase') }}: 
+                        <span class="sell_minus_purchase">
+                            <i class="fas fa-sync fa-spin fa-fw"></i>
+                        </span>
+                    </h4>
+                    <h4>
+                        {{ __('report.difference_due') }}: 
+                        <span class="difference_due">
+                            <i class="fas fa-sync fa-spin fa-fw"></i>
+                        </span>
+                    </h4>
+                </div>
+
+                <h3 class="text-muted no-print">
                     {{ __('report.sell_minus_purchase') }}: 
                     <span class="sell_minus_purchase">
                         <i class="fas fa-sync fa-spin fa-fw"></i>
                     </span>
                 </h3>
 
-                <h3 class="text-muted">
+                <h3 class="text-muted no-print">
                     {{ __('report.difference_due') }}: 
                     <span class="difference_due">
                         <i class="fas fa-sync fa-spin fa-fw"></i>
