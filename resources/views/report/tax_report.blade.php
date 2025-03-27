@@ -34,7 +34,7 @@
     </div>
 
     <br>
-    <table class="table table-bordered table-striped" id="input_tax_table2">
+    <table style="width: 100%;" class="table table-bordered table-striped" id="input_tax_table2">
         <thead>
             <tr>
                 <th>@lang('messages.date')</th>
@@ -66,7 +66,7 @@
         </tfoot>
     </table>
     <br>
-    <table class="table table-bordered table-striped" id="output_tax_table2" width="100%">
+    <table style="width: 100%;" class="table table-bordered table-striped" id="output_tax_table2" width="100%">
         <thead>
             <tr>
                 <th>@lang('messages.date')</th>
@@ -98,7 +98,7 @@
         </tfoot>
     </table>
     <br>
-    <table class="table table-bordered table-striped" id="expense_tax_table2" width="100%">
+    <table style="width: 100%;" class="table table-bordered table-striped" id="expense_tax_table2" width="100%">
         <thead>
             <tr>
                 <th>@lang('messages.date')</th>

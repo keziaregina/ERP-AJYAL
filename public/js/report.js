@@ -37,7 +37,6 @@ $(document).ready(function() {
     // window.canExport initialized ini layout/app.blade.pho
     var export_button = window.canExport;
 
-
     //Purchase & Sell report
     //Date range as a button
     if ($('#purchase_sell_date_filter').length == 1) {
@@ -461,6 +460,179 @@ $(document).ready(function() {
         updateRegisterReport();
     });
 
+    //Sales representative Print Section
+    function initInfoSr() {
+        sr_sales_report2 = $('table#sr_sales_report2').DataTable({
+            dom: 'i',
+            processing: true,
+            serverSide: true,
+            fixedHeader:false,
+            aaSorting: [[0, 'desc']],
+            ajax: {
+                url: '/sells',
+                data: function(d) {
+                    var start = $('input#sr_date_filter')
+                        .data('daterangepicker')
+                        .startDate.format('YYYY-MM-DD');
+                    var end = $('input#sr_date_filter')
+                        .data('daterangepicker')
+                        .endDate.format('YYYY-MM-DD');
+
+                    (d.created_by = $('select#sr_id').val()),
+                        (d.location_id = $('select#sr_business_id').val()),
+                        (d.start_date = start),
+                        (d.end_date = end);
+                },
+            },
+            columns: [
+                { data: 'transaction_date', name: 'transaction_date' },
+                { data: 'invoice_no', name: 'invoice_no' },
+                { data: 'conatct_name', name: 'conatct_name' },
+                { data: 'business_location', name: 'bl.name' },
+                { data: 'payment_status', name: 'payment_status' },
+                { data: 'final_total', name: 'final_total' },
+                { data: 'total_paid', name: 'total_paid' },
+                { data: 'total_remaining', name: 'total_remaining' },
+            ],
+            columnDefs: [
+                {
+                    searchable: false,
+                    targets: [6],
+                },
+            ],
+            fnDrawCallback: function(oSettings) {
+                $('#sr_footer_sale_total').text(
+                    sum_table_col($('#sr_sales_report2'), 'final-total')
+                );
+
+                $('#sr_footer_total_paid').text(sum_table_col($('#sr_sales_report2'), 'total-paid'));
+
+                $('#sr_footer_total_remaining').text(
+                    sum_table_col($('#sr_sales_report2'), 'payment_due')
+                );
+                $('#sr_footer_total_sell_return_due').text(
+                    sum_table_col($('#sr_sales_report2'), 'sell_return_due')
+                );
+
+                $('#sr_footer_payment_status_count ').html(
+                    __sum_status_html($('#sr_sales_report2'), 'payment-status-label')
+                );
+                __currency_convert_recursively($('#sr_sales_report2'));
+            },
+        });
+
+        sr_expenses_report2 = $('table#sr_expenses_report2').DataTable({
+            dom: 'i',
+            processing: true,
+            serverSide: true,
+            fixedHeader:false,
+            aaSorting: [[0, 'desc']],
+            ajax: {
+                url: '/expenses',
+                data: function(d) {
+                    var start = $('input#sr_date_filter')
+                        .data('daterangepicker')
+                        .startDate.format('YYYY-MM-DD');
+                    var end = $('input#sr_date_filter')
+                        .data('daterangepicker')
+                        .endDate.format('YYYY-MM-DD');
+
+                    (d.expense_for = $('select#sr_id').val()),
+                        (d.location_id = $('select#sr_business_id').val()),
+                        (d.start_date = start),
+                        (d.end_date = end);
+                },
+            },
+            columnDefs: [
+                {
+                    targets: 7,
+                    orderable: false,
+                    searchable: false,
+                },
+            ],
+            columns: [
+                { data: 'transaction_date', name: 'transaction_date' },
+                { data: 'ref_no', name: 'ref_no' },
+                { data: 'category', name: 'ec.name' },
+                { data: 'location_name', name: 'bl.name' },
+                { data: 'payment_status', name: 'payment_status' },
+                { data: 'final_total', name: 'final_total' },
+                { data: 'expense_for', name: 'expense_for' },
+                { data: 'additional_notes', name: 'additional_notes' },
+            ],
+            fnDrawCallback: function(oSettings) {
+                var expense_total = sum_table_col($('#sr_expenses_report2'), 'final-total');
+                $('#footer_expense_total').text(expense_total);
+                $('#er_footer_payment_status_count').html(
+                    __sum_status_html($('#sr_expenses_report2'), 'payment-status')
+                );
+                __currency_convert_recursively($('#sr_expenses_report2'));
+            },
+        });
+        
+        sr_sales_commission_report2 = $('table#sr_sales_with_commission_table2').DataTable({
+            dom: 'i',
+            processing: true,
+            serverSide: true,
+            fixedHeader:false,
+            aaSorting: [[0, 'desc']],
+            ajax: {
+                url: '/sells',
+                data: function(d) {
+                    var start = $('input#sr_date_filter')
+                        .data('daterangepicker')
+                        .startDate.format('YYYY-MM-DD');
+                    var end = $('input#sr_date_filter')
+                        .data('daterangepicker')
+                        .endDate.format('YYYY-MM-DD');
+
+                    (d.commission_agent = $('select#sr_id').val()),
+                        (d.location_id = $('select#sr_business_id').val()),
+                        (d.start_date = start),
+                        (d.end_date = end);
+                },
+            },
+            columns: [
+                { data: 'transaction_date', name: 'transaction_date' },
+                { data: 'invoice_no', name: 'invoice_no' },
+                { data: 'conatct_name', name: 'conatct_name' },
+                { data: 'business_location', name: 'bl.name' },
+                { data: 'payment_status', name: 'payment_status' },
+                { data: 'final_total', name: 'final_total' },
+                { data: 'total_paid', name: 'total_paid' },
+                { data: 'total_remaining', name: 'total_remaining' },
+            ],
+            columnDefs: [
+                {
+                    searchable: false,
+                    targets: [6],
+                },
+            ],
+            fnDrawCallback: function(oSettings) {
+                $('#footer_sale_total').text(
+                    sum_table_col($('#sr_sales_with_commission_table'), 'final-total')
+                );
+
+                $('#footer_total_paid').text(
+                    sum_table_col($('#sr_sales_with_commission_table'), 'total-paid')
+                );
+
+                $('#footer_total_remaining').text(
+                    sum_table_col($('#sr_sales_with_commission_table'), 'payment_due')
+                );
+                $('#footer_total_sell_return_due').text(
+                    sum_table_col($('#sr_sales_with_commission_table'), 'sell_return_due')
+                );
+
+                $('#footer_payment_status_count ').html(
+                    __sum_status_html($('#sr_sales_with_commission_table'), 'payment-status-label')
+                );
+                __currency_convert_recursively($('#sr_sales_with_commission_table'));
+                __currency_convert_recursively($('#sr_sales_with_commission'));
+            },
+        });
+    }
+
     //Sales representative report
     if ($('#sr_date_filter').length == 1) {
         //date range setting
@@ -717,7 +889,7 @@ $(document).ready(function() {
             updateSalesRepresentativeReport();
         });
     }
-
+    initInfoSr();
     //Stock expiry report table
     stock_expiry_report_table = $('table#stock_expiry_report_table').DataTable({
         buttons: export_button ? pdfButtons('Stock Expiries Report') : [],
@@ -1881,17 +2053,25 @@ $(document).ready(function() {
         window.startDate = start.format('YYYY-MM-DD');
         window.endDate = end.format('YYYY-MM-DD');
         
-        document.getElementById("startDateTrendingProducts").innerText = window.startDate + ' 12.00 AM';
-        document.getElementById("endDateTrendingProducts").innerText = window.endDate + ' 11.59 PM';
-        
-        // expense_report_table.ajax.reload();
+        expense_report_table.ajax.reload();
     });
     $('#trending_product_date_range').on('cancel.daterangepicker', function(ev, picker) {
         $('#trending_product_date_range').val('');
         expense_report_table.ajax.reload();
     });
+    document.getElementById("startDateTrendingProducts").innerText = window.startDate + ' 12.00 AM';
+    document.getElementById("endDateTrendingProducts").innerText = window.endDate + ' 11.59 PM';
 
     expense_report_table = $('#expense_report_table').DataTable();
+    initExpense();
+    document.getElementById("startDateExpenses").innerText = window.startDate + ' 12.00 AM';
+    document.getElementById("endDateExpenses").innerText = window.endDate + ' 11.59 PM';
+    function initExpense(){
+        expense_report_table2 = $('#expense_report_table2').DataTable({
+            dom: 'i',
+        });
+    }
+
     // expense_report_table = $('#expense_report_table').DataTable({
     //     buttons: export_button ? pdfButtonsWithDate('Expenses Report') : [],
     //     processing: true,
@@ -2036,7 +2216,8 @@ function updateStockAdjustmentReport() {
     window.endDate = $('#stock_adjustment_date_filter')
         .data('daterangepicker')
         .endDate.format('YYYY-MM-DD');
-
+    document.getElementById("startDateStockAjdustment").innerText = window.startDate + ' 12.00 AM'
+    document.getElementById("endDateStockAjdustment").innerText = window.endDate + ' 11.59 AM'
     var data = { start_date: start, end_date: end, location_id: location_id };
 
     var loader = __fa_awesome();
@@ -2099,16 +2280,39 @@ function updateRegisterReport() {
     register_report_table.ajax.url('/reports/register-report?' + url_data).load();
 }
 
-function updateSalesRepresentativeReport() {
+function updateSalesRepresentativeReport(start = null, end = null) {
     //Update total expenses and total sales
     salesRepresentativeTotalExpense();
     salesRepresentativeTotalSales();
     salesRepresentativeTotalCommission();
+    if (start = null) {
+        var start = $('input#sr_date_filter')
+            .data('daterangepicker')
+            .startDate.format('YYYY-MM-DD');
+        window.startDate = $('input#sr_date_filter')
+        .data('daterangepicker')
+        .startDate.format('YYYY-MM-DD');
+    
+    }
+    if (end = null) {
+        var end = $('input#sr_date_filter')
+            .data('daterangepicker')
+            .endDate.format('YYYY-MM-DD');
+        window.endDate = $('input#sr_date_filter')
+        .data('daterangepicker')
+        .endDate.format('YYYY-MM-DD');
+    }
 
+    document.getElementById("startDateSalesRepresentative").innerText = window.startDate + ' 12.00 AM';
+    document.getElementById("endDateSalesRepresentative").innerText = window.endDate + ' 11.59 AM';
     //Expense and expense table refresh
     sr_expenses_report.ajax.reload();
     sr_sales_report.ajax.reload();
     sr_sales_commission_report.ajax.reload();
+    
+    sr_expenses_report2.ajax.reload();
+    sr_sales_report2.ajax.reload();
+    sr_sales_commission_report2.ajax.reload();
 
     if ($('#sr_payments_with_commission_table').length > 0) {
         sr_payments_with_commission_report.ajax.reload();
@@ -2308,8 +2512,8 @@ function updateTaxReport() {
     window.endDate = $('#tax_report_date_range')
         .data('daterangepicker')
         .endDate.format('YYYY-MM-DD');
-    document.getElementById("startDateTax").innerText = window.startDate + ' 12.00 AM'
-    document.getElementById("endDateTax").innerText = window.endDate + ' 11.59 AM'
+    document.getElementById("startDateTax").innerText = window.startDate + ' 12.00 AM';
+    document.getElementById("endDateTax").innerText = window.endDate + ' 11.59 AM';
     var location_id = $('#tax_report_location_id').val();
     var contact_id = $('#tax_report_contact_id').val();
     var data = { start_date: start, end_date: end, location_id: location_id, contact_id: contact_id };
