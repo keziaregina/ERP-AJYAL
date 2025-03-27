@@ -8,8 +8,95 @@
     <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">{{ __('report.sales_representative')}}</h1>
 </section>
 
+<div class="print_section">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <img style="margin-bottom: 15px; height: 70px; border-radius: 8px;" src="{{ asset('img/logo-small.png') }}" alt="">
+        <h4 style="text-align: center; margin: 0; font-size: 18px">{{ session()->get('business.name') }}</h4>
+        <h4 style="text-align: center; margin: 0; font-size: 15px; font-weight: bold">@lang('report.sales_representative')</h4>
+    </div>
+    <br>
+    <p>Exported At : {{ date('Y-m-d h:i A') }}</p>
+    <br>
+    <p>Report Start : <span id="startDateSalesRepresentative"></span></p>
+    <p>Report End : <span id="endDateSalesRepresentative"></span></p>
+    <br>
+
+    <table class="table table-bordered table-striped" id="sr_sales_report2" style="width: 100%;">
+        <thead>
+            <tr>
+                <th>@lang('messages.date')</th>
+                <th>@lang('sale.invoice_no')</th>
+                <th>@lang('sale.customer_name')</th>
+                <th>@lang('sale.location')</th>
+                <th>@lang('sale.payment_status')</th>
+                <th>@lang('sale.total_amount')</th>
+                <th>@lang('sale.total_paid')</th>
+                <th>@lang('sale.total_remaining')</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr class="bg-gray font-17 footer-total text-center">
+                <td colspan="4"><strong>@lang('sale.total'):</strong></td>
+                <td id="sr_footer_payment_status_count"></td>
+                <td><span class="display_currency" id="sr_footer_sale_total" data-currency_symbol ="true"></span></td>
+                <td><span class="display_currency" id="sr_footer_total_paid" data-currency_symbol ="true"></span></td>
+                <td class="text-left"><small>@lang('lang_v1.sell_due') - <span class="display_currency" id="sr_footer_total_remaining" data-currency_symbol ="true"></span><br>@lang('lang_v1.sell_return_due') - <span class="display_currency" id="sr_footer_total_sell_return_due" data-currency_symbol ="true"></span></small></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <br>
+    <table class="table table-bordered table-striped" id="sr_sales_with_commission_table2" style="width: 100%;">
+        <thead>
+            <tr>
+                <th>@lang('messages.date')</th>
+                <th>@lang('sale.invoice_no')</th>
+                <th>@lang('sale.customer_name')</th>
+                <th>@lang('sale.location')</th>
+                <th>@lang('sale.payment_status')</th>
+                <th>@lang('sale.total_amount')</th>
+                <th>@lang('sale.total_paid')</th>
+                <th>@lang('sale.total_remaining')</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr class="bg-gray font-17 footer-total text-center">
+                <td colspan="4"><strong>@lang('sale.total'):</strong></td>
+                <td id="footer_payment_status_count"></td>
+                <td><span class="display_currency" id="footer_sale_total" data-currency_symbol ="true"></span></td>
+                <td><span class="display_currency" id="footer_total_paid" data-currency_symbol ="true"></span></td>
+                <td class="text-left"><small>@lang('lang_v1.sell_due') - <span class="display_currency" id="footer_total_remaining" data-currency_symbol ="true"></span><br>@lang('lang_v1.sell_return_due') - <span class="display_currency" id="footer_total_sell_return_due" data-currency_symbol ="true"></span></small></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <br>
+    <table class="table table-bordered table-striped" id="sr_expenses_report2" style="width: 100%;">
+        <thead>
+            <tr>
+                <th>@lang('messages.date')</th>
+                <th>@lang('purchase.ref_no')</th>
+                <th>@lang('expense.expense_category')</th>
+                <th>@lang('business.location')</th>
+                <th>@lang('sale.payment_status')</th>
+                <th>@lang('sale.total_amount')</th>
+                <th>@lang('expense.expense_for')</th>
+                <th>@lang('expense.expense_note')</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr class="bg-gray font-17 text-center footer-total">
+                <td colspan="4"><strong>@lang('sale.total'):</strong></td>
+                <td id="er_footer_payment_status_count"></td>
+                <td><span class="display_currency" id="footer_expense_total" data-currency_symbol ="true"></span></td>
+                <td colspan="2"></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
 <!-- Main content -->
-<section class="content">
+<section class="content no-print ">
     <div class="row">
         <div class="col-md-12">
             @component('components.filters', ['title' => __('report.filters')])
@@ -81,6 +168,22 @@
                     </span>
                 </h3>
             @endcomponent
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <button class="tw-dw-btn tw-dw-btn-primary tw-text-white pull-right tw-mb-2" aria-label="Print"
+                onclick="window.print();" id="print-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-printer">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+                    <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+                    <path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" />
+                </svg> @lang('messages.print')
+            </button>
         </div>
     </div>
 

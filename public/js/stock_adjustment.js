@@ -154,8 +154,41 @@ $(document).ready(function() {
         },
     });
     
+    initInfo()
+    function initInfo() {       
+        stock_adjustment_table2 = $('#stock_adjustment_table2').DataTable({
+            dom: 'i',
+            processing: true,
+            serverSide: true,
+            fixedHeader:false,
+            ajax: '/stock-adjustments',
+            columnDefs: [
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false,
+                },
+            ],
+            aaSorting: [[1, 'desc']],
+            columns: [
+                { data: 'action', name: 'action' },
+                { data: 'transaction_date', name: 'transaction_date' },
+                { data: 'ref_no', name: 'ref_no' },
+                { data: 'location_name', name: 'BL.name' },
+                { data: 'adjustment_type', name: 'adjustment_type' },
+                { data: 'final_total', name: 'final_total' },
+                { data: 'total_amount_recovered', name: 'total_amount_recovered' },
+                { data: 'additional_notes', name: 'additional_notes' },
+                { data: 'added_by', name: 'u.first_name' },
+            ],
+            fnDrawCallback: function(oSettings) {
+                __currency_convert_recursively($('#stock_adjustment_table'));
+            },
+        });
+    }
     saveColumnVisibility('stock_adjustment_table', 'colvisState_stock_adjustment');
     loadColumnVisibility('stock_adjustment_table', 'colvisState_stock_adjustment');
+    loadColumnVisibility('stock_adjustment_table2', 'colvisState_stock_adjustment');
 
     var detailRows = [];
 
