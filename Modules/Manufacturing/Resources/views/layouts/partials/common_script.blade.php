@@ -57,7 +57,7 @@
 	        ];
 		//Purchase table
 	    productions_table = $('#productions_table').DataTable({
-	        buttons: export_button ? pdfButtonsWithDate('Productions Report') : [],
+	        buttons: export_button ? pdfButtonsWithDate('Productions Report', '#productions_table') : [],
             processing: true,
 	        serverSide: true,
 	        aaSorting: [[0, 'desc']],
@@ -118,7 +118,7 @@
 	    }
 
     	recipe_table = $('#recipe_table').DataTable({
-            buttons : export_button ? pdfButtons('Recipes Report') : [],
+            buttons: export_button ? pdfButtons('Recipes Report', '#recipe_table') : [],
 			processing: true,
 	        serverSide: true,
 	        ajax: '{{action([\Modules\Manufacturing\Http\Controllers\RecipeController::class, 'index'])}}',

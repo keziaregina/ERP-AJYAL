@@ -536,7 +536,7 @@ $(document).ready(function() {
     
     //Purchase table
     purchase_table = $('#purchase_table').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Purchases Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('Purchases Report', '#purchase_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -618,6 +618,9 @@ $(document).ready(function() {
                 .attr('class', 'clickable_td');
         },
     });
+    
+    saveColumnVisibility('purchase_table', 'colvisState_purchase');
+    loadColumnVisibility('purchase_table', 'colvisState_purchase');
 
     var pdfButton = document.querySelector('.buttons-pdf');
     var target = document.querySelector('.hover-q');
@@ -632,9 +635,6 @@ $(document).ready(function() {
         target.setAttribute('data-content', originalContent);
         // console.log(target.getAttribute('data-content'));
     });
-
-    saveColumnVisibility('purchase_table', 'colvisState_purchase');
-    loadColumnVisibility('purchase_table', 'colvisState_purchase');
 
     $(document).on(
         'change',

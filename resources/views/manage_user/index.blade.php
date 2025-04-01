@@ -98,7 +98,7 @@
         var export_button = {{ auth()->user()->can('view_export_buttons') ? 'true' : 'false' }};
         
         var users_table = $('#users_table').DataTable({
-            buttons: export_button ? pdfButtons('Users Report') : [],
+            buttons: export_button ? pdfButtons('Users Report', '#users_table') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,

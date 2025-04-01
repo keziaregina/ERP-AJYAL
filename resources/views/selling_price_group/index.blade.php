@@ -95,7 +95,7 @@
             var export_button = window.canExport;
             //selling_price_group_table
             var selling_price_group_table = $('#selling_price_group_table').DataTable({
-                buttons: export_button ? pdfButtons('Selling Price Groups Report') : [],
+                buttons: export_button ? pdfButtons('Selling Price Groups Report', '#selling_price_group_table') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,

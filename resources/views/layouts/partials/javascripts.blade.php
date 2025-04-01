@@ -68,7 +68,7 @@
     String(now.getMinutes()).padStart(2, '0') + ' ' + 
     (hours >= 12 ? 'PM' : 'AM');
 
-    window.pdfButtons = function(reportName) {
+    window.pdfButtons = function(reportName, table_id) {
         var datatablesButton = [
             [
                 {
@@ -101,7 +101,9 @@
                     pageSize: 'A4',
                     exportOptions: {
                         columns: function(idx, data, node) {
-                            return $(node).text() !== 'Action';
+                            var colHeader = $(node).text();
+                            var isVisible = $(table_id).DataTable().column(idx).visible();
+                            return colHeader !== 'Action' && isVisible;
                         }
                     },
                     customize: function(doc) {
@@ -334,7 +336,7 @@
         return datatablesButton;
     }
 
-    window.pdfButtonsWithDate = function(reportName) {
+    window.pdfButtonsWithDate = function(reportName, table_id) {
         var datatablesButton = [
             [
                 {
@@ -368,7 +370,9 @@
                     exportOptions: {
                         orthogonal:"arabicPDF",
                         columns: function(idx, data, node) {
-                            return $(node).text() !== 'Action';
+                            var colHeader = $(node).text();
+                            var isVisible = $(table_id).DataTable().column(idx).visible();
+                            return colHeader !== 'Action' && isVisible;
                         }
                     },
                     customize: function(doc) {
