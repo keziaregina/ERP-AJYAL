@@ -33,16 +33,24 @@
         console.log(username);
     </script>
 @endif
-
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script src="{{ asset('fonts/vfs_fonts.js') }}"></script>
+{{-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Noto+Sans+Arabic:wght@100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet"> --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+{{-- <script src="{{ asset('fonts/vfs_fonts.js') }}"></script> --}}
 <script>
     window.pdfMake.fonts = {
-        Amiri: {
-            normal: "Amiri-Regular.ttf",
-            bold: "Amiri-Bold.ttf",
-            italics: "Amiri-Italic.ttf",
-            bolditalics: "Amiri-BoldItalic.ttf"
+        // Amiri: {
+        //     normal: "Amiri-Regular.ttf",
+        //     bold: "Amiri-Bold.ttf",
+        //     italics: "Amiri-Italic.ttf",
+        //     bolditalics: "Amiri-BoldItalic.ttf"
+        // }
+        Roboto: {
+            normal: "Roboto-Italic.ttf",
+            bold: "Roboto-Italic.ttf",
+            italics: "Roboto-Italic.ttf",
+            bolditalics: "Roboto-Italic.ttf"
         }
     };
 </script>
@@ -55,7 +63,7 @@
     // console.log("Virtual File System (VFS): ", pdfMake.vfs);
     // console.log(Object.keys(pdfMake.vfs));
 
-</script> --}}
+</script>
 
 
 <script>
