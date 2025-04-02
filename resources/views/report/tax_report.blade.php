@@ -552,7 +552,7 @@
             });
         }
         input_tax_table = $('#input_tax_table').DataTable({
-                buttons: export_button ? pdfButtonsWithDate('Input Taxes Report') : [],
+                buttons: export_button ? pdfButtonsWithDate('Input Taxes Report', '#input_tax_table') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,
@@ -609,7 +609,7 @@
             if ($(e.target).attr('href') == '#output_tax_tab') {
                 if (typeof (output_tax_datatable) == 'undefined') {
                     output_tax_datatable = $('#output_tax_table').DataTable({
-                        buttons: export_button ? pdfButtons('Output Taxes Report') : [],
+                        buttons: export_button ? pdfButtons('Output Taxes Report', '#output_tax_table') : [],
                         processing: true,
                         serverSide: true,
                         fixedHeader:false,
@@ -665,7 +665,7 @@
             } else if ($(e.target).attr('href') == '#expense_tax_tab') {
                 if (typeof (expense_tax_datatable) == 'undefined') {
                     expense_tax_datatable = $('#expense_tax_table').DataTable({
-                        buttons: export_button ? pdfButtons('Expense Taxes Report') : [],
+                        buttons: export_button ? pdfButtons('Expense Taxes Report', '#expense_tax_table') : [],
                         processing: true,
                         serverSide: true,
                         fixedHeader:false,

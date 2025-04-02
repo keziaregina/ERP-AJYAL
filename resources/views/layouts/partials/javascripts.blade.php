@@ -33,6 +33,38 @@
         console.log(username);
     </script>
 @endif
+{{-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Noto+Sans+Arabic:wght@100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet"> --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+{{-- <script src="{{ asset('fonts/vfs_fonts.js') }}"></script> --}}
+<script>
+    window.pdfMake.fonts = {
+        // Amiri: {
+        //     normal: "Amiri-Regular.ttf",
+        //     bold: "Amiri-Bold.ttf",
+        //     italics: "Amiri-Italic.ttf",
+        //     bolditalics: "Amiri-BoldItalic.ttf"
+        // }
+        Roboto: {
+            normal: "Roboto-Italic.ttf",
+            bold: "Roboto-Italic.ttf",
+            italics: "Roboto-Italic.ttf",
+            bolditalics: "Roboto-Italic.ttf"
+        }
+    };
+</script>
+
+<script>
+    // console.log("pdfMake: ", pdfMake);
+
+    // console.log("Available Fonts: ", pdfMake.fonts);
+
+    // console.log("Virtual File System (VFS): ", pdfMake.vfs);
+    // console.log(Object.keys(pdfMake.vfs));
+
+</script>
+
 
 <script>
     const now = new Date();
@@ -40,14 +72,11 @@
     const formattedTime = now.getFullYear() + '-' +
     String(now.getMonth() + 1).padStart(2, '0') + '-' +
     String(now.getDate()).padStart(2, '0') + ' ' +
-    String(hours % 12 || 12).padStart(2, '0') + ':' + // Ubah ke format 12 jam
-    String(now.getMinutes()).padStart(2, '0') + ' ' +
-    (hours >= 12 ? 'PM' : 'AM'); // Tambahkan AM/PM
+    String(hours % 12 || 12).padStart(2, '0') + ':' +
+    String(now.getMinutes()).padStart(2, '0') + ' ' + 
+    (hours >= 12 ? 'PM' : 'AM');
 
-// console.log(formattedTime);
-
-    
-    window.pdfButtons = function(reportName) {
+    window.pdfButtons = function(reportName, table_id) {
         var datatablesButton = [
             [
                 {
@@ -80,7 +109,9 @@
                     pageSize: 'A4',
                     exportOptions: {
                         columns: function(idx, data, node) {
-                            return $(node).text() !== 'Action';
+                            var colHeader = $(node).text();
+                            var isVisible = $(table_id).DataTable().column(idx).visible();
+                            return colHeader !== 'Action' && isVisible;
                         }
                     },
                     customize: function(doc) {
@@ -313,7 +344,7 @@
         return datatablesButton;
     }
 
-    window.pdfButtonsWithDate = function(reportName) {
+    window.pdfButtonsWithDate = function(reportName, table_id) {
         var datatablesButton = [
             [
                 {
@@ -345,8 +376,11 @@
                     orientation: 'landscape',
                     pageSize: 'A4',
                     exportOptions: {
+                        orthogonal:"arabicPDF",
                         columns: function(idx, data, node) {
-                            return $(node).text() !== 'Action';
+                            var colHeader = $(node).text();
+                            var isVisible = $(table_id).DataTable().column(idx).visible();
+                            return colHeader !== 'Action' && isVisible;
                         }
                     },
                     customize: function(doc) {
@@ -380,33 +414,43 @@
                         });
 
                         doc.content.splice(4, 0, {
-                            text: `Exported At : ${formattedTime}`,
-                            alignment: 'left',
-                            fontSize: 9,
+                            columns: [
+                                {
+                                    text: `Exported At : ${formattedTime}`,
+                                    alignment: 'left',
+                                    fontSize: 9,
+                                    width: 200
+                                },
+                                {
+                                    text: 'Date Start : ' + window.startDate + ' 12.00 AM',
+                                    alignment: 'left',
+                                    fontSize: 9,
+                                    width: 200
+                                }
+                            ],
                             margin: [0, 10, 0, 5]
+                            
                         });
 
                         doc.content.splice(5, 0, {
-                            text: `Exported By : ${username}`,
-                            alignment: 'left',
-                            fontSize: 9,
+                            columns: [
+                                {
+                                    text: `Exported By : ${username}`,
+                                    alignment: 'left',
+                                    fontSize: 9,
+                                    width: 200
+                                },
+                                {
+                                    text: 'Date End : ' + window.endDate + ' 11.59 PM',
+                                    alignment: 'left',
+                                    fontSize: 9,
+                                    width: 200
+                                }
+                            ],
                             margin: [0, 0, 0, 5]
+                            
                         });
-
-                        doc.content.splice(6, 0, {
-                            text: 'Date Start : ' + window.startDate + ' 12.00 AM',
-                            alignment: 'left',
-                            fontSize: 9,
-                            margin: [0, 15, 0, 5]
-                        });
-
-                        doc.content.splice(7, 0, {
-                            text: 'Date End : ' + window.endDate + ' 11.59 PM',
-                            alignment: 'left',
-                            fontSize: 9,
-                            margin: [0, 0, 0, 10]
-                        });
-
+                        
                         doc.pageMargins = [25, 25, 25, 25];
 
                         const tableIndex = doc.content.findIndex(item => item.table);

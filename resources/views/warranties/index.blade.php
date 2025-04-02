@@ -67,7 +67,7 @@
             var export_button = window.canExport;
             //Status table
             var warranty_table = $('#warranty_table').DataTable({
-                buttons: export_button ? pdfButtons('Warranties Report') : [],
+                buttons: export_button ? pdfButtons('Warranties Report', '#warranty_table') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,

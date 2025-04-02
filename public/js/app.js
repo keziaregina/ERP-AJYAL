@@ -102,7 +102,7 @@ $(document).ready(function() {
 
     //Brands table
     var brands_table = $('#brands_table').DataTable({
-        buttons : export_button ? pdfButtons('Brands Report') : [],
+        buttons: export_button ? pdfButtons('Brands Report', '#brands_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -184,7 +184,7 @@ $(document).ready(function() {
 
     //Tax Rates table
     var tax_rates_table = $('#tax_rates_table').DataTable({
-        buttons : export_button ? pdfButtons('Tax Rates Report') : [],
+        buttons: export_button ? pdfButtons('Tax Rates Report', '#tax_rates_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -294,7 +294,7 @@ $(document).ready(function() {
     //Start: CRUD for unit
     //Unit table
     var units_table = $('#unit_table').DataTable({
-        buttons : export_button ? pdfButtons('Units Report') : [],
+        buttons: export_button ? pdfButtons('Units Report', '#unit_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -472,7 +472,7 @@ $(document).ready(function() {
     }
     
     contact_table = $('#contact_table').DataTable({
-        buttons : export_button ? pdfButtons(contact_name) : [],
+        buttons: export_button ? pdfButtons(contact_name, '#contact_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -749,7 +749,7 @@ $(document).ready(function() {
     //Start: CRUD for product variations
     //Variations table
     var variation_table = $('#variation_table').DataTable({
-        buttons : export_button ? pdfButtons('Variations Report') : [],
+        buttons: export_button ? pdfButtons('Variations Report', '#variation_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -1012,7 +1012,7 @@ $(document).ready(function() {
 
     //Tax Rates table
     var tax_groups_table = $('#tax_groups_table').DataTable({
-        buttons : export_button ? pdfButtons('Tax Groups Report') : [],
+        buttons: export_button ? pdfButtons('Tax Groups Report', '#tax_groups_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -1162,7 +1162,7 @@ $(document).ready(function() {
         show_invoice_preview();
     });
     var invoice_table = $('#invoice_table').DataTable({
-        buttons : export_button ? pdfButtons('Invoices Report') : [],
+        buttons: export_button ? pdfButtons('Invoices Report', '#invoice_table') : [],
         processing: true,
         serverSide: true,
         bPaginate: false,
@@ -1314,7 +1314,7 @@ $(document).ready(function() {
 
     //Business locations CRUD
     business_locations = $('#business_location_table').DataTable({
-        buttons : export_button ? pdfButtons('Business Locations Report') : [],
+        buttons: export_button ? pdfButtons('Business Locations Report', '#business_location_table') : [],
         processing: true,
         serverSide: true,
         bPaginate: false,
@@ -1432,7 +1432,7 @@ $(document).ready(function() {
     //Start: CRUD for expense category
     //Expense category table
     var expense_cat_table = $('#expense_category_table').DataTable({
-        buttons : export_button ? pdfButtons('Expense Categories Report') : [],
+        buttons: export_button ? pdfButtons('Expense Categories Report', '#expense_category_table') : [],
         processing: true,
         serverSide: true,
         ajax: '/expense-categories',
@@ -1522,7 +1522,7 @@ $(document).ready(function() {
 
     //Expense table
     expense_table = $('#expense_table').DataTable({
-        buttons : export_button ? pdfButtonsWithDate('Expenses Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('Expenses Report', '#expense_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -1766,7 +1766,7 @@ $(document).ready(function() {
 
     //Sales commission agent
     var sales_commission_agent_table = $('#sales_commission_agent_table').DataTable({
-        buttons : export_button ? pdfButtons('contact_name') : [],
+        buttons: export_button ? pdfButtons('contact_name', '#sales_commission_agent_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -1877,7 +1877,7 @@ $(document).ready(function() {
 
     //Customer Group table
     var customer_groups_table = $('#customer_groups_table').DataTable({
-        buttons : export_button ? pdfButtons('Customer Groups Report') : [],
+        buttons: export_button ? pdfButtons('Customer Groups Report', '#customer_groups_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -2023,7 +2023,7 @@ $(document).ready(function() {
     setInterval(function(){ getTotalUnreadNotifications() }, __new_notification_count_interval);
 
     discounts_table = $('#discounts_table').DataTable({
-        buttons : export_button ? pdfButtons('Discounts Report') : [],
+        buttons: export_button ? pdfButtons('Discounts Report', '#discounts_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -2055,7 +2055,7 @@ $(document).ready(function() {
     loadColumnVisibility('discounts_table', 'colvisState_discounts');
 
     types_of_service_table = $('#types_of_service_table').DataTable({
-        buttons : export_button ? pdfButtons('Type of Service Report') : [],
+        buttons: export_button ? pdfButtons('Type of Service Report', '#types_of_service_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,

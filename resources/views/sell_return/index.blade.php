@@ -96,7 +96,7 @@
         var export_button = window.canExport;
 
         sell_return_table = $('#sell_return_table').DataTable({
-            buttons: export_button ? pdfButtonsWithDate('Sell Returns Report') : [],
+            buttons: export_button ? pdfButtonsWithDate('Sell Returns Report', '#sell_return_table') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,
