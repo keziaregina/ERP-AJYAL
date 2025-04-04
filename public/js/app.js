@@ -1766,7 +1766,7 @@ $(document).ready(function() {
 
     //Sales commission agent
     var sales_commission_agent_table = $('#sales_commission_agent_table').DataTable({
-        buttons: export_button ? pdfButtons('contact_name', '#sales_commission_agent_table') : [],
+        buttons: export_button ? pdfButtons('Sales Commision Agent Report', '#sales_commission_agent_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
