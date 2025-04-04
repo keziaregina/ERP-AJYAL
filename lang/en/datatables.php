@@ -11,4 +11,7 @@ return [
     
     'am' => 'AM',
     'pm' => 'PM',
+
+    'page' => 'Page',
+    'of' => 'of',
 ];
