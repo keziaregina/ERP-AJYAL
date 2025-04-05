@@ -40,7 +40,7 @@
             if ($('#category_table').length) {
                 var category_type = $('#category_type').val();
                 category_table = $('#category_table').DataTable({
-                    buttons: export_button ? pdfButtons('Categories Report', '#category_table') : [],
+                    buttons: export_button ? pdfButtons('categories', '#category_table') : [],
                     processing: true,
                     serverSide: true,
                     fixedHeader:false,

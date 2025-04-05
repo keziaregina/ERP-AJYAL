@@ -125,7 +125,7 @@ $(document).ready(function() {
     var export_button = window.canExport;
 
     stock_adjustment_table = $('#stock_adjustment_table').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Stock Adjustments Report', '#stock_adjustment_table') : [],
+        buttons: export_button ? pdfButtonsWithDate('stock_adjustment', '#stock_adjustment_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,

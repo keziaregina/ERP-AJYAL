@@ -96,7 +96,7 @@
             var export_button = window.canExport;
 
             holidays_table = $('#holidays_table').DataTable({
-                buttons: export_button ? pdfButtonsWithDate('Holidays Report', '#holidays_table') : [],                
+                buttons: export_button ? pdfButtonsWithDate('holidays', '#holidays_table') : [],                
                 processing: true,
                 serverSide: true,
                 ajax: {

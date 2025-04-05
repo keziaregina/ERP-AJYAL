@@ -109,7 +109,7 @@
             var export_button = window.canExport;
             //Purchase table
             purchase_return_table = $('#purchase_return_datatable').DataTable({
-                buttons: export_button ? pdfButtonsWithDate('Purchase Returns Report', '#purchase_return_datatable') : [],
+                buttons: export_button ? pdfButtonsWithDate('purchase_return', '#purchase_return_datatable') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader: false,

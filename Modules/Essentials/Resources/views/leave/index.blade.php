@@ -116,7 +116,7 @@
             var export_button = window.canExport;
 
             leaves_table = $('#leave_table').DataTable({
-                buttons: export_button ? pdfButtonsWithDate('Leaves Report', '#leave_table') : [],
+                buttons: export_button ? pdfButtonsWithDate('leaves', '#leave_table') : [],
                 processing: true,
                 serverSide: true,
                 ajax: {

@@ -231,7 +231,7 @@
             var export_button = window.canExport;
 
             attendance_table = $('#attendance_table').DataTable({
-                buttons: export_button ? pdfButtonsWithDate('Attendances Report', '#attendance_table') : [],                
+                buttons: export_button ? pdfButtonsWithDate('attendances', '#attendance_table') : [],                
                 processing: true,
                 serverSide: true,
                 ajax: {
@@ -316,7 +316,7 @@
             @endif
 
             shift_table = $('#shift_table').DataTable({
-                buttons: export_button ? pdfButtons('Attendances Report', '#shift_table') : [],
+                buttons: export_button ? pdfButtons('attendances', '#shift_table') : [],
                 processing: true,
                 serverSide: true,
                 ajax: {
