@@ -102,7 +102,7 @@
         var export_button = window.canExport;
 
         activity_log_table = $('#activity_log_table').DataTable({
-            buttons: export_button ? pdfButtonsWithDate('Activity Logs Report', '#activity_log_table') : [],
+            buttons: export_button ? pdfButtonsWithDate('log', '#activity_log_table') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,

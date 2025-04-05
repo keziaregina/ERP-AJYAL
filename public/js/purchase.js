@@ -536,7 +536,7 @@ $(document).ready(function() {
     
     //Purchase table
     purchase_table = $('#purchase_table').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Purchases Report', '#purchase_table') : [],
+        buttons: export_button ? pdfButtonsWithDate('purchases', '#purchase_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,

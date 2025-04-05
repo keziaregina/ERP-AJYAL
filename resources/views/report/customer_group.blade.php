@@ -104,7 +104,7 @@
             var export_button = window.canExport;
 
             cg_report_table = $('#cg_report_table').DataTable({
-                buttons: export_button ? pdfButtonsWithDate('Customer Groups Report', '#cg_report_table') : [],
+                buttons: export_button ? pdfButtonsWithDate('cg', '#cg_report_table') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,

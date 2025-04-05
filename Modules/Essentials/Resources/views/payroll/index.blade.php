@@ -223,7 +223,7 @@
             var export_button = window.canExport;
 
             payrolls_table = $('#payrolls_table').DataTable({
-                buttons: export_button ? pdfButtons('Payrolls Report', '#payrolls_table') : [],
+                buttons: export_button ? pdfButtons('payrolls', '#payrolls_table') : [],
                 processing: true,
                 serverSide: true,
                 ajax: {
@@ -323,7 +323,7 @@
                 });
                 
                 ad_pc_table = $('#ad_pc_table').DataTable({
-                    buttons: export_button ? pdfButtons('Pay Components Report', '#ad_pc_table') : [],
+                    buttons: export_button ? pdfButtons('pay_component', '#ad_pc_table') : [],
                     processing: true,
                     serverSide: true,
                     ajax: "{{action([\Modules\Essentials\Http\Controllers\EssentialsAllowanceAndDeductionController::class, 'index'])}}",
@@ -377,7 +377,7 @@
             //payroll groups
             @can('essentials.view_all_payroll')
                 payroll_group_table = $('#payroll_group_table').DataTable({
-                        buttons: export_button ? pdfButtons('Payroll Groups Report', '#payroll_group_table') : [],
+                        buttons: export_button ? pdfButtons('pg', '#payroll_group_table') : [],
                         processing: true,
                         serverSide: true,
                         ajax: "{{action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'payrollGroupDatatable'])}}",
