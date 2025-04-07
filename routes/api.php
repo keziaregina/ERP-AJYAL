@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,4 +17,30 @@ use Illuminate\Http\Request;
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::post('/save-colvis', function (Request $request) {
+    Cache::forever($request->key, $request->colvis);
+    return response()->json([
+        'success' => true,
+        'key' => $request->key,
+        'colvis' => $request->colvis
+    ]);
+});
+
+Route::post('/get-colvis', function (Request $request) {
+    $colvis = Cache::get($request->key, []);
+    return response()->json([
+        'success' => true,
+        'key' => $request->key,
+        'colvis' => json_decode($colvis)
+    ]);
+});
+
+Route::get('/delete-colvis', function () {
+    $userId = auth()->id();
+    Cache::forget('colvisState_product', []);
+    return response()->json([
+        'success' => true,
+    ]);
 });
