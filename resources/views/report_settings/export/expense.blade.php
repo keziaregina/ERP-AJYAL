@@ -89,6 +89,8 @@
         } else {
             \App::setLocale('en');
         }
+
+        $colvis = json_decode(Cache::get('colvisState_expense_report'), true) ?? [];
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
@@ -122,8 +124,12 @@
             @forelse ($report as $index => $item)
                 <tr>
                     <td class="indexing">{{ $index + 1 }}</td>
-                    <td>{{ $item['category'] ?: '-' }}</td>
-                    <td>{{ number_format($item['total_expense'], 3) ?: '0' }} {{ $currency }}</td>
+                    @if (!isset($colvis[0]) || $colvis[0] !== false)
+                        <td>{{ $item['category'] ?: '-' }}</td>
+                    @endif
+                    @if (!isset($colvis[1]) || $colvis[1] !== false)
+                        <td>{{ number_format($item['total_expense'], 3) ?: '0' }} {{ $currency }}</td>
+                    @endif
                     @php
                         $total_expense += $expense['total_expense'];
                     @endphp

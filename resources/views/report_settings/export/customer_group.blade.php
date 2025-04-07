@@ -90,6 +90,8 @@
         } else {
             \App::setLocale('en');
         }
+
+        $colvis = json_decode(Cache::get('colvisState_activity_log'), true) ?? [];
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
@@ -112,16 +114,24 @@
         <thead>
             <tr>
                 <th class="indexing">#</th>
-                <th>{{ __('attachment.cg.th_cg') }}</th>
-                <th>{{ __('attachment.cg.th_total') }}</th>
+                @if (!isset($colvis[0]) || $colvis[0] !== false)
+                    <th>{{ __('attachment.cg.th_cg') }}</th>
+                @endif
+                @if (!isset($colvis[1]) || $colvis[1] !== false)
+                    <th>{{ __('attachment.cg.th_total') }}</th>
+                @endif
             </tr>
         </thead>
         <tbody>
             @forelse ($report as $index => $item)
                 <tr>
                     <td class="indexing">{{ $index + 1 }}</td>
-                    <td>{{ $item['name'] ?: '-' }}</td>
-                    <td>{{ number_format($item['total_sell'], 3) ?: '0' }} {{ $currency }}</td>
+                    @if (!isset($colvis[0]) || $colvis[0] !== false)
+                        <td>{{ $item['name'] ?: '-' }}</td>
+                    @endif
+                    @if (!isset($colvis[1]) || $colvis[1] !== false)
+                        <td>{{ number_format($item['total_sell'], 3) ?: '0' }} {{ $currency }}</td>
+                    @endif
                 </tr>
             @empty
                 <tr>
