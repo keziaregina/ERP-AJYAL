@@ -46,11 +46,6 @@ class Kernel extends ConsoleKernel
                     //->everyThirtyMinutes()
                     ->emailOutputTo($email);
         }
-
-        // $schedule->command('send-report:daily')->everyMinute();
-        // $schedule->command('send-report:weekly')->everyMinute();
-        // $schedule->command('send-report:monthly')->everyMinute();
-        // $schedule->command('send-report:yearly')->everyMinute();
     }
 
     /**
