@@ -5,7 +5,7 @@
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-    <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">@lang( 'report.purchase_sell' )
+    <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">@lang( 'report.purchase_sell_print' )
         <small class="tw-text-sm md:tw-text-base tw-text-gray-700 tw-font-semibold">@lang( 'report.purchase_sell_msg' )</small>
     </h1>
 </section>
@@ -16,7 +16,7 @@
         <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
             <img style="margin-bottom: 15px; height: 70px; border-radius: 8px;" src="{{ asset('img/logo-small.png') }}" alt="">
             <h4 style="text-align: center; margin: 0; font-size: 18px">{{ session()->get('business.name') }}</h4>
-            <h4 style="text-align: center; margin: 0; font-size: 15px; font-weight: bold">@lang('report.purchase_sell')</h4>
+            <h4 style="text-align: center; margin: 0; font-size: 15px; font-weight: bold">@lang('report.purchase_sell_print')</h4>
         </div>
         <br>
         <p>Exported At : {{ date('Y-m-d h:i A') }}</p>
