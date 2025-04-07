@@ -52,7 +52,7 @@
     <div class="col-sm-12">
       <div class="form-group">
         {!! Form::label('attachment_lang', __('report_settings.attachment_lang') . ':*') !!}
-          {!! Form::select('attachment_lang', $langs, ['All'], ['class' => 'form-control',
+          {!! Form::select('attachment_lang', $langs, ['en'], ['class' => 'form-control',
           'placeholder' => __('report_settings.attachment_lang'), 'required']); !!}
       </div>
     </div>
