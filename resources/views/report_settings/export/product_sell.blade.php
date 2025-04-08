@@ -34,22 +34,23 @@
         .date{
             font-size: 11px;
         }
-        .indexing {
-            width: 40px;
-        }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
 
         th,
         td {
             border: 0.5px solid #ddd;
-            padding: 8px;
+            padding: 6px 4px;
             text-align: center;
+            width: auto;
+        }
+
+        th .indexing, td .indexing {
+            width: 40px !important;
         }
 
         th {
@@ -88,6 +89,15 @@
         } else {
             \App::setLocale('en');
         }
+
+        $colvis = json_decode(Cache::get('colvisState_table#product_sell_report_table'), true) ?? [];
+        $colCount = 1;
+
+        foreach (range(0, 13) as $i) {
+            if (!isset($colvis[$i]) || $colvis[$i] !== false) {
+                $colCount++;
+            }
+        }
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
@@ -106,61 +116,125 @@
         {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+    <table style="margin-top: 10px;" class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
-                <th rowspan="2">#</th>
-                <th>{{ __('attachment.product_sell.th_product') }}</th>
-                <th>{{ __('attachment.product_sell.th_sku') }}</th>
-                <th>{{ __('attachment.product_sell.th_customer_name') }}</th>
-                <th>{{ __('attachment.product_sell.th_contact_id') }}</th>
-                <th>{{ __('attachment.product_sell.th_invoice_no') }}</th>
-                <th>{{ __('attachment.product_sell.th_date') }}</th>
-            </tr>
-            <tr>
-                <th>{{ __('attachment.product_sell.th_unit_price') }}</th>
-                <th>{{ __('attachment.product_sell.th_discount') }}</th>
-                <th>{{ __('attachment.product_sell.th_tax') }}</th>
-                <th>{{ __('attachment.product_sell.th_price_inctax') }}</th>
-                <th>{{ __('attachment.product_sell.th_total') }}</th>
-                <th>{{ __('attachment.product_sell.th_payment_method') }}</th>
+                <th>#</th>
+                @if (!isset($colvis[0]) || $colvis[0] !== false)
+                    <th>{{ __('attachment.product_sell.th_product') }}</th>
+                @endif
+                @if (!isset($colvis[1]) || $colvis[1] !== false)
+                    <th>{{ __('attachment.product_sell.th_sku') }}</th>
+                @endif
+                @if (!isset($colvis[2]) || $colvis[2] !== false)
+                    <th></th>
+                @endif
+                @if (!isset($colvis[3]) || $colvis[3] !== false)
+                    <th></th>
+                @endif
+                @if (!isset($colvis[4]) || $colvis[4] !== false)
+                    <th>{{ __('attachment.product_sell.th_customer_name') }}</th>
+                @endif
+                @if (!isset($colvis[5]) || $colvis[5] !== false)
+                    <th>{{ __('attachment.product_sell.th_contact_id') }}</th>
+                @endif
+                @if (!isset($colvis[6]) || $colvis[6] !== false)
+                    <th>{{ __('attachment.product_sell.th_invoice_no') }}</th>
+                @endif
+                @if (!isset($colvis[7]) || $colvis[7] !== false)
+                    <th>{{ __('attachment.product_sell.th_date') }}</th>
+                @endif
+                @if (!isset($colvis[8]) || $colvis[8] !== false)
+                    <th>{{ __('attachment.product_sell.th_unit_price') }}</th>
+                @endif
+                @if (!isset($colvis[9]) || $colvis[9] !== false)
+                    <th>{{ __('attachment.product_sell.th_discount') }}</th>
+                @endif
+                @if (!isset($colvis[10]) || $colvis[10] !== false)
+                    <th>{{ __('attachment.product_sell.th_tax') }}</th>
+                @endif
+                @if (!isset($colvis[11]) || $colvis[11] !== false)
+                    <th>{{ __('attachment.product_sell.th_price_inctax') }}</th>
+                @endif
+                @if (!isset($colvis[12]) || $colvis[12] !== false)
+                    <th>{{ __('attachment.product_sell.th_total') }}</th>
+                @endif
+                @if (!isset($colvis[13]) || $colvis[13] !== false)
+                    <th>{{ __('attachment.product_sell.th_payment_method') }}</th>
+                @endif
             </tr>
         </thead>
         <tbody>
             @forelse ($report as $index => $item)
             <tr>
-                <td rowspan="2">{{ $index + 1 }}</td>
-                <td>{{ $item->product_name ?: '-' }}</td>
-                <td>{{ $item->sub_sku ?: '-' }}</td>
-                <td>{{ $item->customer ?: '-' }}</td>
-                <td>{{ $item->contact_id ?: '-' }}</td>
-                <td>{{ $item->invoice_no ?: '-' }}</td>
-                <td>{{ $item->transaction_date ?: '-' }}</td>
-            </tr>
-            <tr>
-                <td>{{ number_format($item->sell_qty, 3) ?: '0' }}</td>
-                <td>{{ number_format($item->unit_price, 3) ?: '0' }}</td>
-                <td>{{ number_format($item->discount_amount, 3) ?: '0' }}</td>
-                <td>{{ number_format($item->tax, 3) ?: '0' }}</td>
-                <td>{{ number_format($item->unit_sale_price, 3) ?: '0' }} {{ $currency }}</td>
-                <td>{{ number_format($item->subtotal, 3) ?: '0' }} {{ $currency }}</td>
-                <td>{{ $item->payment_methods ?: '-' }}</td>
+                <td>{{ $index + 1 }}</td>
+                @if (!isset($colvis[0]) || $colvis[0] !== false)
+                    <td>{{ $item->product_name ?: '-' }}</td>
+                @endif
+                @if (!isset($colvis[1]) || $colvis[1] !== false)
+                    <td>{{ $item->sub_sku ?: '-' }}</td>
+                @endif
+                @if (!isset($colvis[2]) || $colvis[2] !== false)
+                    <td></td>
+                @endif
+                @if (!isset($colvis[3]) || $colvis[3] !== false)
+                    <td></td>
+                @endif
+                @if (!isset($colvis[4]) || $colvis[4] !== false)
+                    <td>{{ $item->customer ?: '-' }}</td>
+                @endif
+                @if (!isset($colvis[5]) || $colvis[5] !== false)
+                    <td>{{ $item->contact_id ?: '-' }}</td>
+                @endif
+                @if (!isset($colvis[6]) || $colvis[6] !== false)
+                    <td>{{ $item->invoice_no ?: '-' }}</td>
+                @endif
+                @if (!isset($colvis[7]) || $colvis[7] !== false)
+                    <td>{{ $item->transaction_date ?: '-' }}</td>
+                @endif
+                @if (!isset($colvis[8]) || $colvis[8] !== false)
+                    <td>{{ number_format($item->sell_qty, 3) ?: '0' }}</td>
+                @endif
+                @if (!isset($colvis[9]) || $colvis[9] !== false)
+                    <td>{{ number_format($item->unit_price, 3) ?: '0' }}</td>
+                @endif
+                @if (!isset($colvis[10]) || $colvis[10] !== false)
+                    <td>{{ number_format($item->discount_amount, 3) ?: '0' }}</td>
+                @endif
+                @if (!isset($colvis[11]) || $colvis[11] !== false)
+                    <td>{{ number_format($item->tax, 3) ?: '0' }}</td>
+                @endif
+                @if (!isset($colvis[12]) || $colvis[12] !== false)
+                    <td>{{ number_format($item->unit_sale_price, 3) ?: '0' }} {{ $currency }}</td>
+                @endif
+                @if (!isset($colvis[13]) || $colvis[13] !== false)
+                    <td>{{ number_format($item->subtotal, 3) ?: '0' }} {{ $currency }}</td>
+                @endif
+                @if (!isset($colvis[14]) || $colvis[14] !== false)
+                    <td>{{ $item->payment_methods ?: '-' }}</td>
+                @endif
             </tr>
             @empty
             <tr>
-                <td colspan="7">
+                <td colspan={{ $colCount }}>
                     {{ __('attachment.general.empty') }}
                 </td>
             </tr>
             @endforelse
         </tbody>
-        <tfoot>
+    </table>
+    <table>
+        @if (!isset($colvis[12]) || $colvis[12] !== false)
             <tr class="total">
-                <td class="bold" colspan="4">{{ __('attachment.general.subtotal') }}</td>
-                <td class="bold" colspan="2">{{ __('attachment.product_purchase.subtotal') }}</td>
-                <td>{{ number_format(collect($report)->sum('subtotal'), 3) ?: '0' }} {{ $currency }}</td>
+                <td class="bold" colspan="12">{{ __('attachment.general.subtotal') }}</td>
             </tr>
-        </tfoot>
+            <tr>
+                <td class="bold" colspan="12">{{ __('attachment.product_purchase.subtotal') }}</td>
+            </tr>
+            <tr>
+                <td colspan="12">{{ number_format(collect($report)->sum('subtotal'), 3) ?: '0' }} {{ $currency }}</td>
+            </tr>
+        @endif
     </table>
 </body>
 </html>

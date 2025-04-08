@@ -71,8 +71,9 @@
         <div class="header">{{ __('email_notification.title', ['interval' => __("interval.$interval")]) }}</div>
         <div class="content-{{ $attachment_lang === 'ar' ? 'rtl' : 'ltr' }}">
             <p>{{ __('email_notification.row_1', ['first_name' => $user->first_name, 'last_name' => $user->last_name]) }}</p>
-            <p>{{ __('email_notification.row_2', ['report_type' => __("report_type.$title")]) }}</p>
-            <a href="#" class="button">{{ __('email_notification.download_button') }}</a>
+            {{-- <p>{{ __('email_notification.row_2', ['report_type' => __("report_type.$title")]) }}</p> --}}
+            <p>{{ __('email_notification.row_2_new', ['report_type' => __("report_type.$title")]) }}</p>
+            {{-- <a href="#" class="button">{{ __('email_notification.download_button') }}</a> --}}
         </div>
         <div class="footer">&copy; {{ date('Y') }} {{ __('email_notification.copyright') }}</div>
     </div>

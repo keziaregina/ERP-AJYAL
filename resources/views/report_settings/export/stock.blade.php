@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 15px;
         }
 
         .header {
@@ -34,9 +34,6 @@
 
         .date{
             font-size: 11px;
-        }
-        .indexing {
-            width: 40px;
         }
 
         .header-box {
@@ -74,15 +71,19 @@
         .data table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
 
         .data th,
         .data td {
             border: 0.5px solid #ddd;
-            padding: 8px;
+            padding: 6px 4px;
             text-align: center;
+            width: auto;
+        }
+
+        tr .indexing, td .indexing {
+            width: 40px !important;
         }
 
         .data th {
@@ -120,6 +121,15 @@
             \App::setLocale('ar');
         } else {
             \App::setLocale('en');
+        }
+
+        $colvis = json_decode(Cache::get('colvisState_stock_report'), true) ?? [];
+        $colCount = 1;
+
+        foreach (range(1, 18) as $i) {
+            if (!isset($colvis[$i]) || $colvis[$i] !== false) {
+                $colCount++;
+            }
         }
     @endphp
     <div class="header">
@@ -163,30 +173,64 @@
     </div>
 
     <div class="data">
-        <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        <table style="margin-top: 10px" class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
             <thead>
                 <tr>
-                    <th rowspan="2" class="indexing">#</th>
-                    <th>{{ __('attachment.stock.th_sku') }}</th>
-                    <th>{{ __('attachment.stock.th_product') }}</th>
-                    <th>{{ __('attachment.stock.th_variations') }}</th>
-                    <th>{{ __('attachment.stock.th_cat') }}</th>
-                    <th>{{ __('attachment.stock.th_location') }}</th>
-                    <th>{{ __('attachment.stock.th_unit_selling_price') }}</th>
-                    <th>{{ __('attachment.stock.th_current_stock') }}</th>
-                    <th>{{ __('attachment.stock.th_current_stock_by_purchase') }}</th>
-                    <th>{{ __('attachment.stock.th_current_stock_by_sale') }}</th>
-                </tr>
-                <tr>
-                    <th>{{ __('attachment.stock.th_potential') }}</th>
-                    <th>{{ __('attachment.stock.th_tunit_sold') }}</th>
-                    <th>{{ __('attachment.stock.th_tunit_transfered') }}</th>
-                    <th>{{ __('attachment.stock.th_tunit_adjusted') }}</th>
-                    <th>{{ __('attachment.stock.th_cust1') }}</th>
-                    <th>{{ __('attachment.stock.th_cust2') }}</th>
-                    <th>{{ __('attachment.stock.th_cust3') }}</th>
-                    <th>{{ __('attachment.stock.th_cust4') }}</th>
-                    <th>{{ __('attachment.stock.th_current_stock_manufacturing') }}</th>
+                    <th class="indexing">#</th>
+                    @if (!isset($colvis[1]) || $colvis[1] !== false)
+                        <th>{{ __('attachment.stock.th_sku') }}</th>
+                    @endif
+                    @if (!isset($colvis[2]) || $colvis[2] !== false)
+                        <th>{{ __('attachment.stock.th_product') }}</th>
+                    @endif
+                    @if (!isset($colvis[3]) || $colvis[3] !== false)
+                        <th>{{ __('attachment.stock.th_variations') }}</th>
+                    @endif
+                    @if (!isset($colvis[4]) || $colvis[4] !== false)
+                        <th>{{ __('attachment.stock.th_cat') }}</th>
+                    @endif
+                    @if (!isset($colvis[5]) || $colvis[5] !== false)
+                        <th>{{ __('attachment.stock.th_location') }}</th>
+                    @endif
+                    @if (!isset($colvis[6]) || $colvis[6] !== false)
+                        <th>{{ __('attachment.stock.th_unit_selling_price') }}</th>
+                    @endif
+                    @if (!isset($colvis[7]) || $colvis[7] !== false)
+                        <th>{{ __('attachment.stock.th_current_stock') }}</th>
+                    @endif
+                    @if (!isset($colvis[8]) || $colvis[8] !== false)
+                        <th>{{ __('attachment.stock.th_current_stock_by_purchase') }}</th>
+                    @endif
+                    @if (!isset($colvis[9]) || $colvis[9] !== false)
+                        <th>{{ __('attachment.stock.th_current_stock_by_sale') }}</th>
+                    @endif
+                    @if (!isset($colvis[10]) || $colvis[10] !== false)
+                        <th>{{ __('attachment.stock.th_potential') }}</th>
+                    @endif
+                    @if (!isset($colvis[11]) || $colvis[11] !== false)
+                        <th>{{ __('attachment.stock.th_tunit_sold') }}</th>
+                    @endif
+                    @if (!isset($colvis[12]) || $colvis[12] !== false)
+                        <th>{{ __('attachment.stock.th_tunit_transfered') }}</th>
+                    @endif
+                    @if (!isset($colvis[13]) || $colvis[13] !== false)
+                        <th>{{ __('attachment.stock.th_tunit_adjusted') }}</th>
+                    @endif
+                    @if (!isset($colvis[14]) || $colvis[14] !== false)
+                        <th>{{ __('attachment.stock.th_cust1') }}</th>
+                    @endif
+                    @if (!isset($colvis[15]) || $colvis[15] !== false)
+                        <th>{{ __('attachment.stock.th_cust2') }}</th>
+                    @endif
+                    @if (!isset($colvis[16]) || $colvis[16] !== false)
+                        <th>{{ __('attachment.stock.th_cust3') }}</th>
+                    @endif
+                    @if (!isset($colvis[17]) || $colvis[17] !== false)
+                        <th>{{ __('attachment.stock.th_cust4') }}</th>
+                    @endif
+                    @if (!isset($colvis[18]) || $colvis[18] !== false)
+                        <th>{{ __('attachment.stock.th_current_stock_manufacturing') }}</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -199,27 +243,61 @@
                         $potential_profit = (float) $stock_price_by_sp - (float) $item->stock_price;
                     @endphp
                     <tr>
-                        <td rowspan="2">{{ $index + 1 }}</td>
-                        <td>{{ $item->sku }}</td>
-                        <td>{{ $item->product }}</td>
-                        <td>{{ $item->variation_name ?: '-' }}</td>
-                        <td>{{ $item->category_name ?: '-' }}</td>
-                        <td>{{ $item->location_name ?: '-' }}</td>
-                        <td>{{ number_format($item->unit_price, 3)  ?: '0' }} {{ $currency }}</td>
-                        <td>{{ number_format($item->stock, 3) ?: '0' }} {{ __('attachment.stock.bags') }}</td>
-                        <td>{{ number_format($item->stock_price,3)  ?: '0' }} {{ $currency }}</td>
-                        <td>{{ number_format($stock_price_by_sp, 3)  ?: '0' }} {{ $currency }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ number_format($potential_profit, 3) ?: '0' }} {{ $currency }}</td>
-                        <td>{{ $item->total_sold ?: '-' }} {{ __('attachment.stock.bags') }}</td>
-                        <td>{{ $item->total_transfered ?: '-' }} {{ __('attachment.stock.bags') }}</td>
-                        <td>{{ $item->total_adjusted ?: '-' }} {{ __('attachment.stock.bags') }}</td>
-                        <td>{{ $item->product_custom_field1 ?: '-' }}</td>
-                        <td>{{ $item->product_custom_field2 ?: '-' }}</td>
-                        <td>{{ $item->product_custom_field3 ?: '-' }}</td>
-                        <td>{{ $item->product_custom_field4 ?: '-' }}</td>
-                        <td>{{ number_format($item->total_mfg_stock, 3) ?: '0' }} {{ __('attachment.stock.bags') }}</td>
+                        <td class="indexing">{{ $index + 1 }}</td>
+                        @if (!isset($colvis[1]) || $colvis[1] !== false)
+                            <td>{{ $item->sku }}</td>
+                        @endif
+                        @if (!isset($colvis[2]) || $colvis[2] !== false)
+                            <td>{{ $item->product }}</td>
+                        @endif
+                        @if (!isset($colvis[3]) || $colvis[3] !== false)
+                            <td>{{ $item->variation_name ?: '-' }}</td>
+                        @endif
+                        @if (!isset($colvis[4]) || $colvis[4] !== false)
+                            <td>{{ $item->category_name ?: '-' }}</td>
+                        @endif
+                        @if (!isset($colvis[5]) || $colvis[5] !== false)
+                            <td>{{ $item->location_name ?: '-' }}</td>
+                        @endif
+                        @if (!isset($colvis[6]) || $colvis[6] !== false)
+                            <td>{{ number_format($item->unit_price, 3)  ?: '0' }} {{ $currency }}</td>
+                        @endif
+                        @if (!isset($colvis[7]) || $colvis[7] !== false)
+                            <td>{{ number_format($item->stock, 3) ?: '0' }} {{ __('attachment.stock.bags') }}</td>
+                        @endif
+                        @if (!isset($colvis[8]) || $colvis[8] !== false)
+                            <td>{{ number_format($item->stock_price,3)  ?: '0' }} {{ $currency }}</td>
+                        @endif
+                        @if (!isset($colvis[9]) || $colvis[9] !== false)
+                            <td>{{ number_format($stock_price_by_sp, 3)  ?: '0' }} {{ $currency }}</td>
+                        @endif
+                        @if (!isset($colvis[10]) || $colvis[10] !== false)
+                            <td>{{ number_format($potential_profit, 3) ?: '0' }} {{ $currency }}</td>
+                        @endif
+                        @if (!isset($colvis[11]) || $colvis[11] !== false)
+                            <td>{{ $item->total_sold ?: '-' }} {{ __('attachment.stock.bags') }}</td>
+                        @endif
+                        @if (!isset($colvis[12]) || $colvis[12] !== false)
+                            <td>{{ $item->total_transfered ?: '-' }} {{ __('attachment.stock.bags') }}</td>
+                        @endif
+                        @if (!isset($colvis[13]) || $colvis[13] !== false)
+                            <td>{{ $item->total_adjusted ?: '-' }} {{ __('attachment.stock.bags') }}</td>
+                        @endif
+                        @if (!isset($colvis[14]) || $colvis[14] !== false)
+                            <td>{{ $item->product_custom_field1 ?: '-' }}</td>
+                        @endif
+                        @if (!isset($colvis[15]) || $colvis[15] !== false)
+                            <td>{{ $item->product_custom_field2 ?: '-' }}</td>
+                        @endif
+                        @if (!isset($colvis[16]) || $colvis[16] !== false)
+                            <td>{{ $item->product_custom_field3 ?: '-' }}</td>
+                        @endif
+                        @if (!isset($colvis[17]) || $colvis[17] !== false)
+                            <td>{{ $item->product_custom_field4 ?: '-' }}</td>
+                        @endif
+                        @if (!isset($colvis[18]) || $colvis[18] !== false)
+                            <td>{{ number_format($item->total_mfg_stock, 3) ?: '0' }} {{ __('attachment.stock.bags') }}</td>
+                        @endif
                     </tr>
                 @endforeach
             </tbody>
