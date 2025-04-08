@@ -90,6 +90,7 @@
         }
         
         $colvis = json_decode(Cache::get('colvisState_supplier_report_tbl'), true) ?? [];
+        
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">

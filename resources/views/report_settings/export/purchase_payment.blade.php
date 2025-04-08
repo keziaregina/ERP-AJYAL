@@ -35,22 +35,23 @@
         .date{
             font-size: 11px;
         }
-        .indexing {
-            width: 40px;
-        }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
 
         th,
         td {
             border: 0.5px solid #ddd;
-            padding: 8px;
+            padding: 6px 4px;
             text-align: center;
+            width: auto;
+        }
+
+        th .indexing, td .indexing {
+            width: 40px !important;
         }
 
         th {
@@ -89,6 +90,15 @@
         } else {
             \App::setLocale('en');
         }
+
+        $colvis = json_decode(Cache::get('colvisState_table#purchase_payment_report'), true) ?? [];
+        $colCount = 1;
+
+        foreach (range(1, 5) as $i) {
+            if (!isset($colvis[$i]) || $colvis[$i] !== false) {
+                $colCount++;
+            }
+        }
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
@@ -107,42 +117,68 @@
         {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+    <table style="margin-top: 10px;" class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th class="indexing">#</th>
-                <th>{{ __('attachment.purchase_payment.th_ref_no') }}</th>
-                <th>{{ __('attachment.purchase_payment.th_paid') }}</th>
-                <th>{{ __('attachment.purchase_payment.th_amount') }}</th>
-                <th>{{ __('attachment.purchase_payment.th_supplier') }}</th>
-                <th>{{ __('attachment.purchase_payment.th_payment_method') }}</th>
+                @if (!isset($colvis[1]) || $colvis[1] !== false)
+                    <th>{{ __('attachment.purchase_payment.th_ref_no') }}</th>
+                @endif
+                @if (!isset($colvis[2]) || $colvis[2] !== false)
+                    <th>{{ __('attachment.purchase_payment.th_paid') }}</th>
+                @endif
+                @if (!isset($colvis[3]) || $colvis[3] !== false)
+                    <th>{{ __('attachment.purchase_payment.th_amount') }}</th>
+                @endif
+                @if (!isset($colvis[4]) || $colvis[4] !== false)
+                    <th>{{ __('attachment.purchase_payment.th_supplier') }}</th>
+                @endif
+                @if (!isset($colvis[5]) || $colvis[5] !== false)
+                    <th>{{ __('attachment.purchase_payment.th_payment_method') }}</th>
+                @endif
             </tr>
         </thead>
         <tbody>
             @forelse ($report as $index => $item)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->payment_ref_no }}</td>
-                    <td>{{ $item->paid_no ?: '-' }}</td>
-                    <td>{{ number_format($item->amount, 3) }} {{ $currency }}</td>
-                    <td>{!! $item->supplier !!}</td>
-                    <td>{{ $item->method }}</td>
+                    <td class="indexing">{{ $index + 1 }}</td>
+                    @if (!isset($colvis[1]) || $colvis[1] !== false)
+                        <td>{{ $item->payment_ref_no }}</td>
+                    @endif
+                    @if (!isset($colvis[2]) || $colvis[2] !== false)
+                        <td>{{ $item->paid_no ?: '-' }}</td>
+                    @endif
+                    @if (!isset($colvis[3]) || $colvis[3] !== false)
+                        <td>{{ number_format($item->amount, 3) }} {{ $currency }}</td>
+                    @endif
+                    @if (!isset($colvis[4]) || $colvis[4] !== false)
+                        <td>{!! $item->supplier !!}</td>
+                    @endif
+                    @if (!isset($colvis[5]) || $colvis[5] !== false)
+                        <td>{{ $item->method }}</td>
+                    @endif
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6">
+                    <td colspan={{ $colCount }}>
                         {{ __('attachment.general.empty') }}
                     </td>
                 </tr>
             @endforelse
         </tbody>
-        <tfoot>
-            <tr class="total">
-                <td class="bold" colspan="3">{{ __('attachment.general.subtotal') }}</td>
-                <td>{{ number_format(collect($report)->sum('amount'), 3) }} {{ $currency }}</td>
-                <td colspan="2"></td>
-            </tr>
-        </tfoot>
+    </table>
+    <table>
+        @if (!isset($colvis[3]) || $colvis[3] !== false)
+        <tr class="total">
+            <td class="bold" colspan="6">{{ __('attachment.general.subtotal') }}</td>
+        </tr>
+        <tr class="total">
+            <td class="bold" colspan="6">{{ __('attachment.purchase_payment.th_amount') }}</td>
+        </tr>
+        <tr>
+            <td colspan="6">{{ number_format(collect($report)->sum('amount'), 3) }} {{ $currency }}</td>
+        </tr>
+        @endif
     </table>
 </body>
 

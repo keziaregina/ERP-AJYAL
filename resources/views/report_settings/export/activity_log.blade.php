@@ -36,22 +36,22 @@
         .date{
             font-size: 11px;
         }
-        .indexing {
-            width: 40px;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
 
         th,
         td {
             border: 0.5px solid #ddd;
-            padding: 8px;
+            padding: 6px 4px;
             text-align: center;
+            width: auto;
+        }
+
+        tr .indexing, td .indexing {
+            width: 40px !important;
         }
 
         th {
@@ -93,6 +93,13 @@
         }
 
         $colvis = json_decode(Cache::get('colvisState_activity_log'), true) ?? [];
+        $colCount = 1;
+
+        foreach (range(0, 4) as $i) {
+            if (!isset($colvis[$i]) || $colvis[$i] !== false) {
+                $colCount++;
+            }
+        }
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
@@ -111,7 +118,7 @@
         {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+    <table style="margin-top: 10px" class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th class="indexing">#</th>
@@ -163,7 +170,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6">{{ __('attachment.general.empty') }}</td>
+                    <td colspan={{ $colCount }}>{{ __('attachment.general.empty') }}</td>
                 </tr>
             @endforelse
 

@@ -749,4 +749,37 @@
     @endforeach
 @endif
 <script src="{{ asset('js/report.js?v=' . $asset_v) }}"></script>
+<script>
+    const input = 'colvisState_input_tax';
+    const ouput = 'colvisState_output_tax';
+    const expense = 'colvisState_expense_tax';
+
+    const colvis1 = localStorage.getItem(input);
+    const colvis2 = localStorage.getItem(ouput);
+    const colvis3 = localStorage.getItem(expense);
+
+    fetch('/api/save-colvis', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: input, colvis: colvis1 })
+    });
+
+    fetch('/api/save-colvis', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: ouput, colvis: colvis2 })
+    });
+
+    fetch('/api/save-colvis', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: expense, colvis: colvis3 })
+    });
+</script>
 @endsection

@@ -36,26 +36,28 @@
         .date{
             font-size: 11px;
         }
-        .indexing {
-            width: 40px;
-        }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
 
         th,
         td {
             border: 0.5px solid #ddd;
-            padding: 8px;
+            padding: 6px 4px;
             text-align: center;
+            width: auto;
         }
 
+        tr .indexing, td .indexing {
+            width: 40px !important;
+        }
+
+
         th {
-            background-color: #2C3E50;
+            background-color: #083cb4;
             color: white;
             font-weight: bold;
         }
@@ -112,6 +114,30 @@
         } else {
             \App::setLocale('en');
         }
+
+        $input = json_decode(Cache::get('colvisState_input_tax'), true) ?? [];
+        $output = json_decode(Cache::get('colvisState_output_tax'), true) ?? [];
+        $expense = json_decode(Cache::get('colvisState_expense_tax'), true) ?? [];
+
+        $colCountInput = 1;
+        $colCountOutput = 1;
+        $colCountExpense = 1;
+
+        foreach (range(0, 6) as $i) {
+            if (!isset($colvis[$i]) || $colvis[$i] !== false) {
+                $colCountInput++;
+            }
+        }
+        foreach (range(0, 6) as $i) {
+            if (!isset($colvis[$i]) || $colvis[$i] !== false) {
+                $colCountOutput++;
+            }
+        }
+        foreach (range(0, 5) as $i) {
+            if (!isset($colvis[$i]) || $colvis[$i] !== false) {
+                $colCountExpense++;
+            }
+        }
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
@@ -120,6 +146,7 @@
 
         {{ Log::info('CUSTOMER & SUPPLIER -------------------------------------------------->') }}
         {{ Log::info(json_encode($report, JSON_PRETTY_PRINT)) }}
+        
     </div>
 
     <div class="report-title">
@@ -144,17 +171,31 @@
             {{ __('attachment.tax.input_title') }}
         </h3>
 
-        <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        <table style="margin-top: 10px" class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
             <thead>
                 <tr>
                     <th class="indexing">#</th>
-                    <th>{{ __('attachment.tax.th_date') }}</th>
-                    <th>{{ __('attachment.tax.th_ref') }}</th>
-                    <th>{{ __('attachment.tax.th_supplier') }}</th>
-                    <th>{{ __('attachment.tax.th_taxnum') }}</th>
-                    <th>{{ __('attachment.tax.th_amount') }}</th>
-                    <th>{{ __('attachment.tax.th_payment_method') }}</th>
-                    <th>{{ __('attachment.tax.th_discount') }}</th>
+                    @if (!isset($input[0]) || $input[0] !== false)
+                        <th>{{ __('attachment.tax.th_date') }}</th>
+                    @endif
+                    @if (!isset($input[1]) || $input[1] !== false)
+                        <th>{{ __('attachment.tax.th_ref') }}</th>
+                    @endif
+                    @if (!isset($input[2]) || $input[2] !== false)
+                        <th>{{ __('attachment.tax.th_supplier') }}</th>
+                    @endif
+                    @if (!isset($input[3]) || $input[3] !== false)
+                        <th>{{ __('attachment.tax.th_taxnum') }}</th>
+                    @endif
+                    @if (!isset($input[4]) || $input[4] !== false)
+                        <th>{{ __('attachment.tax.th_amount') }}</th>
+                    @endif
+                    @if (!isset($input[5]) || $input[5] !== false)
+                        <th>{{ __('attachment.tax.th_payment_method') }}</th>
+                    @endif
+                    @if (!isset($input[6]) || $input[6] !== false)
+                        <th>{{ __('attachment.tax.th_discount') }}</th>
+                    @endif
                     @foreach ($report['taxes'] as $tax)
                         <th>{{ $tax['name'] }}</th>
                     @endforeach
@@ -165,18 +206,32 @@
                     @foreach ($report['input_tax_details']['tax_details'] as $index => $item)
                         <tr>
                             <td class="indexing">{{ $index + 1 }}</td>
-                            <td>{{ $item->transaction_date ?: '-' }}</td>
-                            <td>{{ $item->ref_no ?: '-' }}</td>
-                            <td>{{ $item->contact_name ?: '-' }}</td>
-                            <td>{{ $item->tax_number ?: '-' }}</td>
-                            <td>{{ number_format($item->total_before_tax, 3) ?: '0' }} {{ $currency }}</td>
-                            <td>{{ $item->payment_methods ?: '-' }}</td>
-                            <td>{{ number_format($item->discount_amount, 3) ?: '0' }} {{ $currency }}</td>
+                            @if (!isset($input[0]) || $input[0] !== false)
+                                <td>{{ $item->transaction_date ?: '-' }}</td>
+                            @endif
+                            @if (!isset($input[1]) || $input[1] !== false)
+                                <td>{{ $item->ref_no ?: '-' }}</td>
+                            @endif
+                            @if (!isset($input[2]) || $input[2] !== false)
+                                <td>{{ $item->contact_name ?: '-' }}</td>
+                            @endif
+                            @if (!isset($input[3]) || $input[3] !== false)
+                                <td>{{ $item->tax_number ?: '-' }}</td>
+                            @endif
+                            @if (!isset($input[4]) || $input[4] !== false)
+                                <td>{{ number_format($item->total_before_tax, 3) ?: '0' }} {{ $currency }}</td>
+                            @endif
+                            @if (!isset($input[5]) || $input[5] !== false)
+                                <td>{{ $item->payment_methods ?: '-' }}</td>
+                            @endif
+                            @if (!isset($input[6]) || $input[6] !== false)
+                                <td>{{ number_format($item->discount_amount, 3) ?: '0' }} {{ $currency }}</td>
+                            @endif
                         </tr>
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="11">{{ __('attachment.general.empty') }}</td>
+                        <td colspan={{ $colCountInput }}>{{ __('attachment.general.empty') }}</td>
                     </tr>
                 @endif
             </tbody>
@@ -188,17 +243,31 @@
             {{ __('attachment.tax.output_title') }}
         </h3>
 
-        <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        <table style="margin-top: 10px" class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
             <thead>
                 <tr>
                     <th class="indexing">#</th>
-                    <th>{{ __('attachment.tax.th_date') }}</th>
-                    <th>{{ __('attachment.tax.th_ref') }}</th>
-                    <th>{{ __('attachment.tax.th_customer') }}</th>
-                    <th>{{ __('attachment.tax.th_taxnum') }}</th>
-                    <th>{{ __('attachment.tax.th_amount') }}</th>
-                    <th>{{ __('attachment.tax.th_payment_method') }}</th>
-                    <th>{{ __('attachment.tax.th_discount') }}</th>
+                    @if (!isset($output[0]) || $output[0] !== false)
+                        <th>{{ __('attachment.tax.th_date') }}</th>
+                    @endif
+                    @if (!isset($output[1]) || $output[1] !== false)
+                        <th>{{ __('attachment.tax.th_ref') }}</th>
+                    @endif
+                    @if (!isset($output[2]) || $output[2] !== false)
+                        <th>{{ __('attachment.tax.th_customer') }}</th>
+                    @endif
+                    @if (!isset($output[3]) || $output[3] !== false)
+                        <th>{{ __('attachment.tax.th_taxnum') }}</th>
+                    @endif
+                    @if (!isset($output[4]) || $output[4] !== false)
+                        <th>{{ __('attachment.tax.th_amount') }}</th>
+                    @endif
+                    @if (!isset($output[5]) || $output[5] !== false)
+                        <th>{{ __('attachment.tax.th_payment_method') }}</th>
+                    @endif
+                    @if (!isset($output[6]) || $output[6] !== false)
+                        <th>{{ __('attachment.tax.th_discount') }}</th>
+                    @endif
                     @foreach ($report['taxes'] as $tax)
                         <th>{{ $tax['name'] }}</th>
                     @endforeach
@@ -209,18 +278,32 @@
                     @foreach ($report['output_tax_details']['tax_details'] as $index => $item)
                         <tr class="indexing">
                             <td>{{ $index + 1 }}</td>
-                            <td>{{ $item->transaction_date ?: '-' }}</td>
-                            <td>{{ $item->invoice_no ?: '-' }}</td>
-                            <td>{{ $item->contact_name ?: '-' }}</td>
-                            <td>{{ $item->tax_number ?: '-' }}</td>
-                            <td>{{ number_format($item->total_before_tax, 3) ?: '0' }} {{ $currency }}</td>
-                            <td>{{ $item->payment_methods ?: '-' }}</td>
-                            <td>{{ number_format($item->discount_amount, 3) ?: '0' }} {{ $currency }}</td>
+                            @if (!isset($output[0]) || $output[0] !== false)
+                                <td>{{ $item->transaction_date ?: '-' }}</td>
+                            @endif
+                            @if (!isset($output[1]) || $output[1] !== false)
+                                <td>{{ $item->invoice_no ?: '-' }}</td>
+                            @endif
+                            @if (!isset($output[2]) || $output[2] !== false)
+                                <td>{{ $item->contact_name ?: '-' }}</td>
+                            @endif
+                            @if (!isset($output[3]) || $output[3] !== false)
+                                <td>{{ $item->tax_number ?: '-' }}</td>
+                            @endif
+                            @if (!isset($output[4]) || $output[4] !== false)
+                                <td>{{ number_format($item->total_before_tax, 3) ?: '0' }} {{ $currency }}</td>
+                            @endif
+                            @if (!isset($output[5]) || $output[5] !== false)
+                                <td>{{ $item->payment_methods ?: '-' }}</td>
+                            @endif
+                            @if (!isset($output[6]) || $output[6] !== false)
+                                <td>{{ number_format($item->discount_amount, 3) ?: '0' }} {{ $currency }}</td>
+                            @endif
                         </tr>
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="11">{{ __('attachment.general.empty') }}</td>
+                        <td colspan={{ $colCountOutput }}>{{ __('attachment.general.empty') }}</td>
                     </tr>
                 @endif
             </tbody>
@@ -232,16 +315,28 @@
             {{ __('attachment.tax.expense_title') }}
         </h3>
 
-        <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+        <table style="margin-top: 10px" class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
             <thead>
                 <tr>
                     <th class="indexing">#</th>
-                    <th>{{ __('attachment.tax.th_date') }}</th>
-                    <th>{{ __('attachment.tax.th_ref') }}</th>
-                    <th>{{ __('attachment.tax.th_taxnum') }}</th>
-                    <th>{{ __('attachment.tax.th_amount') }}</th>
-                    <th>{{ __('attachment.tax.th_payment_method') }}</th>
-                    <th>{{ __('attachment.tax.th_discount') }}</th>
+                    @if (!isset($expense[0]) || $expense[0] !== false)
+                        <th>{{ __('attachment.tax.th_date') }}</th>
+                    @endif
+                    @if (!isset($expense[1]) || $expense[1] !== false)
+                        <th>{{ __('attachment.tax.th_ref') }}</th>
+                    @endif
+                    @if (!isset($expense[2]) || $expense[2] !== false)
+                        <th>{{ __('attachment.tax.th_taxnum') }}</th>
+                    @endif
+                    @if (!isset($expense[3]) || $expense[3] !== false)
+                        <th>{{ __('attachment.tax.th_amount') }}</th>
+                    @endif
+                    @if (!isset($expense[4]) || $expense[4] !== false)
+                        <th>{{ __('attachment.tax.th_payment_method') }}</th>
+                    @endif
+                    @if (!isset($expense[5]) || $expense[5] !== false)
+                        <th>{{ __('attachment.tax.th_discount') }}</th>
+                    @endif
                     @foreach ($report['taxes'] as $tax)
                         <th>{{ $tax['name'] }}</th>
                     @endforeach
@@ -252,17 +347,29 @@
                     @foreach ($report['expense_tax_details']['tax_details'] as $index => $item)
                         <tr>
                             <td class="indexing">{{ $index + 1 }}</td>
-                            <td>{{ $item->transaction_date ?: '-' }}</td>
-                            <td>{{ $item->ref_no ?: '-' }}</td>
-                            <td>{{ $item->tax_number ?: '-' }}</td>
-                            <td>{{ number_format($item->total_before_tax, 3) ?: '0' }} {{ $currency }}</td>
-                            <td>{{ $item->payment_methods ?: '-' }}</td>
-                            <td>{{ number_format($item->discount_amount, 3) ?: '0' }} {{ $currency }}</td>
+                            @if (!isset($expense[0]) || $expense[0] !== false)
+                                <td>{{ $item->transaction_date ?: '-' }}</td>
+                            @endif
+                            @if (!isset($expense[1]) || $expense[1] !== false)
+                                <td>{{ $item->ref_no ?: '-' }}</td>
+                            @endif
+                            @if (!isset($expense[2]) || $expense[2] !== false)
+                                <td>{{ $item->tax_number ?: '-' }}</td>
+                            @endif
+                            @if (!isset($expense[3]) || $expense[3] !== false)
+                                <td>{{ number_format($item->total_before_tax, 3) ?: '0' }} {{ $currency }}</td>
+                            @endif
+                            @if (!isset($expense[4]) || $expense[4] !== false)
+                                <td>{{ $item->payment_methods ?: '-' }}</td>
+                            @endif
+                            @if (!isset($expense[5]) || $expense[5] !== false)
+                                <td>{{ number_format($item->discount_amount, 3) ?: '0' }} {{ $currency }}</td>
+                            @endif
                         </tr>
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="10">{{ __('attachment.general.empty') }}</td>
+                        <td colspan={{ $colCountExpense }}>{{ __('attachment.general.empty') }}</td>
                     </tr>
                 @endif
             </tbody>

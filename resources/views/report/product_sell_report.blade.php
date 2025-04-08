@@ -459,4 +459,16 @@
             });
         });
     </script>
+
+    <script>
+        const key = 'colvisState_table#product_sell_report_table';
+        const colvis = localStorage.getItem(key);
+        fetch('/api/save-colvis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key, colvis })
+        });
+    </script>
 @endsection

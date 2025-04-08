@@ -36,11 +36,3 @@ Route::post('/get-colvis', function (Request $request) {
         'colvis' => json_decode($colvis)
     ]);
 });
-
-Route::get('/delete-colvis', function () {
-    $userId = auth()->id();
-    Cache::forget('colvisState_product', []);
-    return response()->json([
-        'success' => true,
-    ]);
-});
