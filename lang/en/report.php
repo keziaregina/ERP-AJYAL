@@ -14,6 +14,7 @@ return [
     'reports' => 'Reports',
     'purchase_sell_report' => 'Purchase & Sale',
     'purchase_sell' => 'Purchase & Sale Report',
+    'purchase_sell_print' => 'Purchase & Sale Report',
     'purchase_sell_msg' => 'Purchase & sale details for the selected date range',
     'total_purchase' => 'Total Purchase',
     'purchase_inc_tax' => 'Purchase Including tax',
