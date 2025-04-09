@@ -62,8 +62,10 @@ return [
     'items' => [
         'th_product' => 'Product',
         'th_sku' => 'SKU',
+        'th_description' => 'Description',
         'th_purchase_date' => 'Purchase Date',
         'th_purchase' => 'Purchase',
+        'th_lot_number' => 'Lot Number',
         'th_supplier' => 'Supplier',
         'th_purchase_price' => 'Purchase Price',
     

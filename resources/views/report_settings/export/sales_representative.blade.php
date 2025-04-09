@@ -35,9 +35,6 @@
         .date{
             font-size: 11px;
         }
-        .indexing {
-            width: 40px;
-        }
 
         .header-box{
             margin-left: 20px;
@@ -64,15 +61,19 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
 
         th,
         td {
             border: 0.5px solid #ddd;
-            padding: 8px;
+            padding: 6px 4px;
             text-align: center;
+            width: auto;
+        }
+
+        tr .indexing, td .indexing {
+            width: 40px !important;
         }
 
         th {
@@ -149,6 +150,15 @@
                 $colCountExpense++;
             }
         }
+
+        $columnsCount = 0;
+        $showAmount = !isset($sales[5]) || $sales[5] !== false;
+        $showPaid = !isset($sales[6]) || $sales[6] !== false;
+        $showRemaining = !isset($sales[7]) || $sales[7] !== false;
+
+        if ($showAmount) $columnsCount++;
+        if ($showPaid) $columnsCount++;
+        if ($showRemaining) $columnsCount++;
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
@@ -170,7 +180,7 @@
     <div>
         <p class="label {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">{{ __('attachment.sales_representative.summary') }}</p>
         <div class="box">
-            <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+            <table style="margin-top: 10px" class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
                 <tr>
                     <td>
                         <div class="label">{{ __('attachment.sales_representative.total_sale-return') }}</div>
@@ -192,7 +202,7 @@
     </div>
 
     <h3 class="label {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">{{ __('attachment.sales_representative.sales') }}</h3>
-    <table>
+    <table style="margin-top: 10px">
         <thead>
             <tr>
                 <th class="indexing">#</th>
@@ -257,42 +267,40 @@
                 </tr>
                 @endforelse
         </tbody>
-        <tfoot>
-            <tr class="total">
-                <td></td>
-                @if (!isset($sales[0]) || $sales[0] !== false)
-                    <td class="bold">{{ __('attachment.general.subtotal') }}</td>
-                @endif
-                @if (!isset($sales[1]) || $sales[1] !== false)
-                    <td></td>
-                @endif
-                @if (!isset($sales[2]) || $sales[2] !== false)
-                    <td></td>
-                @endif
-                @if (!isset($sales[3]) || $sales[3] !== false)
-                    <td></td>
-                @endif
-                @if (!isset($sales[4]) || $sales[4] !== false)
-                    <td></td>
-                @endif
-                @if (!isset($sales[5]) || $sales[5] !== false)
-                    <td>{{ number_format(collect($report['collection']['sales'])->sum('final_total'), 3) }} {{ $currency }}</td>
-                @endif
-                @if (!isset($sales[6]) || $sales[6] !== false)
-                    <td>{{ number_format(collect($report['collection']['sales'])->sum('total_paid'), 3) }} {{ $currency }}</td>
-                @endif
-                @if (!isset($sales[7]) || $sales[7] !== false)
-                    <td>
-                        <div><span class="bold">{{ __('attachment.sales_representative.sell_due') }}</span> ~ {{ number_format(collect($report['collection']['sales'])->sum('payment_due'), 3) }} {{ $currency }}</div>
-                        <div><span class="bold">{{ __('attachment.sales_representative.sell_return_due') }}</span> ~ {{ number_format(collect($report['collection']['sales'])->sum('sell_return_due'), 3) }} {{ $currency }}</div>
-                    </td>
-                @endif
-            </tr>
-        </tfoot>
+    </table>
+    <table>
+        <tr class="total">
+            <td class="bold" colspan={{ $columnsCount }}>{{ __('attachment.general.subtotal') }}</td>
+        </tr>
+        <tr class="total">
+            @if ($showAmount)
+                <td class="bold">{{ __('attachment.sales_representative.th_amount') }}</td>
+            @endif
+            @if ($showPaid)
+                <td class="bold">{{ __('attachment.sales_representative.th_paid') }}</td>
+            @endif
+            @if ($showRemaining)
+                <td class="bold">{{ __('attachment.sales_representative.th_remaining') }}</td>
+            @endif
+        </tr>
+        <tr>
+            @if ($showAmount)
+                <td>{{ number_format(collect($report['collection']['sales'])->sum('final_total'), 3) }} {{ $currency }}</td>
+            @endif
+            @if ($showPaid)
+                <td>{{ number_format(collect($report['collection']['sales'])->sum('total_paid'), 3) }} {{ $currency }}</td>
+            @endif
+            @if ($showRemaining)
+                <td>
+                    <div><span class="bold">{{ __('attachment.sales_representative.sell_due') }}</span> ~ {{ number_format(collect($report['collection']['sales'])->sum('payment_due'), 3) }} {{ $currency }}</div>
+                    <div><span class="bold">{{ __('attachment.sales_representative.sell_return_due') }}</span> ~ {{ number_format(collect($report['collection']['sales'])->sum('sell_return_due'), 3) }} {{ $currency }}</div>
+                </td>
+            @endif
+        </tr>
     </table>
 
     <h3 class="label {{ $lang === 'ar' ? 'rtl' : 'ltr' }}">{{ __('attachment.sales_representative.expenses') }}</h3>
-    <table>
+    <table style="margin-top: 10px">
         <thead>
             <tr>
                 <th class="indexing">#</th>
@@ -357,35 +365,18 @@
                 </tr>
                 @endforelse
         </tbody>
-        <tfoot>
-            <tr class="total">
-                <td></td>
-                @if (!isset($expense[0]) || $expense[0] !== false)
-                    <td class="bold">{{ __('attachment.general.subtotal') }}</td>
-                @endif
-                @if (!isset($expense[1]) || $expense[1] !== false)
-                    <td></td>
-                @endif
-                @if (!isset($expense[2]) || $expense[2] !== false)
-                    <td></td>
-                @endif
-                @if (!isset($expense[3]) || $expense[3] !== false)
-                    <td></td>
-                @endif
-                @if (!isset($expense[4]) || $expense[4] !== false)
-                    <td></td>
-                @endif
-                @if (!isset($expense[5]) || $expense[5] !== false)
+    </table>
+    <table>
+        <tr class="total">
+            @if (!isset($expense[5]) || $expense[5] !== false)
+                <td class="bold">{{ __('attachment.sales_representative.th_amount') }}</td>
+            @endif
+        </tr>
+        <tr>
+            @if (!isset($expense[5]) || $expense[5] !== false)
                 <td>{{ number_format(collect($report['collection']['expense'])->sum('final_total'), 3) }} {{ $currency }}</td>
-                @endif
-                @if (!isset($expense[6]) || $expense[6] !== false)
-                    <td></td>
-                @endif
-                @if (!isset($expense[7]) || $expense[7] !== false)
-                    <td></td>
-                @endif
-            </tr>
-        </tfoot>
+            @endif
+        </tr>
     </table>
 
     </main>
