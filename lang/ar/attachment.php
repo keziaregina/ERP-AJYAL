@@ -66,8 +66,10 @@ return [
     'items' => [
         'th_product' => 'المنتج',
         'th_sku' => 'رمز SKU',
+        'th_description' => 'الوصف',
         'th_purchase_date' => 'تاريخ الشراء',
         'th_purchase' => 'الشراء',
+        'th_lot_number' => 'رقم التشغيلة',
         'th_supplier' => 'المورد',
         'th_purchase_price' => 'سعر الشراء',
 
