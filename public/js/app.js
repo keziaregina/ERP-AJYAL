@@ -468,7 +468,7 @@ $(document).ready(function() {
             // { data: 'custom_field9', name: 'custom_field9'},
             // { data: 'custom_field10', name: 'custom_field10'},
             ]);
-            var contact_name = 'Customer Group Report';
+            var contact_name = 'cg';
     }
     
     contact_table = $('#contact_table').DataTable({
