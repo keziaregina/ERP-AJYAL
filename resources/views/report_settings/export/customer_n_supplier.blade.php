@@ -34,23 +34,25 @@
         .date{
             font-size: 11px;
         }
-        .indexing {
-            width: 40px;
-        }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
 
         th,
         td {
             border: 0.5px solid #ddd;
-            padding: 8px;
+            padding: 6px 4px;
             text-align: center;
+            width: auto;
         }
+
+        tr .indexing, td .indexing {
+            width: 40px !important;
+        }
+
 
         th {
             background-color: #083cb4;
@@ -88,6 +90,15 @@
         } else {
             \App::setLocale('en');
         }
+        
+        $colvis = json_decode(Cache::get('colvisState_supplier_report_tbl'), true) ?? [];
+        $colCount = 1;
+
+        foreach (range(0, 3) as $i) {
+            if (!isset($sales[$i]) || $sales[$i] !== false) {
+                $colCount++;
+            }
+        }
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
@@ -110,45 +121,108 @@
         <thead>
             <tr>
                 <th class="indexing">#</th>
-                <th>{{ __('attachment.customer_supplier.th_contact') }}</th>
-                <th>{{ __('attachment.customer_supplier.th_tpurchase') }}</th>
-                <th>{{ __('attachment.customer_supplier.th_tpurchase_return') }}</th>
-                <th>{{ __('attachment.customer_supplier.th_tsale') }}</th>
-                <th>{{ __('attachment.customer_supplier.th_tsell_return') }}</th>
-                <th>{{ __('attachment.customer_supplier.th_opening_balance') }}</th>
-                <th>{{ __('attachment.customer_supplier.th_due_amount') }}</th>
+                @if (!isset($colvis[0]) || $colvis[0] !== false)
+                    <th>{{ __('attachment.customer_supplier.th_contact') }}</th>
+                @endif
+                @if (!isset($colvis[1]) || $colvis[1] !== false)
+                    <th>{{ __('attachment.customer_supplier.th_tpurchase') }}</th>
+                @endif
+                @if (!isset($colvis[2]) || $colvis[2] !== false)
+                    <th>{{ __('attachment.customer_supplier.th_tpurchase_return') }}</th>
+                @endif
+                @if (!isset($colvis[3]) || $colvis[3] !== false)
+                    <th>{{ __('attachment.customer_supplier.th_tsale') }}</th>
+                @endif
+                @if (!isset($colvis[4]) || $colvis[4] !== false)
+                    <th>{{ __('attachment.customer_supplier.th_tsell_return') }}</th>
+                @endif
+                @if (!isset($colvis[5]) || $colvis[5] !== false)
+                    <th>{{ __('attachment.customer_supplier.th_opening_balance') }}</th>
+                @endif
+                @if (!isset($colvis[6]) || $colvis[6] !== false)
+                    <th>{{ __('attachment.customer_supplier.th_due_amount') }}</th>
+                @endif
             </tr>
         </thead>
         <tbody>
             @forelse ($report as $index => $item)
                 <tr>
                     <td class="indexing">{{ $index + 1 }}</td>
-                    <td>{{ $item['name'] }}</td>
-                    <td>{{ number_format($item['total_purchase'], 3) ?: '0' }} {{ $currency }}</td>
-                    <td>{{ number_format($item['total_purchase_return'], 3) ?: '0' }} {{ $currency }}</td>
-                    <td>{{ number_format($item['total_invoice'], 3) ?: '0' }} {{ $currency }}</td>
-                    <td>{{ number_format($item['total_sell_return'], 3) ?: '0' }} {{ $currency }}</td>
-                    <td>{{ number_format($item['opening_balance'], 3) ?: '0' }} {{ $currency }}</td>
-                    <td>{{ $item['due'] }} {{ $currency }}</td>
+                    @if (!isset($colvis[0]) || $colvis[0] !== false)
+                        <td>{{ $item['name'] }}</td>
+                    @endif
+                    @if (!isset($colvis[1]) || $colvis[1] !== false)
+                        <td>{{ number_format($item['total_purchase'], 3) ?: '0' }} {{ $currency }}</td>
+                    @endif
+                    @if (!isset($colvis[2]) || $colvis[2] !== false)
+                        <td>{{ number_format($item['total_purchase_return'], 3) ?: '0' }} {{ $currency }}</td>
+                    @endif
+                    @if (!isset($colvis[3]) || $colvis[3] !== false)
+                        <td>{{ number_format($item['total_invoice'], 3) ?: '0' }} {{ $currency }}</td>
+                    @endif
+                    @if (!isset($colvis[4]) || $colvis[4] !== false)
+                        <td>{{ number_format($item['total_sell_return'], 3) ?: '0' }} {{ $currency }}</td>
+                    @endif
+                    @if (!isset($colvis[5]) || $colvis[5] !== false)
+                        <td>{{ number_format($item['opening_balance'], 3) ?: '0' }} {{ $currency }}</td>
+                    @endif
+                    @if (!isset($colvis[6]) || $colvis[6] !== false)
+                        <td>{{ $item['due'] }} {{ $currency }}</td>
+                    @endif
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8">{{ __('attachment.general.empty') }}</td>
+                    <td colspan={{ $colCount }}>{{ __('attachment.general.empty') }}</td>
                 </tr>
             @endforelse
-            
         </tbody>
-        <tfoot>
-            <tr class="total">
-                <td class="bold" colspan="2">{{ __('attachment.general.subtotal') }}</td>
+    </table>
+    <table>
+        <tr class="total">
+            <td class="bold">{{ __('attachment.general.subtotal') }}</td>
+        </tr>
+    </table>
+    <table>
+        <tr class="total">
+            @if (!isset($colvis[1]) || $colvis[1] !== false)
+                <td>{{ __('attachment.customer_supplier.th_tpurchase') }}</td>
+            @endif
+            @if (!isset($colvis[2]) || $colvis[2] !== false)
+                <td>{{ __('attachment.customer_supplier.th_tpurchase_return') }}</td>
+            @endif
+            @if (!isset($colvis[3]) || $colvis[3] !== false)
+                <td>{{ __('attachment.customer_supplier.th_tsale') }}</td>
+            @endif
+            @if (!isset($colvis[4]) || $colvis[4] !== false)
+                <td>{{ __('attachment.customer_supplier.th_tsell_return') }}</td>
+            @endif
+            @if (!isset($colvis[5]) || $colvis[5] !== false)
+                <td>{{ __('attachment.customer_supplier.th_opening_balance') }}</td>
+                @endif
+            @if (!isset($colvis[6]) || $colvis[6] !== false)
+                <td>{{ __('attachment.customer_supplier.th_due_amount') }}</td>
+            @endif
+        </tr>
+        <tr>
+            @if (!isset($colvis[1]) || $colvis[1] !== false)
                 <td>{{ number_format(collect($report)->sum('total_purchase'), 3) ?: '0' }} {{ $currency }}</td>
+            @endif
+            @if (!isset($colvis[2]) || $colvis[2] !== false)
                 <td>{{ number_format(collect($report)->sum('total_purchase_return'), 3) ?: '0' }} {{ $currency }}</td>
+            @endif
+            @if (!isset($colvis[3]) || $colvis[3] !== false)
                 <td>{{ number_format(collect($report)->sum('total_invoice'), 3) ?: '0' }} {{ $currency }}</td>
+            @endif
+            @if (!isset($colvis[4]) || $colvis[4] !== false)
                 <td>{{ number_format(collect($report)->sum('total_sell_return'), 3) ?: '0' }} {{ $currency }}</td>
+            @endif
+            @if (!isset($colvis[5]) || $colvis[5] !== false)
                 <td>{{ number_format(collect($report)->sum('opening_balance'), 3) ?: '0' }} {{ $currency }}</td>
+            @endif
+            @if (!isset($colvis[6]) || $colvis[6] !== false)
                 <td>{{ number_format(collect($report)->sum('due'), 3) ?: '0' }} {{ $currency }}</td>
-            </tr>
-        </tfoot>
+            @endif
+        </tr>
     </table>
 </body>
 </html>

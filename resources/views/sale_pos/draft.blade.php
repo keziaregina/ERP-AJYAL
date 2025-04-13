@@ -113,7 +113,7 @@ $(document).ready( function(){
     var export_button = window.canExport;
 
     sell_table = $('#sell_table').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Drafts Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('drafts', '#sell_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,

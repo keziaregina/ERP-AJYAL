@@ -155,7 +155,7 @@ $(document).ready(function() {
     var export_button = window.canExport;
 
     stock_transfer_table = $('#stock_transfer_table').DataTable({
-        buttons: export_button ? pdfButtons('Stock Transfers Report') : [],
+        buttons: export_button ? pdfButtons('stock_transfer', '#stock_transfer_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,

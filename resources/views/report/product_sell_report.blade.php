@@ -293,7 +293,7 @@
                 if (target == '#psr_by_cat_tab') {
                     if (typeof product_sell_report_by_category_datatable == 'undefined') {
                         product_sell_report_by_category_datatable = $('table#product_sell_report_by_category').DataTable({
-                            buttons: export_button ? pdfButtonsWithDate('Product Sales Report (By Category)') : [],
+                            buttons: export_button ? pdfButtonsWithDate('product_sales_bycat', 'table#product_sell_report_by_category') : [],
                             processing: true,
                             serverSide: true,
                             fixedHeader: false,
@@ -375,7 +375,7 @@
                 } else if (target == '#psr_by_brand_tab') {
                     if (typeof product_sell_report_by_brand_datatable == 'undefined') {
                         product_sell_report_by_brand_datatable = $('table#product_sell_report_by_brand').DataTable({
-                                buttons: export_button ? pdfButtonsWithDate('Product Sales Report (By Brand)') : [],
+                                buttons: export_button ? pdfButtonsWithDate('product_sales_bybrand', 'table#product_sell_report_by_brand') : [],
                                 processing: true,
                                 serverSide: true,
                                 fixedHeader: false,
@@ -457,6 +457,18 @@
                     }
                 }
             });
+        });
+    </script>
+
+    <script>
+        const key = 'colvisState_table#product_sell_report_table';
+        const colvis = localStorage.getItem(key);
+        fetch('/api/save-colvis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key, colvis })
         });
     </script>
 @endsection

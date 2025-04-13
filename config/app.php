@@ -16,6 +16,8 @@ return [
 
     'name' => env('APP_NAME', 'ultimatePOS'),
 
+    'title' => env('APP_TITLE', 'Ajyal Al-Madina'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
@@ -66,7 +68,7 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'Europe/London'),
+    'timezone' => env('APP_TIMEZONE', 'Asia/Muscat'),
 
     /*
     |--------------------------------------------------------------------------

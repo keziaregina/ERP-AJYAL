@@ -73,7 +73,7 @@ $(document).ready(function() {
 
     //contact report
     supplier_report_tbl = $('#supplier_report_tbl').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Customers & Suppliers Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('customer_supplier', '#supplier_report_tbl') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -174,7 +174,7 @@ $(document).ready(function() {
         }
     //Stock report table
     stock_report_table = $('#stock_report_table').DataTable({
-        buttons: export_button ? pdfButtons('Stock Report') : [],
+        buttons: export_button ? pdfButtons('stock', '#stock_report_table') : [],
         processing: true,
         fixedHeader:false,
         order: [[1, 'asc']],
@@ -340,7 +340,7 @@ $(document).ready(function() {
 
     //Register report
     register_report_table = $('#register_report_table').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Registers Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('register', '#register_report_table') : [],
         processing: true,
         serverSide: true,
         scrollY:        "75vh",
@@ -666,7 +666,7 @@ $(document).ready(function() {
         if ($('#sr_payments_with_commission_table').length > 0) {
             sr_payments_with_commission_report = 
             $('table#sr_payments_with_commission_table').DataTable({
-                buttons: export_button ? pdfButtons('Sales Representatives Report') : [],
+                buttons: export_button ? pdfButtons('sr', 'table#sr_payments_with_commission_table') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,
@@ -707,7 +707,7 @@ $(document).ready(function() {
 
         //Sales representative report -> Sales
         sr_sales_report = $('table#sr_sales_report').DataTable({
-            buttons: export_button ? pdfButtonsWithDate('Sales Representatives (Sales) Report') : [],
+            buttons: export_button ? pdfButtonsWithDate('sr_sales', 'table#sr_sales_report') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,
@@ -769,7 +769,7 @@ $(document).ready(function() {
 
         //Sales representative report -> Expenses
         sr_expenses_report = $('table#sr_expenses_report').DataTable({
-            buttons: export_button ? pdfButtonsWithDate('Sales Representatives (Expenses) Report') : [],
+            buttons: export_button ? pdfButtonsWithDate('sr_expenses', 'table#sr_expenses_report') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,
@@ -821,7 +821,7 @@ $(document).ready(function() {
 
         //Sales representative report -> Sales with commission
         sr_sales_commission_report = $('table#sr_sales_with_commission_table').DataTable({
-            buttons: export_button ? pdfButtonsWithDate('Sales Representatives (With Commission) Report') : [],
+            buttons: export_button ? pdfButtonsWithDate('sr_wcommission', 'table#sr_sales_with_commission_table') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,
@@ -892,7 +892,7 @@ $(document).ready(function() {
     initInfoSr();
     //Stock expiry report table
     stock_expiry_report_table = $('table#stock_expiry_report_table').DataTable({
-        buttons: export_button ? pdfButtons('Stock Expiries Report') : [],
+        buttons: export_button ? pdfButtons('se', 'table#stock_expiry_report_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -1013,7 +1013,7 @@ $(document).ready(function() {
         product_purchase_report.ajax.reload();
     });
     product_purchase_report = $('table#product_purchase_report_table').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Product Purchases Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('product_purchase', 'table#product_purchase_report_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -1140,7 +1140,7 @@ $(document).ready(function() {
         });
 
         product_sell_report = $('table#product_sell_report_table').DataTable({
-            buttons: export_button ? pdfButtonsWithDate('Product Sales Report') : [],
+            buttons: export_button ? pdfButtonsWithDate('product_sales', 'table#product_sell_report_table') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,
@@ -1208,7 +1208,7 @@ $(document).ready(function() {
 
     var is_lot_enabled = $('#lot_enabled').length > 0 ? true : false;
     product_sell_report_with_purchase_table = $('table#product_sell_report_with_purchase_table').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Product Saless With Purchases Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('product_sales_wp', 'table#product_sell_report_with_purchase_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -1262,7 +1262,7 @@ $(document).ready(function() {
 	loadColumnVisibility2('table#product_sell_report_with_purchase_table', 'colvisState_table#product_sell_report_with_purchase_table');    
 
     product_sell_grouped_report = $('table#product_sell_grouped_report_table').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Product Sales Grouped Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('product_sales_group', 'table#product_sell_grouped_report_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -1365,7 +1365,7 @@ $(document).ready(function() {
 
     //Product lot Report
     lot_report = $('table#lot_report').DataTable({
-        buttons: export_button ? pdfButtons('LOT Report') : [],
+        buttons: export_button ? pdfButtons('lot', 'table#lot_report') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -1412,7 +1412,7 @@ $(document).ready(function() {
 
     //Purchase Payment Report
     purchase_payment_report = $('table#purchase_payment_report_table').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Purchase Payments Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('purchase_payment', 'table#purchase_payment_report_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,
@@ -1526,7 +1526,7 @@ $(document).ready(function() {
 
     //Sell Payment Report
     sell_payment_report = $('table#sell_payment_report_table').DataTable({
-        buttons: export_button ? pdfButtonsWithDate('Sell Payments Report') : [],
+        buttons: export_button ? pdfButtonsWithDate('sell_payment', 'table#sell_payment_report_table') : [],
         processing: true,
         serverSide: true,
         fixedHeader:false,

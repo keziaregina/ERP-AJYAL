@@ -109,4 +109,18 @@
 
 @section('javascript')
     <script src="{{ asset('js/report.js?v=' . $asset_v) }}"></script>
+
+    <script>
+        const key = 'colvisState_table#product_purchase';
+        const colvis = localStorage.getItem(key);
+        fetch('/api/save-colvis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key, colvis })
+        });
+        console.log(colvis);
+        
+    </script>
 @endsection

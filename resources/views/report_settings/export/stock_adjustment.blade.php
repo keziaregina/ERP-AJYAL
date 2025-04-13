@@ -35,9 +35,6 @@
         .date{
             font-size: 11px;
         }
-        .indexing {
-            width: 40px;
-        }
 
         .box {
             border: 1px solid #ddd;
@@ -61,15 +58,19 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
 
         th,
         td {
             border: 0.5px solid #ddd;
-            padding: 8px;
+            padding: 6px 4px;
             text-align: center;
+            width: auto;
+        }
+
+        tr .indexing, td .indexing {
+            width: 40px !important;
         }
 
         th {
@@ -120,6 +121,15 @@
             \App::setLocale('ar');
         } else {
             \App::setLocale('en');
+        }
+
+        $colvis = json_decode(Cache::get('colvisState_stock_adjustment'), true) ?? [];
+        $colCount = 1;
+
+        foreach (range(1, 8) as $i) {
+            if (!isset($colvis[$i]) || $colvis[$i] !== false) {
+                $colCount++;
+            }
         }
     @endphp
     <div class="header">
@@ -172,36 +182,68 @@
 
         <div>
             <h3 class="label">{{ __('attachment.stock_adjustment.sa') }}</h3>
-            <table>
+            <table style="margin-top: 10px">
                 <thead>
                     <tr>
                         <th class="indexing">#</th>
-                        <th>{{ __('attachment.stock_adjustment.th_date') }}</th>
-                        <th>{{ __('attachment.stock_adjustment.th_ref_no') }}</th>
-                        <th>{{ __('attachment.stock_adjustment.th_location') }}</th>
-                        <th>{{ __('attachment.stock_adjustment.th_type') }}</th>
-                        <th>{{ __('attachment.stock_adjustment.th_tamount') }}</th>
-                        <th>{{ __('attachment.stock_adjustment.th_tamount_recovered') }}</th>
-                        <th>{{ __('attachment.stock_adjustment.th_reason') }}</th>
-                        <th>{{ __('attachment.stock_adjustment.th_added_by') }}</th>
+                        @if (!isset($colvis[1]) || $colvis[1] !== false)
+                            <th>{{ __('attachment.stock_adjustment.th_date') }}</th>
+                        @endif
+                        @if (!isset($colvis[2]) || $colvis[2] !== false)
+                            <th>{{ __('attachment.stock_adjustment.th_ref_no') }}</th>
+                        @endif
+                        @if (!isset($colvis[3]) || $colvis[3] !== false)
+                            <th>{{ __('attachment.stock_adjustment.th_location') }}</th>
+                        @endif
+                        @if (!isset($colvis[4]) || $colvis[4] !== false)
+                            <th>{{ __('attachment.stock_adjustment.th_type') }}</th>
+                        @endif
+                        @if (!isset($colvis[5]) || $colvis[5] !== false)
+                            <th>{{ __('attachment.stock_adjustment.th_tamount') }}</th>
+                        @endif
+                        @if (!isset($colvis[6]) || $colvis[6] !== false)
+                            <th>{{ __('attachment.stock_adjustment.th_tamount_recovered') }}</th>
+                        @endif
+                        @if (!isset($colvis[7]) || $colvis[7] !== false)
+                            <th>{{ __('attachment.stock_adjustment.th_reason') }}</th>
+                        @endif
+                        @if (!isset($colvis[8]) || $colvis[8] !== false)
+                            <th>{{ __('attachment.stock_adjustment.th_added_by') }}</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($report['collection'] as $index => $item)
                         <tr>
                             <td>{{ $index + 1 }}</th>
-                            <td>{{ $item->transaction_date }}</th>
-                            <td>{{ $item->ref_no }}</th>
-                            <td>{{ $item->location_name }}</th>
-                            <td>{{ $item->adjustment_type }}</th>
-                            <td>{{ $item->final_total }}</th>
-                            <td>{{ $item->total_amount_recovered }}</th>
-                            <td>{{ $item->additional_notes }}</th>
-                            <td>{{ $item->added_by }}</th>
+                            @if (!isset($colvis[1]) || $colvis[1] !== false)
+                                <td>{{ $item->transaction_date }}</th>
+                            @endif
+                            @if (!isset($colvis[2]) || $colvis[2] !== false)
+                                <td>{{ $item->ref_no }}</th>
+                            @endif
+                            @if (!isset($colvis[3]) || $colvis[3] !== false)
+                                <td>{{ $item->location_name }}</th>
+                            @endif
+                            @if (!isset($colvis[4]) || $colvis[4] !== false)
+                                <td>{{ $item->adjustment_type }}</th>
+                            @endif
+                            @if (!isset($colvis[5]) || $colvis[5] !== false)
+                                <td>{{ $item->final_total }}</th>
+                            @endif
+                            @if (!isset($colvis[6]) || $colvis[6] !== false)
+                                <td>{{ $item->total_amount_recovered }}</th>
+                            @endif
+                            @if (!isset($colvis[7]) || $colvis[7] !== false)
+                                <td>{{ $item->additional_notes }}</th>
+                            @endif
+                            @if (!isset($colvis[8]) || $colvis[8] !== false)
+                                <td>{{ $item->added_by }}</th>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" style="text-align: center;">{{ __('attachment.general.empty') }}</td>
+                            <td colspan={{ $colCount }} style="text-align: center;">{{ __('attachment.general.empty') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

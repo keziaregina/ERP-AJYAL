@@ -34,24 +34,24 @@
         .date{
             font-size: 11px;
         }
-        .indexing {
-            width: 40px;
-        }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
 
         th,
         td {
             border: 0.5px solid #ddd;
-            padding: 8px;
+            padding: 6px 4px;
             text-align: center;
+            width: auto;
         }
 
+        th .indexing, td .indexing {
+            width: 40px !important;
+        }
         th {
             background-color: #083cb4;
             color: white;
@@ -88,6 +88,15 @@
         } else {
             \App::setLocale('en');
         }
+
+        $colvis = json_decode(Cache::get('colvisState_table#product_purchase'), true) ?? [];
+        $colCount = 1;
+
+        foreach (range(0, 8) as $i) {
+            if (!isset($colvis[$i]) || $colvis[$i] !== false) {
+                $colCount++;
+            }
+        }
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
@@ -106,60 +115,110 @@
         {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+    <table style="margin-top: 10px" class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
-                <th class="indexing" rowspan="2">#</th>
-                <th>{{ __('attachment.product_purchase.th_product') }}</th>
-                <th>{{ __('attachment.product_purchase.th_sku') }}</th>
-                <th>{{ __('attachment.product_purchase.th_supplier') }}</th>
-                <th>{{ __('attachment.product_purchase.th_ref_no') }}</th>
-                <th>{{ __('attachment.product_purchase.th_date') }}</th>
-            </tr>
-            <tr>
-                <th>{{ __('attachment.product_purchase.th_quantity') }}</th>
-                <th>{{ __('attachment.product_purchase.th_tunit_adjusted') }}</th>
-                <th>{{ __('attachment.product_purchase.th_unit_purchase_price') }}</th>
-                <th colspan="2">{{ __('attachment.product_purchase.subtotal') }}</th>
+                <th class="indexing">#</th>
+                @if (!isset($colvis[0]) || $colvis[0] !== false)
+                    <th>{{ __('attachment.product_purchase.th_product') }}</th>
+                @endif
+                @if (!isset($colvis[1]) || $colvis[1] !== false)
+                    <th>{{ __('attachment.product_purchase.th_sku') }}</th>
+                @endif
+                @if (!isset($colvis[2]) || $colvis[2] !== false)
+                    <th>{{ __('attachment.product_purchase.th_supplier') }}</th>
+                @endif
+                @if (!isset($colvis[3]) || $colvis[3] !== false)
+                    <th>{{ __('attachment.product_purchase.th_ref_no') }}</th>
+                @endif
+                @if (!isset($colvis[4]) || $colvis[4] !== false)
+                    <th>{{ __('attachment.product_purchase.th_date') }}</th>
+                @endif
+                @if (!isset($colvis[5]) || $colvis[5] !== false)
+                    <th>{{ __('attachment.product_purchase.th_quantity') }}</th>
+                @endif
+                @if (!isset($colvis[6]) || $colvis[6] !== false)
+                    <th>{{ __('attachment.product_purchase.th_tunit_adjusted') }}</th>
+                @endif
+                @if (!isset($colvis[7]) || $colvis[7] !== false)
+                    <th>{{ __('attachment.product_purchase.th_unit_purchase_price') }}</th>
+                @endif
+                @if (!isset($colvis[8]) || $colvis[8] !== false)
+                    <th>{{ __('attachment.product_purchase.subtotal') }}</th>
+                @endif
             </tr>
         </thead>
         <tbody>
             @forelse ($report as $index => $item)
             <tr>
-                <td class="indexing" rowspan="2">{{ $index + 1 }}</td>
-                <td>{{ $item->product_name }}</td>
-                <td>{{ $item->sub_sku }}</td>
-                <td>{{ $item->supplier }}</td>
-                <td>{{ $item->ref_no }}</td>
-                <td>{{ $item->transaction_date }}</td>
-            </tr>
-            <tr>
-                <td>{{ number_format($item->purchase_qty, 3) }}</td>
-                <td>{{ number_format($item->quantity_adjusted, 3) }}</td>
-                <td>{{ number_format($item->unit_purchase_price, 3) ?: '0' }} {{ $currency }}</td>
-                <td colspan="2">{{ number_format($item->subtotal, 3) ?: '0' }} {{ $currency }}</td>
+                <td class="indexing">{{ $index + 1 }}</td>
+                @if (!isset($colvis[0]) || $colvis[0] !== false)
+                    <td>{{ $item->product_name }}</td>
+                @endif
+                @if (!isset($colvis[1]) || $colvis[1] !== false)
+                    <td>{{ $item->sub_sku }}</td>
+                @endif
+                @if (!isset($colvis[2]) || $colvis[2] !== false)
+                    <td>{{ $item->supplier }}</td>
+                @endif
+                @if (!isset($colvis[3]) || $colvis[3] !== false)
+                    <td>{{ $item->ref_no }}</td>
+                @endif
+                @if (!isset($colvis[4]) || $colvis[4] !== false)
+                    <td>{{ $item->transaction_date }}</td>
+                @endif
+                @if (!isset($colvis[5]) || $colvis[5] !== false)
+                    <td>{{ number_format($item->purchase_qty, 3) }}</td>
+                @endif
+                @if (!isset($colvis[6]) || $colvis[6] !== false)
+                    <td>{{ number_format($item->quantity_adjusted, 3) }}</td>
+                @endif
+                @if (!isset($colvis[7]) || $colvis[7] !== false)
+                    <td>{{ number_format($item->unit_purchase_price, 3) ?: '0' }} {{ $currency }}</td>
+                @endif
+                @if (!isset($colvis[8]) || $colvis[8] !== false)
+                    <td>{{ number_format($item->subtotal, 3) ?: '0' }} {{ $currency }}</td>
+                @endif
             </tr>
             @empty
             <tr>
-                <td colspan="6">
+                <td colspan={{ $colCount }}>
                     {{ __('attachment.general.empty') }}
                 </td>
             </tr>
             @endforelse
         </tbody>
-        <tfoot>
-            <tr class="total">
-                <td class="bold" colspan="6">{{ __('attachment.general.subtotal') }}</td>
-            </tr>
-            <tr class="total">
-                <td class="bold" colspan="3">{{ __('attachment.product_purchase.tf_unit_purchase_price') }}</td>
-                <td class="bold" colspan="3">{{ __('attachment.product_purchase.subtotal') }}</td>
-            </tr>
-            <tr>
-                <td colspan="3">{{ number_format(collect($report)->sum('quantity_adjusted'), 3) ?: '0' }} {{ $currency }}</td>
-                <td colspan="3">{{ number_format(collect($report)->sum('subtotal'), 3) ?: '0' }} {{ $currency }}</td>
-            </tr>
-        </tfoot>
+    </table>
+    <table>
+        @php
+            $col7 = !isset($colvis[7]) || $colvis[7] !== false;
+            $col8 = !isset($colvis[8]) || $colvis[8] !== false;
+
+            $activeCount = ($col7 ? 1 : 0) + ($col8 ? 1 : 0);
+
+            $colspan = $activeCount === 1 ? 10 : 5;
+        @endphp
+        <tr class="total">
+            @if ($col7 || $col8)
+                <td class="bold" colspan="10">{{ __('attachment.general.subtotal') }}</td>
+            @endif
+        </tr>
+        <tr class="total">
+            @if (!isset($colvis[7]) || $colvis[7] !== false)
+                <td class="bold" colspan={{ $colspan }}>{{ __('attachment.product_purchase.tf_unit_purchase_price') }}</td>
+            @endif
+            @if (!isset($colvis[8]) || $colvis[8] !== false)
+                <td class="bold" colspan={{ $colspan }}>{{ __('attachment.product_purchase.subtotal') }}</td>
+            @endif
+        </tr>
+        <tr>
+            @if (!isset($colvis[7]) || $colvis[7] !== false)
+                <td colspan={{ $colspan }}>{{ number_format(collect($report)->sum('quantity_adjusted'), 3) ?: '0' }} {{ $currency }}</td>
+            @endif
+            @if (!isset($colvis[8]) || $colvis[8] !== false)
+                <td colspan={{ $colspan }}>{{ number_format(collect($report)->sum('subtotal'), 3) ?: '0' }} {{ $currency }}</td>
+            @endif
+        </tr>
     </table>
 </body>
 </html>

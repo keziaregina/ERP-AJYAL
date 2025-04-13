@@ -252,4 +252,37 @@
 @section('javascript')
     <script src="{{ asset('js/report.js?v=' . $asset_v) }}"></script>
     <script src="{{ asset('js/payment.js?v=' . $asset_v) }}"></script>
+
+    <script>
+        const sales = 'colvisState_table#sr_sales_report';
+        const saleswc = 'colvisState_table#sr_sales_with_commission_table';
+        const expense = 'colvisState_table#sr_expenses_report';
+
+        const colvis1 = localStorage.getItem(sales);
+        fetch('/api/save-colvis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key: sales, colvis: colvis1 })
+        });
+
+        const colvis2 = localStorage.getItem(saleswc);
+        fetch('/api/save-colvis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key: saleswc, colvis: colvis2 })
+        });
+
+        const colvis3 = localStorage.getItem(expense);
+        fetch('/api/save-colvis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key: expense, colvis: colvis3 })
+        });
+    </script>
 @endsection

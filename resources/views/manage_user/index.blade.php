@@ -82,7 +82,6 @@
                     let reader = new FileReader();
                     reader.onloadend = function () {
                         let base64data = reader.result;
-                        console.log(base64data); // Cek hasil Base64 di Console
                         callback(base64data);
                     };
                     reader.readAsDataURL(blob);
@@ -90,15 +89,10 @@
                 .catch(error => console.error("Gagal memuat font: " + error));
         }
 
-
-        convertFontToBase64("{{ asset('images/text.png') }}", function(base64) {
-            console.log(base64); 
-        });
-
         var export_button = {{ auth()->user()->can('view_export_buttons') ? 'true' : 'false' }};
         
         var users_table = $('#users_table').DataTable({
-            buttons: export_button ? pdfButtons('Users Report') : [],
+            buttons: export_button ? pdfButtons('users', '#users_table') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,
@@ -120,7 +114,7 @@
         saveColumnVisibility('users_table', 'colvisState_users');
         loadColumnVisibility('users_table', 'colvisState_users');
         
-                $(document).on('click', 'button.delete_user_button', function(){
+        $(document).on('click', 'button.delete_user_button', function(){
             swal({
               title: LANG.sure,
               text: LANG.confirm_delete_user,

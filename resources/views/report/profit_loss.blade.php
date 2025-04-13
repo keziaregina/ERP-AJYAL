@@ -184,7 +184,7 @@
     var export_button = window.canExport;
 
             profit_by_products_table = $('#profit_by_products_table').DataTable({
-                buttons: export_button ? pdfButtonsWithDate('Profit / Loss (By Products) Report') : [],
+                buttons: export_button ? pdfButtonsWithDate('profitloss_byproduct', '#profit_by_products_table') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,
@@ -229,7 +229,7 @@
                 if (target == '#profit_by_categories') {
                     if (typeof profit_by_categories_datatable == 'undefined') {
                         profit_by_categories_datatable = $('#profit_by_categories_table').DataTable({
-                            buttons: export_button ? pdfButtonsWithDate('Profit / Loss (By Categories)Report') : [],
+                            buttons: export_button ? pdfButtonsWithDate('profitloss_bycat', '#profit_by_categories_table') : [],
                             processing: true,
                             serverSide: true,
                             fixedHeader:false,
@@ -275,7 +275,7 @@
                 } else if (target == '#profit_by_brands') {
                     if (typeof profit_by_brands_datatable == 'undefined') {
                         profit_by_brands_datatable = $('#profit_by_brands_table').DataTable({
-                            buttons: export_button ? pdfButtonsWithDate('Profit / Loss (By Brands)Report') : [],
+                            buttons: export_button ? pdfButtonsWithDate('profitloss_bybrand', '#profit_by_brands_table') : [],
                             processing: true,
                             serverSide: true,
                             fixedHeader:false,
@@ -321,7 +321,7 @@
                 } else if (target == '#profit_by_locations') {
                     if (typeof profit_by_locations_datatable == 'undefined') {
                         profit_by_locations_datatable = $('#profit_by_locations_table').DataTable({
-                            buttons: export_button ? pdfButtonsWithDate('Profit / Loss (By Locations)Report') : [],
+                            buttons: export_button ? pdfButtonsWithDate('profitloss_bylocations', '#profit_by_locations_table') : [],
                             processing: true,
                             serverSide: true,
                             fixedHeader:false,
@@ -367,7 +367,7 @@
                 } else if (target == '#profit_by_invoice') {
                     if (typeof profit_by_invoice_datatable == 'undefined') {
                         profit_by_invoice_datatable = $('#profit_by_invoice_table').DataTable({
-                            buttons: export_button ? pdfButtonsWithDate('Profit / Loss (By Invoice)Report') : [],
+                            buttons: export_button ? pdfButtonsWithDate('profitloss_byinvoice', '#profit_by_invoice_table') : [],
                             processing: true,
                             serverSide: true,
                             fixedHeader:false,
@@ -413,7 +413,7 @@
                 } else if (target == '#profit_by_date') {
                     if (typeof profit_by_date_datatable == 'undefined') {
                         profit_by_date_datatable = $('#profit_by_date_table').DataTable({
-                            buttons: export_button ? pdfButtonsWithDate('Profit / Loss (By Date)Report') : [],
+                            buttons: export_button ? pdfButtonsWithDate('profitloss_bydate', '#profit_by_date_table') : [],
                             processing: true,
                             serverSide: true,
                             fixedHeader:false,
@@ -459,7 +459,7 @@
                 } else if (target == '#profit_by_customer') {
                     if (typeof profit_by_customers_table == 'undefined') {
                         profit_by_customers_table = $('#profit_by_customer_table').DataTable({
-                            buttons: export_button ? pdfButtonsWithDate('Profit / Loss (By Customer)Report') : [],
+                            buttons: export_button ? pdfButtonsWithDate('profitloss_bycustomer', '#profit_by_customer_table') : [],
                             processing: true,
                             serverSide: true,
                             fixedHeader:false,
@@ -520,7 +520,7 @@
                         success: function(result) {
                             $('#profit_by_day').html(result);
                             profit_by_days_table = $('#profit_by_day_table').DataTable({
-                                buttons: export_button ? pdfButtonsWithDate('Profit / Loss (By Day)Report') : [],
+                                buttons: export_button ? pdfButtonsWithDate('profitloss_byday', '#profit_by_day_table') : [],
                                 "searching": false,
                                 'paging': false,
                                 'ordering': false,

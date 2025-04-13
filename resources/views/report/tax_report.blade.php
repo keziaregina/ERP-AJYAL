@@ -552,7 +552,7 @@
             });
         }
         input_tax_table = $('#input_tax_table').DataTable({
-                buttons: export_button ? pdfButtonsWithDate('Input Taxes Report') : [],
+                buttons: export_button ? pdfButtonsWithDate('input_tax', '#input_tax_table') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,
@@ -609,7 +609,7 @@
             if ($(e.target).attr('href') == '#output_tax_tab') {
                 if (typeof (output_tax_datatable) == 'undefined') {
                     output_tax_datatable = $('#output_tax_table').DataTable({
-                        buttons: export_button ? pdfButtons('Output Taxes Report') : [],
+                        buttons: export_button ? pdfButtons('output_taxes', '#output_tax_table') : [],
                         processing: true,
                         serverSide: true,
                         fixedHeader:false,
@@ -665,7 +665,7 @@
             } else if ($(e.target).attr('href') == '#expense_tax_tab') {
                 if (typeof (expense_tax_datatable) == 'undefined') {
                     expense_tax_datatable = $('#expense_tax_table').DataTable({
-                        buttons: export_button ? pdfButtons('Expense Taxes Report') : [],
+                        buttons: export_button ? pdfButtons('expense_taxes', '#expense_tax_table') : [],
                         processing: true,
                         serverSide: true,
                         fixedHeader:false,
@@ -749,4 +749,37 @@
     @endforeach
 @endif
 <script src="{{ asset('js/report.js?v=' . $asset_v) }}"></script>
+<script>
+    const input = 'colvisState_input_tax';
+    const ouput = 'colvisState_output_tax';
+    const expense = 'colvisState_expense_tax';
+
+    const colvis1 = localStorage.getItem(input);
+    const colvis2 = localStorage.getItem(ouput);
+    const colvis3 = localStorage.getItem(expense);
+
+    fetch('/api/save-colvis', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: input, colvis: colvis1 })
+    });
+
+    fetch('/api/save-colvis', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: ouput, colvis: colvis2 })
+    });
+
+    fetch('/api/save-colvis', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: expense, colvis: colvis3 })
+    });
+</script>
 @endsection

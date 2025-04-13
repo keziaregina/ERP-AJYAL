@@ -248,7 +248,7 @@
             var export_button = window.canExport;
 
             var product_table = $('#product_table').DataTable({
-                buttons: export_button ? pdfButtons('Product Report') : [],
+                buttons: export_button ? pdfButtons('product', '#product_table') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,
@@ -758,7 +758,7 @@
                         order: [
                             [1, 'asc']
                         ],
-                        buttons: export_button ? pdfButtons('Stock Report') : [],
+                        buttons: export_button ? pdfButtons('stock_product', '#stock_report_table') : [],
                         processing: true,
                         serverSide: true,
                         scrollY: "75vh",

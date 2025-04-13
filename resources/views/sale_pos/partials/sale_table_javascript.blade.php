@@ -46,7 +46,7 @@
         var export_button = window.canExport;
 
         sell_table = $('#sell_table').DataTable({
-            buttons: export_button ? pdfButtonsWithDate('POS Report') : [],
+            buttons: export_button ? pdfButtonsWithDate('pos', '#sell_table') : [],
             processing: true,
             serverSide: true,
             fixedHeader: false,

@@ -102,7 +102,7 @@
         var export_button = window.canExport;
 
         activity_log_table = $('#activity_log_table').DataTable({
-            buttons: export_button ? pdfButtonsWithDate('Activity Logs Report') : [],
+            buttons: export_button ? pdfButtonsWithDate('log', '#activity_log_table') : [],
             processing: true,
             serverSide: true,
             fixedHeader:false,
@@ -136,6 +136,16 @@
 
         saveColumnVisibility('activity_log_table', 'colvisState_activity_log');
         loadColumnVisibility('activity_log_table', 'colvisState_activity_log');
+
+        const key = 'colvisState_activity_log';
+        const colvis = localStorage.getItem(key);
+        fetch('/api/save-colvis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key, colvis })
+        });
 
         $(document).on('change', '#al_users_filter, #subject_type', function(){
             activity_log_table.ajax.reload();

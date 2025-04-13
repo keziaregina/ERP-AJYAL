@@ -104,7 +104,7 @@
             var export_button = window.canExport;
 
             cg_report_table = $('#cg_report_table').DataTable({
-                buttons: export_button ? pdfButtonsWithDate('Customer Groups Report') : [],
+                buttons: export_button ? pdfButtonsWithDate('cg', '#cg_report_table') : [],
                 processing: true,
                 serverSide: true,
                 fixedHeader:false,
@@ -129,10 +129,21 @@
             saveColumnVisibility('cg_report_table', 'colvisState_cg_report');
             loadColumnVisibility('cg_report_table', 'colvisState_cg_report');
             
-                        //Customer Group report filter
+                //Customer Group report filter
             $('select#cg_location_id, select#cg_customer_group_id, #cg_date_range').change( function(){
                 cg_report_table.ajax.reload();
             });
         })
+    </script>
+    <script>
+        const key = 'colvisState_cg_report';
+        const colvis = localStorage.getItem(key);
+        fetch('/api/save-colvis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key, colvis })
+        });
     </script>
 @endsection

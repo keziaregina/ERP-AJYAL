@@ -32,10 +32,10 @@ class Kernel extends ConsoleKernel
             $schedule->command('pos:autoSendPaymentReminder')->dailyAt('8:00');
 
             // Schedule to send report email based on interval and types
-            $schedule->command('send-report:daily')->dailyAt('07:00');
-            $schedule->command('send-report:weekly')->weekly()->at('07:00');
-            $schedule->command('send-report:monthly')->monthly()->at('07:00');
-            $schedule->command('send-report:yearly')->yearly()->at('07:00');
+            $schedule->command('send-report:daily')->dailyAt('23:59');
+            $schedule->command('send-report:weekly')->weekly()->at('23:59');
+            $schedule->command('send-report:monthly')->monthly()->at('23:59');
+            $schedule->command('send-report:yearly')->yearly()->at('23:59');
 
         }
 
@@ -46,11 +46,6 @@ class Kernel extends ConsoleKernel
                     //->everyThirtyMinutes()
                     ->emailOutputTo($email);
         }
-
-        // $schedule->command('send-report:daily')->everyMinute();
-        // $schedule->command('send-report:weekly')->everyMinute();
-        // $schedule->command('send-report:monthly')->everyMinute();
-        // $schedule->command('send-report:yearly')->everyMinute();
     }
 
     /**

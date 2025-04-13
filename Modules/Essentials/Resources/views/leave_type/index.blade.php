@@ -70,7 +70,7 @@
             var export_button = window.canExport;
 
             leave_type_table = $('#leave_type_table').DataTable({
-                buttons: export_button ? pdfButtons('Leave Types Report') : [],
+                buttons: export_button ? pdfButtons('leave_type', '#leave_type_table') : [],
                 processing: true,
                 serverSide: true,
                 ajax: "{{action([\Modules\Essentials\Http\Controllers\EssentialsLeaveTypeController::class, 'index'])}}",

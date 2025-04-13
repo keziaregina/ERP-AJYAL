@@ -193,7 +193,7 @@ class ReportEmailService
                     'user' => $user,
                     'report' => $report,
                     'dates' => $dates,
-                    'currency' => 'ر.س',
+                    'currency' => 'ر.ع',
                     'lang' => $data->attachment_lang,
                     ]);            
         $data['interval'] = $interval;

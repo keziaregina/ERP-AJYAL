@@ -56,7 +56,7 @@
             var export_button = window.canExport;
 
             sales_target_table = $('#sales_target_table').DataTable({
-                buttons: export_button ? pdfButtons('Sales Targets Report') : [],
+                buttons: export_button ? pdfButtons('sales_target', '#sales_target_table') : [],
                 processing: true,
                 serverSide: true,
                 ajax: {

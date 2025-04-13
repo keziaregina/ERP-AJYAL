@@ -84,11 +84,12 @@ class ReportSettingsController extends Controller
             'monthly'=> __('report_settings.monthly'), 
             'yearly'=> __('report_settings.yearly')
         ];
+
         $langs = [
-            'All'=> __('report_settings.all'),
             'en'=> __('report_settings.en'),
             'ar'=> __('report_settings.ar'),
         ];
+
         return view('report_settings.create', compact('users', 'reportTypes', 'intervals', 'langs'));
     }
 
@@ -160,7 +161,6 @@ class ReportSettingsController extends Controller
             'yearly'=> __('report_settings.yearly')
         ];
         $langs = [
-            'All'=> __('report_settings.all'),
             'en'=> __('report_settings.en'),
             'ar'=> __('report_settings.ar'),
         ];

@@ -36,22 +36,22 @@
         .date{
             font-size: 11px;
         }
-        .indexing {
-            width: 40px;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
 
         th,
         td {
             border: 0.5px solid #ddd;
-            padding: 8px;
+            padding: 6px 4px;
             text-align: center;
+            width: auto;
+        }
+
+        tr .indexing, td .indexing {
+            width: 40px !important;
         }
 
         th {
@@ -91,6 +91,15 @@
         } else {
             \App::setLocale('en');
         }
+
+        $colvis = json_decode(Cache::get('colvisState_activity_log'), true) ?? [];
+        $colCount = 1;
+
+        foreach (range(0, 4) as $i) {
+            if (!isset($colvis[$i]) || $colvis[$i] !== false) {
+                $colCount++;
+            }
+        }
     @endphp
     <div class="header">
         <img class="logo" src="{{ $logo }}" alt="logo">
@@ -109,34 +118,59 @@
         {{ __('attachment.general.daterange', ['start' => $dates['start_date'], 'end' => $dates['end_date']]) }}
     </p>
 
-    <table class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
+    <table style="margin-top: 10px" class="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
         <thead>
             <tr>
                 <th class="indexing">#</th>
-                <th>{{ __('attachment.activity.th_date') }}</th>
-                <th>{{ __('attachment.activity.th_subject') }}</th>
-                <th>{{ __('attachment.activity.th_action') }}</th>
-                <th>{{ __('attachment.activity.th_by') }}</th>
-                <th>{{ __('attachment.activity.th_note') }}</th>
+    
+                @if (!isset($colvis[0]) || $colvis[0] !== false)
+                    <th>{{ __('attachment.activity.th_date') }}</th>
+                @endif
+        
+                @if (!isset($colvis[1]) || $colvis[1] !== false)
+                    <th>{{ __('attachment.activity.th_subject') }}</th>
+                @endif
+        
+                @if (!isset($colvis[2]) || $colvis[2] !== false)
+                    <th>{{ __('attachment.activity.th_action') }}</th>
+                @endif
+        
+                @if (!isset($colvis[3]) || $colvis[3] !== false)
+                    <th>{{ __('attachment.activity.th_by') }}</th>
+                @endif
+        
+                @if (!isset($colvis[4]) || $colvis[4] !== false)
+                    <th>{{ __('attachment.activity.th_note') }}</th>
+                @endif
             </tr>
         </thead>
         <tbody>
             @forelse ($report as $index => $item)
                 <tr>
                     <td class="indexing">{{ $index + 1 }}</td>
+                    @if (!isset($colvis[0]) || $colvis[0] !== false)
                     <td>
                         {{ $item->created_at->format('Y-m-d') }}
                         <br>
                         {{ $item->created_at->format('H:i:s') }}
                     </td>
-                    <td>{{ $item->subject_type }}</td>
-                    <td>{{ $item->description }}</td>
-                    <td>{{ $item->created_by }}</td>
-                    <td class="arabic">{!! $item->note ?: '-' !!}</td>
+                    @endif
+                    @if (!isset($colvis[1]) || $colvis[1] !== false)
+                        <td>{{ $item->subject_type }}</td>
+                    @endif
+                    @if (!isset($colvis[2]) || $colvis[2] !== false)
+                        <td>{{ $item->description }}</td>
+                    @endif
+                    @if (!isset($colvis[3]) || $colvis[3] !== false)
+                        <td>{{ $item->created_by }}</td>
+                    @endif
+                    @if (!isset($colvis[4]) || $colvis[4] !== false)
+                        <td class="arabic">{!! $item->note ?: '-' !!}</td>
+                    @endif
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6">{{ __('attachment.general.empty') }}</td>
+                    <td colspan={{ $colCount }}>{{ __('attachment.general.empty') }}</td>
                 </tr>
             @endforelse
 
