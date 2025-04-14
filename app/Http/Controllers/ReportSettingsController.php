@@ -53,7 +53,7 @@ class ReportSettingsController extends Controller
         return [
             'profit_or_loss_report'      => __('report_type.profit_or_loss_report'),
             'purchase_n_sell_report'     => __('report_type.purchase_n_sell_report'),
-            'contacts_report'            => __('report_type.contacts_report'),
+            // 'contacts_report'            => __('report_type.contacts_report'),
             'customer_n_supplier_report' => __('report_type.customer_n_supplier_report'),
             'customer_group_report'      => __('report_type.customer_group_report'),
             'stock_report'               => __('report_type.stock_report'),

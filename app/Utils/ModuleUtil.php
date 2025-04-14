@@ -137,9 +137,9 @@ class ModuleUtil extends Util
     public function hasThePermissionInSubscription($business_id, $permission, $callback_function = null)
     {
         if ($this->isSuperadminInstalled()) {
-            if (auth()->user()->can('superadmin')) {
-                return true;
-            }
+            // if (auth()->user()->can('superadmin')) {
+            //     return true;
+            // }
 
             $package = \Modules\Superadmin\Entities\Subscription::active_subscription($business_id);
 
