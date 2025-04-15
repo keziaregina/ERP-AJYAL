@@ -91,6 +91,7 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
 
 
         // Route for overtime sheets
-        Route::get('/overtime-sheet', [Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'index']);
+        // Route::get('/overtime-sheet', [Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'index']);
+        Route::resource('overtime-sheets', Modules\Essentials\Http\Controllers\OvertimeSheetController::class);
     });
 });

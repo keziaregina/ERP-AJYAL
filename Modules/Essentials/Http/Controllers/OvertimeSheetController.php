@@ -3,14 +3,17 @@
 namespace Modules\Essentials\Http\Controllers;
 
 use App\User;
+use Carbon\Carbon;
 use App\Utils\Util;
+use App\EmployeeOvertime;
 use App\Utils\ModuleUtil;
 use App\Utils\BusinessUtil;
+use Illuminate\Http\Request;
 use App\Utils\TransactionUtil;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
 use Modules\Essentials\Utils\EssentialsUtil;
 use Illuminate\Contracts\Database\Query\Builder;
 
@@ -26,13 +29,55 @@ class OvertimeSheetController extends Controller {
 
     function index() {
         try {
+            // dd(Carbon::now()->subDays(8));
             $businessId = request()->session()->get('user.business_id');
             $employees = $this->getEmployeesByLocation(businessId: $businessId);
             $daysInMonth = Carbon::now()->month(date('m'))->daysInMonth;
+            $overtimeOptions = EmployeeOvertime::OVERTIME_HOURS;
 
-            return view('essentials::overtime_sheets.index')->with(compact('employees', 'daysInMonth'));
+            // Log::info(json_encode($overtimeOptions));
+
+            // dd($overtimeOptions);
+            
+            // Get overtime data for the current month
+            $overtimeDatas = $this->getOvertimeDataForCurrentMonth();
+
+            // dd($overtimeHoursStatus);
+
+            return view('essentials::overtime_sheets.index')->with(compact('employees', 'daysInMonth', 'overtimeOptions', 'overtimeDatas'));
         } catch (\Exception $e) {
             Log::error("error on index overtime: "  . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    function store(Request $request) {
+        try {
+
+            // dd($request->all());
+
+            $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'overtime_hours' => ['required', Rule::in(array_keys(EmployeeOvertime::OVERTIME_HOURS))]
+            ]);
+
+            // dd($request->all());
+
+            $overtimeHour = EmployeeOvertime::updateOrCreate([
+                'user_id' =>  $request->user_id,
+                'day' => date('d'),
+                'month' => date('m'),
+                'year' => date('Y'),
+            ],[
+                'total_hour' => $request->overtime_hours,
+                'created_by' => auth()->id()
+            ]);
+
+            return redirect()->back()->with('success', 'Created Successfully.');
+
+        } catch (\Exception $e) {
+            // Log::error("error storing overtime hour : " . $e->getMessage());
+            Log::error("error storing overtime hour : " . $e->getMessage());
             throw $e;
         }
     }
@@ -52,18 +97,78 @@ class OvertimeSheetController extends Controller {
 
             $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
 
-            // dd(date('M'));
-            // dd($daysInMonth);
-
-            // $employees = $users->pluck('id', 'full_name')->toArray();
-            // $employees = $users;
-
-            // Log::info(json_encode($employees,JSON_PRETTY_PRINT));
-
             return $employees;
 
         } catch (\Exception $e) {
             Log::error("error get employees: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Get overtime data for users in the current month
+     * 
+     * @return \Illuminate\Support\Collection
+     */
+    private function getOvertimeDataForCurrentMonth()
+    {
+        try {
+            $currentMonth = date('m');
+
+            $currentYear = date('Y');
+
+            $businessId = request()->session()->get('user.business_id');
+            
+            // Get all active employees
+            $query = User::query();
+
+            if (! empty($locationId)) {
+                $query->where('location_id', $locationId);
+            } else {
+                $query->whereNull('location_id');
+            }
+
+            $query = $query->where('business_id', $businessId)
+            ->where('status', 'active');
+
+            $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
+
+            // Get all overtime records for the current month
+            $overtimeRecords = EmployeeOvertime::where('month', $currentMonth)
+                ->where('year', $currentYear)
+                ->whereIn('user_id', $employees->pluck('id'))
+                ->get();
+
+            // Group overtime records by user_id
+            $overtimeByUser = $overtimeRecords->groupBy('user_id');
+            
+            // Process the data to create a structured format
+            $result = $employees->map(function($employee) use ($overtimeByUser, $currentMonth) {
+                $overtimeData = [];
+                
+                // Initialize all days with null values
+                for ($day = 1; $day <= now()->daysInMonth; $day++) {
+                    $overtimeData[str_pad($day, 2, '0', STR_PAD_LEFT)] = null;
+                }
+                
+                // Fill in the actual overtime data if user has any records
+                if ($overtimeByUser->has($employee->id)) {
+                    foreach ($overtimeByUser->get($employee->id) as $overtime) {
+                        $overtimeData[$overtime->day] = $overtime->total_hour;
+                    }
+                }
+                
+                return [
+                    'user_id' => $employee->id,
+                    'full_name' => $employee->full_name,
+                    'overtime_data' => $overtimeData
+                ];
+            });
+            
+            return $result;
+            
+        } catch (\Exception $e) {
+            Log::error("error getting overtime data: " . $e->getMessage());
             throw $e;
         }
     }

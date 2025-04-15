@@ -315,7 +315,13 @@ return[
     'days_present' => 'أيام الحضور',
     'days_absent' => 'أيام الغياب',
     'attendance_report_for' => 'تقرير الحضور لـ',
+
+
+    // Overtime sheets
     'overtime_sheets' => 'أوراق العمل الإضافي',
     'manage_your_overtime_sheets' => 'إدارة أوراق العمل الإضافية الخاصة بك',
-    'employee_name' => 'اسم الموظف'
+    'employee_name' => 'اسم الموظف',
+    'add_new_overtime' => 'إضافة ساعة عمل إضافية',
+    'select_overtime_hours' => 'حدد ساعات العمل الإضافي',
+    'overtime_hours' => 'ساعات العمل الإضافي'
 ];

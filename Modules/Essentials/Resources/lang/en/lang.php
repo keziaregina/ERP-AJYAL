@@ -315,7 +315,13 @@ return [
     'days_present' => 'Days Present',
     'days_absent' => 'Days Absent',
     'attendace_report_for' => 'Attendance Report for',
+
+
+    // Overtime sheets
     'overtime_sheets' => 'Overtime Sheets',
     'manage_your_overtime_sheets' => 'Manage your overtime sheets',
-    'employee_name' => 'Employee Name'
+    'employee_name' => 'Employee Name',
+    'add_new_overtime' => 'Add Overtime Hour',
+    'select_overtime_hours' => 'Select Overtime Hours',
+    'overtime_hours' => 'Overtime Hours'
 ];
