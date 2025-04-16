@@ -16,18 +16,20 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Modules\Essentials\Utils\EssentialsUtil;
 use Illuminate\Contracts\Database\Query\Builder;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
-class OvertimeSheetController extends Controller {
+class OvertimeSheetController extends Controller
+{
     public function __construct(
         protected ModuleUtil $moduleUtil,
         protected EssentialsUtil $essentialsUtil,
         protected Util $commonUtil,
         protected TransactionUtil $transactionUtil,
         protected BusinessUtil $businessUtil
-    ) {
-    }
+    ) {}
 
-    function index() {
+    function index()
+    {
         try {
             // dd(Carbon::now()->subDays(8));
             $businessId = request()->session()->get('user.business_id');
@@ -38,7 +40,7 @@ class OvertimeSheetController extends Controller {
             // Log::info(json_encode($overtimeOptions));
 
             // dd($overtimeOptions);
-            
+
             // Get overtime data for the current month
             $overtimeDatas = $this->getOvertimeDataForCurrentMonth();
 
@@ -51,7 +53,8 @@ class OvertimeSheetController extends Controller {
         }
     }
 
-    function store(Request $request) {
+    function store(Request $request)
+    {
         try {
 
             // dd($request->all());
@@ -68,13 +71,12 @@ class OvertimeSheetController extends Controller {
                 'day' => date('d'),
                 'month' => date('m'),
                 'year' => date('Y'),
-            ],[
+            ], [
                 'total_hour' => $request->overtime_hours,
                 'created_by' => auth()->id()
             ]);
 
             return redirect()->back()->with('success', 'Created Successfully.');
-
         } catch (\Exception $e) {
             // Log::error("error storing overtime hour : " . $e->getMessage());
             Log::error("error storing overtime hour : " . $e->getMessage());
@@ -82,7 +84,8 @@ class OvertimeSheetController extends Controller {
         }
     }
 
-    private function getEmployeesByLocation($businessId, $locationId = null) {
+    private function getEmployeesByLocation($businessId, $locationId = null)
+    {
         try {
             $query = User::query();
 
@@ -93,12 +96,11 @@ class OvertimeSheetController extends Controller {
             }
 
             $query = $query->where('business_id', $businessId)
-            ->where('status', 'active');
+                ->where('status', 'active');
 
             $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
 
             return $employees;
-
         } catch (\Exception $e) {
             Log::error("error get employees: " . $e->getMessage());
             throw $e;
@@ -118,7 +120,7 @@ class OvertimeSheetController extends Controller {
             $currentYear = date('Y');
 
             $businessId = request()->session()->get('user.business_id');
-            
+
             // Get all active employees
             $query = User::query();
 
@@ -129,7 +131,7 @@ class OvertimeSheetController extends Controller {
             }
 
             $query = $query->where('business_id', $businessId)
-            ->where('status', 'active');
+                ->where('status', 'active');
 
             $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
 
@@ -141,35 +143,60 @@ class OvertimeSheetController extends Controller {
 
             // Group overtime records by user_id
             $overtimeByUser = $overtimeRecords->groupBy('user_id');
-            
+
             // Process the data to create a structured format
-            $result = $employees->map(function($employee) use ($overtimeByUser, $currentMonth) {
+            $result = $employees->map(function ($employee) use ($overtimeByUser, $currentMonth) {
                 $overtimeData = [];
-                
+
                 // Initialize all days with null values
                 for ($day = 1; $day <= now()->daysInMonth; $day++) {
                     $overtimeData[str_pad($day, 2, '0', STR_PAD_LEFT)] = null;
                 }
-                
+
                 // Fill in the actual overtime data if user has any records
                 if ($overtimeByUser->has($employee->id)) {
                     foreach ($overtimeByUser->get($employee->id) as $overtime) {
                         $overtimeData[$overtime->day] = $overtime->total_hour;
                     }
                 }
-                
+
                 return [
                     'user_id' => $employee->id,
                     'full_name' => $employee->full_name,
                     'overtime_data' => $overtimeData
                 ];
             });
-            
+
             return $result;
-            
         } catch (\Exception $e) {
             Log::error("error getting overtime data: " . $e->getMessage());
             throw $e;
+        }
+    }
+
+    public function printPdf()
+    {
+        try {
+            $logo = public_path('img/logo-small.png');
+            $data = $this->getOvertimeDataForCurrentMonth();
+            
+            $pdf = PDF::loadView('essentials::overtime_sheets.pdf', [
+                'data' => $data,
+                'logo' => $logo,
+                'business' => request()->session()->get('business'),
+                'location' => request()->session()->get('user.location_id'),
+                'month' => now()->format('F'),
+                'year' => now()->format('Y'),
+            ], [], [
+                'orientation' => 'L',
+                'format' => 'A4'
+            ]);
+
+            return $pdf->download('overtime_sheet_' . now()->format('F_Y') . '.pdf');
+            
+        } catch (\Exception $e) {
+            Log::error("Error generating overtime PDF: " . $e->getMessage());
+            return back()->with('error', 'Could not generate PDF. Please try again.');
         }
     }
 }

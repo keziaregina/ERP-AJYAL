@@ -3,6 +3,8 @@
 // use App\Http\Controllers\Modules;
 // use Illuminate\Support\Facades\Route;
 
+use Modules\Essentials\Http\Controllers\OvertimeSheetController;
+
 Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezone', 'AdminSidebarMenu')->group(function () {
     Route::prefix('essentials')->group(function () {
         Route::get('/dashboard', [Modules\Essentials\Http\Controllers\DashboardController::class, 'essentialsDashboard']);
@@ -93,5 +95,6 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
         // Route for overtime sheets
         // Route::get('/overtime-sheet', [Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'index']);
         Route::resource('overtime-sheets', Modules\Essentials\Http\Controllers\OvertimeSheetController::class);
+        Route::get('/print-pdf', [OvertimeSheetController::class, 'printPdf'])->name('pdfovertime');
     });
 });

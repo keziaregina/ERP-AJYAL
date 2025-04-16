@@ -14,10 +14,6 @@
 @endsection
 
 @section('content')
-    {{-- <h1>TEST</h1> --}}
-    {{-- @dd($employees) --}}
-
-    
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">@lang('essentials::lang.overtime_sheets')
@@ -29,6 +25,7 @@
     {{-- Main content --}}
     <section class="content">
         @component('components.widget', ['class' => 'box-primary', 'title' => __('essentials::lang.manage_your_overtime_sheets')])
+            <a href="{{ route('pdfovertime') }}">Print</a>
             @slot('tool')
                 <div class="box-tools">
                     {{-- <a class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right"
