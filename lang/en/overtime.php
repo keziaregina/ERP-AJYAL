@@ -2,9 +2,9 @@
 
 return [
     'title' => 'Overtime Sheet Report',
-    'sl' => 'sl',
-    'badge' => 'badge',
-    'name' => 'name',
+    'sl' => 'SL',
+    'badge' => 'Badge',
+    'name' => 'Employee Name',
 
     'month' => [
         'january' => 'January',

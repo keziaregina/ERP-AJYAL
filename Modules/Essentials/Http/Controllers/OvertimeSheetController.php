@@ -6,6 +6,7 @@ use App\User;
 use Carbon\Carbon;
 use App\Utils\Util;
 use App\EmployeeOvertime;
+use App\Exports\OvertimeSheetExport;
 use App\Utils\ModuleUtil;
 use App\Utils\BusinessUtil;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Modules\Essentials\Utils\EssentialsUtil;
 use Illuminate\Contracts\Database\Query\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
 class OvertimeSheetController extends Controller
@@ -174,7 +176,7 @@ class OvertimeSheetController extends Controller
         }
     }
 
-    public function printPdf()
+    public function exportPdf()
     {
         try {
             $logo = public_path('img/logo-small.png');
@@ -192,11 +194,17 @@ class OvertimeSheetController extends Controller
                 'format' => 'A4'
             ]);
 
-            return $pdf->download('overtime_sheet_' . now()->format('F_Y') . '.pdf');
+            return $pdf->download('overtime_report-' . now()->format('F_Y') . '.pdf');
             
         } catch (\Exception $e) {
             Log::error("Error generating overtime PDF: " . $e->getMessage());
             return back()->with('error', 'Could not generate PDF. Please try again.');
         }
+    }
+
+    public function exportExcel()
+    {   
+        $data = $this->getOvertimeDataForCurrentMonth();
+        return Excel::download(new OvertimeSheetExport($data), 'overtime_sheet-'.now()->format('F_Y').'.xlsx');        
     }
 }
