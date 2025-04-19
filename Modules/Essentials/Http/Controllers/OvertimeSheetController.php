@@ -6,7 +6,6 @@ use App\User;
 use Carbon\Carbon;
 use App\Utils\Util;
 use App\EmployeeOvertime;
-use App\Exports\OvertimeSheetExport;
 use App\Utils\ModuleUtil;
 use App\Utils\BusinessUtil;
 use Illuminate\Http\Request;
@@ -14,10 +13,11 @@ use App\Utils\TransactionUtil;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Exports\OvertimeSheetExport;
 use App\Http\Controllers\Controller;
-use Modules\Essentials\Utils\EssentialsUtil;
-use Illuminate\Contracts\Database\Query\Builder;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Database\Eloquent\Builder;
+use Modules\Essentials\Utils\EssentialsUtil;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
 class OvertimeSheetController extends Controller
@@ -91,7 +91,10 @@ class OvertimeSheetController extends Controller
     private function getEmployeesByLocation($businessId, $locationId = null)
     {
         try {
-            $query = User::query();
+            $query = User::query()
+            ->whereHas('roles', function ( Builder $query) {
+                $query->whereNotIn('id', [1]);
+            });
 
             if (! empty($locationId)) {
                 $query->where('location_id', $locationId);

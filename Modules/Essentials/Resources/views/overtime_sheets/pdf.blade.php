@@ -117,9 +117,11 @@
                     @foreach ($employee['overtime_data'] as $day => $value)
                         @php
                             $bgClass = '';
-                            if ($value == 8) {
+                            if ($value == 'SL') {
                                 $bgClass = 'highlight-yellow';
-                            } elseif ($value == 'ML') {
+                            } elseif ($value == 'GE') {
+                                $bgClass = 'highlight-green';
+                            } elseif ($value == 'VL') {
                                 $bgClass = 'highlight-blue';
                             } elseif ($value == 'A') {
                                 $bgClass = 'highlight-red';

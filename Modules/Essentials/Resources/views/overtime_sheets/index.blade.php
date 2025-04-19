@@ -25,24 +25,32 @@
     {{-- Main content --}}
     <section class="content">
         @component('components.widget', ['class' => 'box-primary', 'title' => __('essentials::lang.manage_your_overtime_sheets')])
-            <a href="{{ route('pdfovertime') }}">PDF</a>
-            <a href="{{ route('excelovertime') }}">Excel</a>
+            <div class="tw-flex tw-gap-2 tw-mb-4">
+                <a href="{{ route('pdfovertime') }}" class="tw-dw-btn tw-bg-gradient-to-r tw-from-red-600 tw-to-red-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    PDF
+                </a>
+                <a href="{{ route('excelovertime') }}" class="tw-dw-btn tw-bg-gradient-to-r tw-from-green-600 tw-to-green-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Excel
+                </a>
+            </div>
             @slot('tool')
                 <div class="box-tools">
-                    {{-- <a class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right"
-                        href="{{action([\App\Http\Controllers\ReportSettingsController::class, 'create'])}}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M12 5l0 14" />
-                            <path d="M5 12l14 0" />
-                        </svg> @lang('essentials::lang.add_new_overtime')
-                    </a> --}}
-
                     <!-- Button trigger modal -->
                     <button type="button" class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right" data-toggle="modal" data-target="#exampleModalCenter">
-                    {{-- <button type="button" class="btn btn-primary btn-modal" data-toggle="modal" data-target="#exampleModalCenter"> --}}
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
@@ -52,7 +60,6 @@
                         </svg> 
                         @lang('essentials::lang.add_new_overtime')
                     </button>
-
                 </div>
             @endslot
             <div class="table-responsive">
@@ -60,19 +67,11 @@
                     <thead>
                         <tr>
                             <th>@lang('essentials::lang.employee_name')</th>
-                            {{-- <th>@lang('report_settings.report_type')</th>
-                            <th>@lang('report_settings.attachment_lang')</th>
-                            <th>@lang('report_settings.report_interval')</th> --}}
                             @for ($i = 1; $i <= $daysInMonth; $i++)
                                 <th>{{ $i }}</th>
                             @endfor
-                            {{-- <th>@lang('messages.action')</th> --}}
                         </tr>
-                        {{-- @dd($employees); --}}
-                        {{-- @dd($overtimeData); --}}
-                        {{-- @dd($overtimeData); --}}
                         @foreach ($overtimeDatas as $key => $employee)
-                        {{-- @dd($overtimeData);  --}}
                             <tr>
                                 <td>{{ $employee['full_name'] }}</td>
                                 @forelse ($employee['overtime_data'] as $key => $value)
@@ -127,11 +126,6 @@
                                 @endforeach
                             </select>
                         </div>
-
-                        {{-- <div class="col-sm-12 text-center">
-                            <button type="submit" class="btn btn-primary">@lang('messages.save')</button>
-                        </div> --}}
-
                     </div>
                     
                     <div class="modal-footer">
