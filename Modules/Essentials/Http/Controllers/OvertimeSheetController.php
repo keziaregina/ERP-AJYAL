@@ -44,11 +44,13 @@ class OvertimeSheetController extends Controller
             // dd($overtimeOptions);
 
             // Get overtime data for the current month
-            $overtimeDatas = $this->getOvertimeDataForCurrentMonth();
+            $overtimeData = $this->getOvertimeDataForCurrentMonth();
+            $overtimeDatas = $overtimeData['employees'];
+            $totalAllOvertime = $overtimeData['total_all_overtime'];
 
             // dd($overtimeHoursStatus);
 
-            return view('essentials::overtime_sheets.index')->with(compact('employees', 'daysInMonth', 'overtimeOptions', 'overtimeDatas'));
+            return view('essentials::overtime_sheets.index')->with(compact('employees', 'daysInMonth', 'overtimeOptions', 'overtimeDatas', 'totalAllOvertime'));
         } catch (\Exception $e) {
             Log::error("error on index overtime: "  . $e->getMessage());
             throw $e;
@@ -162,14 +164,66 @@ class OvertimeSheetController extends Controller
                     }
                 }
 
+                $filteredOvertimeData = collect(array_values($overtimeData))->filter(function ($value) {
+                    return $value != 'A' && $value != 'VL' && $value != 'GE' && $value != 'SL';
+                })->toArray();
+
+                // Calculate total overtime hours properly handling minutes
+                $totalOvertimeMonthly = 0;
+                $totalHours = 0;
+                $totalMinutes = 0;
+                
+                foreach ($filteredOvertimeData as $overtimeValue) {
+                    if (is_numeric($overtimeValue)) {
+                        // Split the value into hours and minutes
+                        $parts = explode('.', (string)$overtimeValue);
+                        $hours = (int)$parts[0];
+                        $minutes = isset($parts[1]) ? (int)$parts[1] : 0;
+                        
+                        // Add to totals
+                        $totalHours += $hours;
+                        $totalMinutes += $minutes;
+                    }
+                }
+                
+                // Convert excess minutes to hours
+                $additionalHours = floor($totalMinutes / 60);
+                $remainingMinutes = $totalMinutes % 60;
+                
+                // Calculate final total with proper formatting for minutes
+                $totalOvertimeMonthly = $totalHours + $additionalHours + ($remainingMinutes / 100);
+                
+                // Format to ensure minutes always have two digits
+                $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 2, '.', '');
+
                 return [
                     'user_id' => $employee->id,
                     'full_name' => $employee->full_name,
-                    'overtime_data' => $overtimeData
+                    'overtime_data' => $overtimeData,
+                    'total_overtime_by_month' => $totalOvertimeMonthly
                 ];
             });
 
-            return $result;
+            Log::info(json_encode($result,JSON_PRETTY_PRINT));
+
+            // Calculate total overtime across all employees
+            $totalAllOvertime = 0;
+            foreach ($result as $employeeData) {
+                $totalAllOvertime += (float)$employeeData['total_overtime_by_month'];
+            }
+            
+            // Format the total to ensure minutes have two digits
+            $totalAllOvertime = number_format($totalAllOvertime, 2, '.', '');
+
+            // Add the total to the result
+            $resultWithTotal = [
+                'employees' => $result,
+                'total_all_overtime' => $totalAllOvertime
+            ];
+
+            Log::info(json_encode($resultWithTotal,JSON_PRETTY_PRINT));
+
+            return $resultWithTotal;
         } catch (\Exception $e) {
             Log::error("error getting overtime data: " . $e->getMessage());
             throw $e;
@@ -180,10 +234,13 @@ class OvertimeSheetController extends Controller
     {
         try {
             $logo = public_path('img/logo-small.png');
-            $data = $this->getOvertimeDataForCurrentMonth();
+            $overtimeData = $this->getOvertimeDataForCurrentMonth();
+            $data = $overtimeData['employees'];
+            $totalAllOvertime = $overtimeData['total_all_overtime'];
             
             $pdf = PDF::loadView('essentials::overtime_sheets.pdf', [
                 'data' => $data,
+                'totalAllOvertime' => $totalAllOvertime,
                 'logo' => $logo,
                 'business' => request()->session()->get('business'),
                 'location' => request()->session()->get('user.location_id'),
@@ -204,7 +261,9 @@ class OvertimeSheetController extends Controller
 
     public function exportExcel()
     {   
-        $data = $this->getOvertimeDataForCurrentMonth();
-        return Excel::download(new OvertimeSheetExport($data), 'overtime_sheet-'.now()->format('F_Y').'.xlsx');        
+        $overtimeData = $this->getOvertimeDataForCurrentMonth();
+        $data = $overtimeData['employees'];
+        $totalAllOvertime = $overtimeData['total_all_overtime'];
+        return Excel::download(new OvertimeSheetExport($data, $totalAllOvertime), 'overtime_sheet-'.now()->format('F_Y').'.xlsx');        
     }
 }

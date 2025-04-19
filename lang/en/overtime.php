@@ -20,4 +20,7 @@ return [
         'november' => 'November',
         'december' => 'December'
     ],
+
+    'total_per_month' => 'Total',
+    'total_all' => 'Total All'
 ];
