@@ -86,6 +86,28 @@
                     </thead>
                 </table>
             </div>
+            
+            <div class="tw-mt-6 tw-p-4 tw-bg-gray-50 tw-rounded-lg tw-border tw-border-gray-200">
+                <h4 class="tw-text-lg tw-font-semibold tw-mb-3 tw-text-gray-700">@lang('essentials::lang.legend')</h4>
+                <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-4">
+                    <div class="tw-flex tw-items-center">
+                        <span class="tw-w-8 tw-h-8 tw-flex tw-items-center tw-justify-center tw-bg-red-100 tw-text-red-800 tw-font-bold tw-rounded-full tw-mr-2">A</span>
+                        <span style="padding: 0 10px">@lang('essentials::lang.absent')</span>
+                    </div>
+                    <div class="tw-flex tw-items-center">
+                        <span class="tw-w-8 tw-h-8 tw-flex tw-items-center tw-justify-center tw-bg-blue-100 tw-text-blue-800 tw-font-bold tw-rounded-full tw-mr-2">VL</span>
+                        <span style="padding: 0 10px">@lang('essentials::lang.vacation_leave')</span>
+                    </div>
+                    <div class="tw-flex tw-items-center">
+                        <span class="tw-w-8 tw-h-8 tw-flex tw-items-center tw-justify-center tw-bg-green-100 tw-text-green-800 tw-font-bold tw-rounded-full tw-mr-2">GE</span>
+                        <span style="padding: 0 10px">@lang('essentials::lang.glorious_employee_allowance')</span>
+                    </div>
+                    <div class="tw-flex tw-items-center">
+                        <span class="tw-w-8 tw-h-8 tw-flex tw-items-center tw-justify-center tw-bg-yellow-100 tw-text-yellow-800 tw-font-bold tw-rounded-full tw-mr-2">SL</span>
+                        <span style="padding: 0 10px">@lang('essentials::lang.sick_leave')</span>
+                    </div>
+                </div>
+            </div>
         @endcomponent
     </section>
 

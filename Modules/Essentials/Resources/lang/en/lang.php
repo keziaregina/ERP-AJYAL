@@ -323,5 +323,9 @@ return [
     'employee_name' => 'Employee Name',
     'add_new_overtime' => 'Add Overtime Hour',
     'select_overtime_hours' => 'Select Overtime Hours',
-    'overtime_hours' => 'Overtime Hours'
+    'overtime_hours' => 'Overtime Hours',
+    'legend' => 'Legend',
+    'vacation_leave' => 'Vacation Leave',
+    'glorious_employee_allowance' => 'Glorious Employee Allowance',
+    'sick_leave' => 'Sick Leave',
 ];

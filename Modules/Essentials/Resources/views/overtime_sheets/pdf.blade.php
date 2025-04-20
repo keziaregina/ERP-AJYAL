@@ -152,6 +152,39 @@
         </tbody>
     </table>
 
+    <!-- Legend Section -->
+    <div style="margin-top: 20px; border: 1px solid #ddd; padding: 10px; background-color: #f9f9f9;">
+        <h3 style="font-size: 12px; margin-bottom: 10px; text-align: center;">{{ __('essentials::lang.legend') }}</h3>
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="border: none; width: 25%;">
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 20px; height: 20px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px;"></div>
+                        <span style="font-size: 10px;">A - {{ __('essentials::lang.absent') }}</span>
+                    </div>
+                </td>
+                <td style="border: none; width: 25%;">
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 20px; height: 20px; background-color: #5dade2; border-radius: 50%; margin-right: 5px;"></div>
+                        <span style="font-size: 10px;">VL - {{ __('essentials::lang.vacation_leave') }}</span>
+                    </div>
+                </td>
+                <td style="border: none; width: 25%;">
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 20px; height: 20px; background-color: #2ecc71; border-radius: 50%; margin-right: 5px;"></div>
+                        <span style="font-size: 10px;">GE - {{ __('essentials::lang.glorious_employee_allowance') }}</span>
+                    </div>
+                </td>
+                <td style="border: none; width: 25%;">
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 20px; height: 20px; background-color: #f1c40f; border-radius: 50%; margin-right: 5px;"></div>
+                        <span style="font-size: 10px;">SL - {{ __('essentials::lang.sick_leave') }}</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
 </body>
 
 </html>

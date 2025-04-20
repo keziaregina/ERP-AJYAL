@@ -121,7 +121,7 @@ return[
     'hrm_info' => 'معلومات إدارة الموارد البشرية',
     'activity' => 'نشاط',
     'status_changed_to' => 'تم تغيير الحالة إلى :status',
-    'leaves_summary_for_user' => 'ملخص الأوراق لـ :user',
+    'leaves_summary_for_user' => 'ملخص الإجازات لـ :user',
     'total_work_hours' => 'إجمالي ساعات العمل',
     'leave_count_interval' => 'إجازة عدد الفاصل',
     'current_month' => 'الشهر الحالي',
@@ -323,5 +323,9 @@ return[
     'employee_name' => 'اسم الموظف',
     'add_new_overtime' => 'إضافة ساعة عمل إضافية',
     'select_overtime_hours' => 'حدد ساعات العمل الإضافي',
-    'overtime_hours' => 'ساعات العمل الإضافي'
+    'overtime_hours' => 'ساعات العمل الإضافي',
+    'legend' => 'مفتاح',
+    'vacation_leave' => 'إجازة سنوية',
+    'glorious_employee_allowance' => 'بدل الموظف المتميز',
+    'sick_leave' => 'إجازة مرضية',
 ];
