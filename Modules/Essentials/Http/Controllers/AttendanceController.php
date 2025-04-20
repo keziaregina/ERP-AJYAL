@@ -159,7 +159,7 @@ class AttendanceController extends Controller
                                 ->first();
         $employees = [];
         if ($can_crud_all_attendance) {
-            $employees = User::forDropdown($business_id, false);
+            $employees = User::forDropdownWithActive($business_id, false);
         }
 
         $days = $this->moduleUtil->getDays();
@@ -182,7 +182,7 @@ class AttendanceController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $employees = User::forDropdown($business_id, false);
+        $employees = User::forDropdownWithActive($business_id, false);
 
         return view('essentials::attendance.create')->with(compact('employees'));
     }
