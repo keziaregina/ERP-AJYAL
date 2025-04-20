@@ -299,6 +299,16 @@ class DataController extends Controller
                 'label' => __('essentials::lang.access_sales_target'),
                 'default' => false,
             ],
+            [
+                'value' => 'essentials.add_overtime_hour',
+                'label' => __('essentials::lang.add_overtime_hour'),
+                'default' => false,
+            ],
+            [
+                'value' => 'essentials.edit_overtime_hour',
+                'label' => __('essentials::lang.edit_overtime_hour'),
+                'default' => false,
+            ],
         ];
     }
 

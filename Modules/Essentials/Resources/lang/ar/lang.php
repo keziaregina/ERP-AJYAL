@@ -323,5 +323,7 @@ return[
     'employee_name' => 'اسم الموظف',
     'add_new_overtime' => 'إضافة ساعة عمل إضافية',
     'select_overtime_hours' => 'حدد ساعات العمل الإضافي',
-    'overtime_hours' => 'ساعات العمل الإضافي'
+    'overtime_hours' => 'ساعات العمل الإضافي',
+    'add_overtime_hour' => 'إضافة ساعة عمل إضافية',
+    'edit_overtime_hour' => 'تعديل ساعة العمل الإضافي',
 ];

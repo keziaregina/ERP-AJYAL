@@ -323,5 +323,7 @@ return [
     'employee_name' => 'Employee Name',
     'add_new_overtime' => 'Add Overtime Hour',
     'select_overtime_hours' => 'Select Overtime Hours',
-    'overtime_hours' => 'Overtime Hours'
+    'overtime_hours' => 'Overtime Hours',
+    'add_overtime_hour' => 'Add overtime hour',
+    'edit_overtime_hour' => 'Edit overtime hour',
 ];
