@@ -35,20 +35,17 @@ class OvertimeSheetController extends Controller
         try {
             // dd(Carbon::now()->subDays(8));
             $businessId = request()->session()->get('user.business_id');
-            $employees = $this->getEmployeesByLocation(businessId: $businessId);
+            // $employees = $this->getEmployeesByLocation(businessId: $businessId);
+        
+            $employees = $this->getActiveEmployeesPerBusiness(businessId: $businessId);
+
             $daysInMonth = Carbon::now()->month(date('m'))->daysInMonth;
             $overtimeOptions = EmployeeOvertime::OVERTIME_HOURS;
-
-            // Log::info(json_encode($overtimeOptions));
-
-            // dd($overtimeOptions);
 
             // Get overtime data for the current month
             $overtimeData = $this->getOvertimeDataForCurrentMonth();
             $overtimeDatas = $overtimeData['employees'];
             $totalAllOvertime = $overtimeData['total_all_overtime'];
-
-            // dd($overtimeHoursStatus);
 
             return view('essentials::overtime_sheets.index')->with(compact('employees', 'daysInMonth', 'overtimeOptions', 'overtimeDatas', 'totalAllOvertime'));
         } catch (\Exception $e) {
@@ -68,8 +65,6 @@ class OvertimeSheetController extends Controller
                 'user_id' => 'required|exists:users,id',
                 'overtime_hours' => ['required', Rule::in(array_keys(EmployeeOvertime::OVERTIME_HOURS))]
             ]);
-
-            // dd($request->all());
 
             $overtimeHour = EmployeeOvertime::updateOrCreate([
                 'user_id' =>  $request->user_id,
@@ -115,6 +110,32 @@ class OvertimeSheetController extends Controller
         }
     }
 
+    private function getActiveEmployeesPerBusiness($businessId) {
+
+        $rawEmployees = User::forDropdownWithActive(business_id: $businessId);
+            
+        $employees = collect($rawEmployees)->each(function ($employeeId, $employeName) {
+            return [
+                'id' => $employeeId,
+                'full_name' => $employeName
+            ];
+        });
+        $employees = [];
+
+        foreach ($rawEmployees as $key => $value) {
+            $employees[] = [
+                'id' => $key,
+                'full_name' => $value
+            ];
+        }
+        
+        $employees = collect($employees)->filter(function ($employee) {
+            return isset($employee['id']) && $employee['id'] != '' && $employee['id'] != null;
+        });
+
+        return $employees;
+    }
+
     /**
      * Get overtime data for users in the current month
      * 
@@ -130,18 +151,7 @@ class OvertimeSheetController extends Controller
             $businessId = request()->session()->get('user.business_id');
 
             // Get all active employees
-            $query = User::query();
-
-            if (! empty($locationId)) {
-                $query->where('location_id', $locationId);
-            } else {
-                $query->whereNull('location_id');
-            }
-
-            $query = $query->where('business_id', $businessId)
-                ->where('status', 'active');
-
-            $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
+            $employees = $this->getActiveEmployeesPerBusiness(businessId: $businessId);
 
             // Get all overtime records for the current month
             $overtimeRecords = EmployeeOvertime::where('month', $currentMonth)
@@ -162,8 +172,8 @@ class OvertimeSheetController extends Controller
                 }
 
                 // Fill in the actual overtime data if user has any records
-                if ($overtimeByUser->has($employee->id)) {
-                    foreach ($overtimeByUser->get($employee->id) as $overtime) {
+                if ($overtimeByUser->has($employee['id'])) {
+                    foreach ($overtimeByUser->get($employee['id']) as $overtime) {
                         $overtimeData[$overtime->day] = $overtime->total_hour;
                     }
                 }
@@ -201,8 +211,8 @@ class OvertimeSheetController extends Controller
                 $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 2, '.', '');
 
                 return [
-                    'user_id' => $employee->id,
-                    'full_name' => $employee->full_name,
+                    'user_id' => $employee['id'],
+                    'full_name' => $employee['full_name'],
                     'overtime_data' => $overtimeData,
                     'total_overtime_by_month' => $totalOvertimeMonthly
                 ];

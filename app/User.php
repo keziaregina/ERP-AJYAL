@@ -206,6 +206,45 @@ class User extends Authenticatable
     }
 
     /**
+     * Return list of users dropdown for a business with active status only
+     * 
+     * @param int $business_id int
+     * @param boolean $prepend_none
+     * @param boolean $include_commission_agents
+     * @return array 
+     */
+
+    public static function forDropdownWithActive($business_id, $prepend_none = true, $include_commission_agents = false, $prepend_all = false, $check_location_permission = false) {
+        $query = User::where('business_id', $business_id)
+                    ->where('status', 'active')
+                    ->user();
+
+        if (! $include_commission_agents) {
+            $query->where('is_cmmsn_agnt', 0);
+        }
+
+        if ($check_location_permission) {
+            $query->onlyPermittedLocations();
+        }
+
+        $all_users = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
+        $users = $all_users->pluck('full_name', 'id');
+
+        //Prepend none
+        if ($prepend_none) {
+            $users = $users->prepend(__('lang_v1.none'), '');
+        }
+
+        //Prepend all
+        if ($prepend_all) {
+            $users = $users->prepend(__('lang_v1.all'), '');
+        }
+
+        return $users;
+    }
+
+
+    /**
      * Return list of sales commission agents dropdown for a business
      *
      * @param $business_id int

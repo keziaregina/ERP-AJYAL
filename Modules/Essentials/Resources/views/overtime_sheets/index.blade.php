@@ -131,7 +131,7 @@
                             <select name="user_id" id="user_id" class="form-control" required>
                                 <option value="">@lang('essentials::lang.select_employee')</option>
                                 @foreach ($employees as $employee)
-                                    <option value="{{ $employee->id }}">{{ $employee->full_name }}</option>
+                                    <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
                                 @endforeach
                             </select>
                         </div>
