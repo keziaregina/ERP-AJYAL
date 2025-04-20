@@ -214,7 +214,7 @@ class User extends Authenticatable
      * @return array 
      */
 
-    public static function forDropdownWithActive($business_id, $prepend_none = true, $include_commission_agents = false, $prepend_all = false, $check_location_permission = false) {
+    public static function forDropdownWithActive($business_id, $prepend_none = true, $include_commission_agents = false, $prepend_all = false, $check_location_permission = false, $location_id = null) {
         $query = User::where('business_id', $business_id)
                     ->where('status', 'active')
                     ->user();
@@ -225,6 +225,10 @@ class User extends Authenticatable
 
         if ($check_location_permission) {
             $query->onlyPermittedLocations();
+        }
+
+        if (! empty($location_id)) {
+            $query->where('location_id', $location_id);
         }
 
         $all_users = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
