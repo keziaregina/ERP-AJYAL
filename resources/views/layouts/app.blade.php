@@ -173,7 +173,6 @@
     #scrollable-container{
         position:relative;
     }
-    
 
 
 

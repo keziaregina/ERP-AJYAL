@@ -121,7 +121,7 @@ return[
     'hrm_info' => 'معلومات إدارة الموارد البشرية',
     'activity' => 'نشاط',
     'status_changed_to' => 'تم تغيير الحالة إلى :status',
-    'leaves_summary_for_user' => 'ملخص الأوراق لـ :user',
+    'leaves_summary_for_user' => 'ملخص الإجازات لـ :user',
     'total_work_hours' => 'إجمالي ساعات العمل',
     'leave_count_interval' => 'إجازة عدد الفاصل',
     'current_month' => 'الشهر الحالي',
@@ -315,4 +315,25 @@ return[
     'days_present' => 'أيام الحضور',
     'days_absent' => 'أيام الغياب',
     'attendance_report_for' => 'تقرير الحضور لـ',
+
+
+    // Overtime sheets
+    'overtime_sheets' => 'أوراق العمل الإضافي',
+    'manage_your_overtime_sheets' => 'إدارة أوراق العمل الإضافية الخاصة بك',
+    'employee_name' => 'اسم الموظف',
+    'add_new_overtime' => 'إضافة ساعة عمل إضافية',
+    'select_overtime_hours' => 'حدد ساعات العمل الإضافي',
+    'overtime_hours' => 'ساعات العمل الإضافي',
+    'legend' => 'مفتاح',
+    'vacation_leave' => 'إجازة سنوية',
+    'glorious_employee_allowance' => 'بدل الموظف المتميز',
+    'sick_leave' => 'إجازة مرضية',
+
+    // Payroll calculation formulas
+    'payroll_calculation_formulas' => 'صيغ حساب الرواتب',
+    'absent_calculation' => 'خصم أيام الغياب',
+    'vacation_calculation' => 'خصم الإجازة السنوية',
+    'sick_leave_calculation' => 'بدل الإجازة المرضية',
+    'formula' => 'الصيغة',
+    'example' => 'مثال',
 ];

@@ -74,6 +74,7 @@ class EssentialsUtil extends Util
      */
     public function getEmployeeAllowancesAndDeductions($business_id, $user_id, $start_date = null, $end_date = null)
     {
+        // TODO: add to db
         $query = EssentialsAllowanceAndDeduction::join('essentials_user_allowance_and_deductions as euad', 'euad.allowance_deduction_id', '=', 'essentials_allowances_and_deductions.id')
                 ->where('business_id', $business_id)
                 ->where('euad.user_id', $user_id);

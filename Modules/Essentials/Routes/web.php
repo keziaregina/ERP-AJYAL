@@ -3,6 +3,8 @@
 // use App\Http\Controllers\Modules;
 // use Illuminate\Support\Facades\Route;
 
+use Modules\Essentials\Http\Controllers\OvertimeSheetController;
+
 Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezone', 'AdminSidebarMenu')->group(function () {
     Route::prefix('essentials')->group(function () {
         Route::get('/dashboard', [Modules\Essentials\Http\Controllers\DashboardController::class, 'essentialsDashboard']);
@@ -64,6 +66,7 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
         Route::get('/get-attendance-by-shift', [Modules\Essentials\Http\Controllers\AttendanceController::class, 'getAttendanceByShift']);
         Route::get('/get-attendance-by-date', [Modules\Essentials\Http\Controllers\AttendanceController::class, 'getAttendanceByDate']);
         Route::get('/get-attendance-row/{user_id}', [Modules\Essentials\Http\Controllers\AttendanceController::class, 'getAttendanceRow']);
+        Route::get('/get-attendance-data', [Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'getAttendanceData']);
 
         Route::get(
             '/user-attendance-summary',
@@ -88,5 +91,12 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
         Route::get('/sales-target', [Modules\Essentials\Http\Controllers\SalesTargetController::class, 'index']);
         Route::get('/set-sales-target/{id}', [Modules\Essentials\Http\Controllers\SalesTargetController::class, 'setSalesTarget']);
         Route::post('/save-sales-target', [Modules\Essentials\Http\Controllers\SalesTargetController::class, 'saveSalesTarget']);
+
+
+        // Route for overtime sheets
+        // Route::get('/overtime-sheet', [Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'index']);
+        Route::resource('overtime-sheets', Modules\Essentials\Http\Controllers\OvertimeSheetController::class);
+        Route::get('/print-pdf', [OvertimeSheetController::class, 'exportPdf'])->name('pdfovertime');
+        Route::get('/print-excel', [OvertimeSheetController::class, 'exportExcel'])->name('excelovertime');
     });
 });
