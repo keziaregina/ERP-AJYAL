@@ -336,4 +336,6 @@ return [
     'sick_leave_calculation' => 'Sick Leave Allowance',
     'formula' => 'Formula',
     'example' => 'Example',
+    'add_overtime_hour' => 'Add overtime hour',
+    'edit_overtime_hour' => 'Edit overtime hour',
 ];

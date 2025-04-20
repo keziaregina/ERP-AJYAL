@@ -412,6 +412,14 @@ class OvertimeSheetController extends Controller
         $overtimeData = $this->getOvertimeDataForCurrentMonth();
         $data = $overtimeData['employees'];
         $totalAllOvertime = $overtimeData['total_all_overtime'];
-        return Excel::download(new OvertimeSheetExport($data, $totalAllOvertime), 'overtime_sheet-'.now()->format('F_Y').'.xlsx');        
+        
+        return Excel::download(new OvertimeSheetExport(
+                $data, 
+                now()->format('F'), 
+                now()->format('Y'), 
+                $totalAllOvertime
+            ), 
+            'overtime_sheet-'.now()->format('F_Y').'.xlsx'
+        );        
     }
 }

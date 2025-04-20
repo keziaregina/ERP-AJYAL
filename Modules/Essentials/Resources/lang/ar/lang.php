@@ -336,4 +336,6 @@ return[
     'sick_leave_calculation' => 'بدل الإجازة المرضية',
     'formula' => 'الصيغة',
     'example' => 'مثال',
+    'add_overtime_hour' => 'إضافة ساعة عمل إضافية',
+    'edit_overtime_hour' => 'تعديل ساعة العمل الإضافي',
 ];
