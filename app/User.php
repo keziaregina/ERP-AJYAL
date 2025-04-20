@@ -377,4 +377,34 @@ class User extends Authenticatable
     public function employeeOvertimes(): HasMany {
         return $this->hasMany(EmployeeOvertime::class, 'user_id', 'id');
     }
+
+    /**
+     * Summary of getActiveEmployeesPerBusiness
+     * @param mixed $businessId
+     * @return \Illuminate\Support\Collection<mixed, array{full_name: mixed, id: mixed>|\Illuminate\Support\Collection<mixed, mixed>}
+     */
+    public static function getActiveEmployeesPerBusiness($businessId = null) {
+        $rawEmployees = self::forDropdownWithActive(business_id: $businessId);
+            
+        $employees = collect($rawEmployees)->each(function ($employeeId, $employeName) {
+            return [
+                'id' => $employeeId,
+                'full_name' => $employeName
+            ];
+        });
+        $employees = [];
+
+        foreach ($rawEmployees as $key => $value) {
+            $employees[] = [
+                'id' => $key,
+                'full_name' => $value
+            ];
+        }
+        
+        $employees = collect($employees)->filter(function ($employee) {
+            return isset($employee['id']) && $employee['id'] != '' && $employee['id'] != null;
+        });
+
+        return $employees;
+    }
 }
