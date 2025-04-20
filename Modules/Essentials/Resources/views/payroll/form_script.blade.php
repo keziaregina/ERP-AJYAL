@@ -79,57 +79,228 @@ $(document).ready( function () {
         calculateTotalGrossAmount();
     });
 
-    function calculateTotal (id) {
-        //calculate basic salary
-    	let total_duration = __read_number($("input#essentials_duration_"+id));
-	    let amount_per_unit_duration = __read_number($("input#essentials_amount_per_unit_duration_"+id));
-	    let total = total_duration * amount_per_unit_duration;
-	    __write_number($("input#total_"+id), total, false, 2);
+    function calculateTotal(id) {
+        try {
+            //calculate basic salary
+            let total_duration = __read_number($("input#essentials_duration_"+id));
+            let amount_per_unit_duration = __read_number($("input#essentials_amount_per_unit_duration_"+id));
+            let total = total_duration * amount_per_unit_duration;
+            __write_number($("input#total_"+id), total, false, 2);
 
-        //calculate total allownace
+            // Get food allowance if exists
+            let food_allowance = 0;
+            $("table#allowance_table_"+id).find('tbody tr').each(function () {
+                let description = $(this).find('input[name*="[description]"]').val();
+                if (description && description.toLowerCase().includes('food')) {
+                    food_allowance = __read_number($(this).find('input.allowance'));
+                }
+            });
+
+            // Calculate absent days deduction
+            let absent_days = 0;
+            let vacation_days = 0;
+            let sick_leave_days = 0;
+            let glorious_employee = false;
+
+            // Get attendance data from overtime sheet
+            $.ajax({
+                method: "GET",
+                url: '/hrm/get-attendance-data',
+                data: {
+                    'user_id': id,
+                    'month': $("input[name='transaction_date']").val()
+                },
+                success: function(result) {
+                    absent_days = result.absent_days || 0;
+                    vacation_days = result.vacation_days || 0;
+                    sick_leave_days = result.sick_leave_days || 0;
+                    glorious_employee = result.glorious_employee || false;
+                    overtime_hours = result.overtime_hours || 0;
+
+                    // Calculate absent deduction
+                    let daily_rate = total / 30;
+                    let absent_deduction = daily_rate * absent_days;
+                    
+                    // Calculate vacation deduction
+                    let vacation_deduction = 0;
+                    if (vacation_days > 0) {
+                        let daily_food_allowance = food_allowance / 30;
+                        vacation_deduction = (daily_rate + daily_food_allowance) * vacation_days;
+                    }
+
+                    // Add glorious employee allowance if applicable
+                    let glorious_allowance = 0;
+                    if (glorious_employee) {
+                        glorious_allowance = total * 0.1; // 10% of basic salary
+                    }
+
+                    // Add sick leave allowance if applicable
+                    let sick_leave_allowance = 0;
+                    // if (sick_leave_days > 0) {
+                    //     sick_leave_allowance = daily_rate * sick_leave_days;
+                    // }
+
+                    // Calculate overtime earnings
+                    let overtime_earnings = 0;
+                    if (overtime_hours > 0) {
+                        overtime_earnings = daily_rate * overtime_hours;
+                    }
+
+                    // Update the example calculations in the formulas section
+                    updateFormulaExamples(id, daily_rate, absent_days, vacation_days, food_allowance, total, sick_leave_days);
+
+                    // Add deductions to the deductions table
+                    if (absent_deduction > 0) {
+                        addDeductionRow(id, 'Absent Days Deduction', absent_deduction);
+                    }
+                    if (vacation_deduction > 0) {
+                        addDeductionRow(id, 'Vacation Leave Deduction', vacation_deduction);
+                    }
+
+                    // Add allowances to the allowance table
+                    if (glorious_allowance > 0) {
+                        addAllowanceRow(id, 'Glorious Employee Allowance', glorious_allowance);
+                    }
+                    // if (sick_leave_allowance > 0) {
+                    //     addAllowanceRow(id, 'Sick Leave Allowance', sick_leave_allowance);
+                    // }
+
+                    if (overtime_earnings > 0) {
+                        addAllowanceRow(id, 'Overtime Earnings', overtime_earnings);
+                    }
+
+                    // Recalculate totals
+                    calculateTotalAllowances(id);
+                    calculateTotalDeductions(id);
+                    calculateGrossAmount(id);
+                }
+            });
+        } catch (error) {
+            console.error('Error in calculateTotal:', error);
+        }
+    }
+
+    function updateFormulaExamples(id, daily_rate, absent_days, vacation_days, food_allowance, total, sick_leave_days) {
+        // Update absent calculation example
+        let absent_example = daily_rate * absent_days;
+        $('#absent_calculation_example').text(__currency_trans_from_en(absent_example, true));
+        
+        // Update vacation calculation example
+        let daily_food_allowance = food_allowance / 30;
+        let vacation_example = (daily_rate + daily_food_allowance) * vacation_days;
+        $('#vacation_calculation_example').text(__currency_trans_from_en(vacation_example, true));
+        
+        // Update glorious employee example
+        let glorious_example = total * 0.1;
+        $('#glorious_employee_example').text(__currency_trans_from_en(glorious_example, true));
+        
+        // Update sick leave example
+        let sick_leave_example = daily_rate * sick_leave_days;
+        $('#sick_leave_example').text(__currency_trans_from_en(sick_leave_example, true));
+    }
+
+    function addDeductionRow(id, description, amount) {
+        try {
+            let row = `
+                <tr>
+                    <td>
+                        <input type="text" name="payrolls[${id}][deductions][description][]" value="${description}" class="form-control" readonly>
+                    </td>
+                    <td>
+                        <input type="text" value="fixed" class="form-control" readonly>
+                    </td>
+                    <td>
+                        <input type="text" name="payrolls[${id}][deductions][amount][]" value="${amount}" class="form-control input_number deduction" readonly>
+                    </td>
+                    <td></td>
+                </tr>
+            `;
+            $("table#deductions_table_"+id+" tbody").append(row);
+        } catch (error) {
+            console.error('Error in addDeductionRow:', error);
+        }
+    }
+
+    function addAllowanceRow(id, description, amount) {
+        try {
+            let row = `
+                <tr>
+                    <td>
+                        <input type="text" name="payrolls[${id}][allowances][description][]" value="${description}" class="form-control" readonly>
+                    </td>
+                    <td>
+                        <input type="text" value="fixed" class="form-control" readonly>
+                    </td>
+                    <td>
+                        <input type="text" name="payrolls[${id}][allowances][amount][]" value="${amount}" class="form-control input_number allowance" readonly>
+                    </td>
+                    <td></td>
+                </tr>
+            `;
+            $("table#allowance_table_"+id+" tbody").append(row);
+        } catch (error) {
+            console.error('Error in addAllowanceRow:', error);
+        }
+    }
+
+    function calculateTotalAllowances(id) {
         let total_allowance = 0;
         $("table#allowance_table_"+id).find('tbody tr').each(function () {
-            let type = $(this).find('.amount_type').val();
-            if (type == 'percent') {
-                let percent = __read_number($(this).find('.percent'));
-                let row_total = __calculate_amount('percentage', percent, total);
-                __write_number($(this).find('input.allowance'), row_total);
-            }
             total_allowance += __read_number($(this).find('input.allowance'));
         });
         $('#total_allowances_'+id).text(__currency_trans_from_en(total_allowance, true));
+        return total_allowance;
+    }
 
-        //calculate total deduction
+    function calculateTotalDeductions(id) {
         let total_deduction = 0;
-        $('table#deductions_table_'+id).find('tbody tr').each( function(){
-            let type = $(this).find('.amount_type').val();
-            if (type == 'percent') {
-                let percent = __read_number($(this).find('.percent'));
-                let row_total = __calculate_amount('percentage', percent, total);
-                __write_number($(this).find('input.deduction'), row_total);
-            }
+        $("table#deductions_table_"+id).find('tbody tr').each(function () {
             total_deduction += __read_number($(this).find('input.deduction'));
         });
         $('#total_deductions_'+id).text(__currency_trans_from_en(total_deduction, true));
+        return total_deduction;
+    }
 
-        //calculate gross amount
-        var gross_amount = total + total_allowance - total_deduction;
-        $('#gross_amount_'+id).val(gross_amount);
+    function calculateGrossAmount(id) {
+        let basic_salary = __read_number($("input#total_"+id));
+        let total_allowances = calculateTotalAllowances(id);
+        let total_deductions = calculateTotalDeductions(id);
+        
+        let gross_amount = basic_salary + total_allowances - total_deductions;
+        
+        // Update the gross amount display and hidden input
         $('#gross_amount_text_'+id).text(__currency_trans_from_en(gross_amount, true));
+        __write_number($('#gross_amount_'+id), gross_amount);
+        
+        return gross_amount;
     }
 
-    function calculateTotalGrossAmount () {
-        let total_gross_amount = 0;
-        $("input.gross_amount").each(function () {
-            let gross_amount = __read_number($(this));
-            total_gross_amount += gross_amount;
-        });
-        $('#total_gross_amount').val(total_gross_amount);
+    function calculateTotalGrossAmount() {
+        try {
+            let total_gross = 0;
+            $('input.gross_amount').each(function() {
+                total_gross += __read_number($(this)) || 0;
+            });
+            __write_number($('#total_gross_amount'), total_gross, false, 2);
+        } catch (error) {
+            console.error('Error in calculateTotalGrossAmount:', error);
+        }
     }
 
-    $("table#payroll_table tbody tr").each(function () {
-       calculateTotal($(this).data('id'));
-       calculateTotalGrossAmount();
+    // Initialize calculations for all employees
+    $("#payroll_table tr[data-id]").each(function() {
+        let id = $(this).data('id');
+        if (id) {
+            calculateTotal(id);
+        }
+    });
+
+    // Recalculate on input changes
+    $(document).on('change', '.essentials_duration, .essentials_amount_per_unit_duration, .allowance, .deduction', function() {
+        let id = $(this).closest('tr').data('id');
+        if (id) {
+            calculateTotal(id);
+        }
     });
 });
 </script>

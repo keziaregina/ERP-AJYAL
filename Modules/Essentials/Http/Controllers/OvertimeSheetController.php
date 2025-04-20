@@ -244,6 +244,140 @@ class OvertimeSheetController extends Controller
         }
     }
 
+    /**
+     * Get attendance data for payroll calculations
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAttendanceData(Request $request)
+    {
+        try {
+            $user_id = $request->input('user_id');
+            $month = $request->input('month');
+            
+            if (!$user_id || !$month) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing required parameters'
+                ]);
+            }
+
+            // $start_date = Carbon::parse($month)->startOfMonth();
+            // $end_date = Carbon::parse($month)->endOfMonth();
+
+            // Get overtime records for the month
+            // $overtime_records = EmployeeOvertime::where('user_id', $user_id)
+            //     ->whereDate('created_at', '>=', $start_date)
+            //     ->whereDate('created_at', '<=', $end_date)
+            //     ->get();
+            $overtime_records = EmployeeOvertime::where('user_id', $user_id)
+                ->where('month', date('m'))
+                ->where('year', date('Y'))
+                // ->whereDate('created_at', '<=', $end_date)
+                ->get();
+
+            $overtime_hours = EmployeeOvertime::where('user_id', $user_id)
+                ->where('month', date('m'))
+                ->where('year', date('Y'))
+                ->whereNotIn('total_hour', ['A','VL','SL','GE'])
+                ->pluck('total_hour')
+                ->toArray();
+
+            // Calculate total overtime hours
+            $total_overtime = $this->calculateTotalOvertime($overtime_hours);
+
+            $absent_days = 0;
+            $vacation_days = 0;
+            $sick_leave_days = 0;
+            $glorious_employee = false;
+
+            foreach ($overtime_records as $record) {
+                switch ($record->total_hour) {
+                    case 'A':
+                        $absent_days++;
+                        break;
+                    case 'VL':
+                        $vacation_days++;
+                        break;
+                    case 'SL':
+                        $sick_leave_days++;
+                        break;
+                    case 'GE':
+                        $glorious_employee = true;
+                        break;
+                }
+            }
+
+            Log::info(json_encode([
+                'success' => true,
+                'overtime_hours' => $total_overtime,
+                'absent_days' => $absent_days,
+                'vacation_days' => $vacation_days,
+                'sick_leave_days' => $sick_leave_days,
+                'glorious_employee' => $glorious_employee
+            ],JSON_PRETTY_PRINT));
+
+            return response()->json([
+                'success' => true,
+                'overtime_hours' => $total_overtime,
+                'absent_days' => $absent_days,
+                'vacation_days' => $vacation_days,
+                'sick_leave_days' => $sick_leave_days,
+                'glorious_employee' => $glorious_employee
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Error getting attendance data: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving attendance data'
+            ]);
+        }
+    }
+
+    /**
+     * Calculate total overtime hours from array of time values
+     * Handles format like "2.30" (2 hours 30 minutes)
+     * 
+     * @param array $overtime_hours
+     * @return float
+     */
+    private function calculateTotalOvertime($overtime_hours)
+    {
+        $total_hours = 0;
+        $total_minutes = 0;
+
+        foreach ($overtime_hours as $time) {
+            if (is_numeric($time)) {
+                // Split the time into hours and decimal part
+                $parts = explode('.', (string)$time);
+                
+                // Add hours
+                $total_hours += intval($parts[0]);
+
+                // If there's a decimal part, convert it to minutes
+                if (isset($parts[1])) {
+                    // Convert decimal part to actual minutes (e.g., .30 → 30 minutes)
+                    $minutes = intval($parts[1]);
+                    if ($minutes < 10) {
+                        $minutes *= 10; // Handle single digit decimals (e.g., .3 → 30 minutes)
+                    }
+                    $total_minutes += $minutes;
+                }
+            }
+        }
+
+        // Convert excess minutes to hours
+        $additional_hours = floor($total_minutes / 60);
+        $remaining_minutes = $total_minutes % 60;
+
+        // Calculate final total in decimal format
+        $total = $total_hours + $additional_hours + ($remaining_minutes / 60);
+
+        return round($total, 2);
+    }
+
     public function exportPdf()
     {
         try {

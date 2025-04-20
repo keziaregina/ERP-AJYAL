@@ -328,4 +328,12 @@ return [
     'vacation_leave' => 'Vacation Leave',
     'glorious_employee_allowance' => 'Glorious Employee Allowance',
     'sick_leave' => 'Sick Leave',
+    
+    // Payroll calculation formulas
+    'payroll_calculation_formulas' => 'Payroll Calculation Formulas',
+    'absent_calculation' => 'Absent Days Deduction',
+    'vacation_calculation' => 'Vacation Leave Deduction',
+    'sick_leave_calculation' => 'Sick Leave Allowance',
+    'formula' => 'Formula',
+    'example' => 'Example',
 ];

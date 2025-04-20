@@ -328,4 +328,12 @@ return[
     'vacation_leave' => 'إجازة سنوية',
     'glorious_employee_allowance' => 'بدل الموظف المتميز',
     'sick_leave' => 'إجازة مرضية',
+
+    // Payroll calculation formulas
+    'payroll_calculation_formulas' => 'صيغ حساب الرواتب',
+    'absent_calculation' => 'خصم أيام الغياب',
+    'vacation_calculation' => 'خصم الإجازة السنوية',
+    'sick_leave_calculation' => 'بدل الإجازة المرضية',
+    'formula' => 'الصيغة',
+    'example' => 'مثال',
 ];

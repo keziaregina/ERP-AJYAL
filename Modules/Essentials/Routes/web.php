@@ -66,6 +66,7 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
         Route::get('/get-attendance-by-shift', [Modules\Essentials\Http\Controllers\AttendanceController::class, 'getAttendanceByShift']);
         Route::get('/get-attendance-by-date', [Modules\Essentials\Http\Controllers\AttendanceController::class, 'getAttendanceByDate']);
         Route::get('/get-attendance-row/{user_id}', [Modules\Essentials\Http\Controllers\AttendanceController::class, 'getAttendanceRow']);
+        Route::get('/get-attendance-data', [Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'getAttendanceData']);
 
         Route::get(
             '/user-attendance-summary',
