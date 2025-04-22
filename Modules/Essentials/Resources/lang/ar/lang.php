@@ -338,4 +338,9 @@ return[
     'example' => 'مثال',
     'add_overtime_hour' => 'إضافة ساعة عمل إضافية',
     'edit_overtime_hour' => 'تعديل ساعة العمل الإضافي',
+
+    'select_employee_glorious_this_month' => 'اختر الموظف المتميز لهذا الشهر',
+
+    'employee_glorious_this_month' => 'الموظف المتميز لهذا الشهر',
+
 ];

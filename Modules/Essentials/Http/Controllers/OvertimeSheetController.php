@@ -14,6 +14,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Exports\OvertimeSheetExport;
+use App\GloriousEmployee;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\Eloquent\Builder;
@@ -33,9 +34,7 @@ class OvertimeSheetController extends Controller
     function index()
     {
         try {
-            // dd(Carbon::now()->subDays(8));
             $businessId = request()->session()->get('user.business_id');
-            // $employees = $this->getEmployeesByLocation(businessId: $businessId);
         
             $employees = $this->getActiveEmployeesPerBusiness(businessId: $businessId);
 
@@ -47,7 +46,14 @@ class OvertimeSheetController extends Controller
             $overtimeDatas = $overtimeData['employees'];
             $totalAllOvertime = $overtimeData['total_all_overtime'];
 
-            return view('essentials::overtime_sheets.index')->with(compact('employees', 'daysInMonth', 'overtimeOptions', 'overtimeDatas', 'totalAllOvertime'));
+            $gloriousEmployeeThisMonth = GloriousEmployee::where('month', date('m'))
+            ->where('year', date('Y'))
+            ->get()
+            ->first();
+
+            // dd($gloriousEmployeeThisMonth);
+
+            return view('essentials::overtime_sheets.index')->with(compact('employees', 'daysInMonth', 'overtimeOptions', 'overtimeDatas', 'totalAllOvertime', 'gloriousEmployeeThisMonth'));
         } catch (\Exception $e) {
             Log::error("error on index overtime: "  . $e->getMessage());
             throw $e;
@@ -59,7 +65,6 @@ class OvertimeSheetController extends Controller
         
         try {
 
-            // dd($request->all());
 
             $request->validate([
                 'user_id' => 'required|exists:users,id',
@@ -349,9 +354,12 @@ class OvertimeSheetController extends Controller
         $total_minutes = 0;
 
         foreach ($overtime_hours as $time) {
+            // Convert to string and remove any quotes or special characters
+            $time = str_replace(['"', "'"], '', (string)$time);
+            
             if (is_numeric($time)) {
                 // Split the time into hours and decimal part
-                $parts = explode('.', (string)$time);
+                $parts = explode('.', $time);
                 
                 // Add hours
                 $total_hours += intval($parts[0]);

@@ -4,6 +4,7 @@
 // use Illuminate\Support\Facades\Route;
 
 use Modules\Essentials\Http\Controllers\OvertimeSheetController;
+use Modules\Essentials\Http\Controllers\GloriousEmployeeController;
 
 Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezone', 'AdminSidebarMenu')->group(function () {
     Route::prefix('essentials')->group(function () {
@@ -98,5 +99,9 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
         Route::resource('overtime-sheets', Modules\Essentials\Http\Controllers\OvertimeSheetController::class);
         Route::get('/print-pdf', [OvertimeSheetController::class, 'exportPdf'])->name('pdfovertime');
         Route::get('/print-excel', [OvertimeSheetController::class, 'exportExcel'])->name('excelovertime');
+
+
+        // Route for glorious employee
+        Route::resource('glorious-employee', GloriousEmployeeController::class);
     });
 });

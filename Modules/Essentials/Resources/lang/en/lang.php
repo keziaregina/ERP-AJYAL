@@ -307,9 +307,12 @@ return [
     'sales_targets' => 'Sales targets',
     'get_current_location' => 'Get current location',
     'payroll_cant_be_deleted_if_final' => 'Payroll can not be deleted if status is final',
-    'add_todos' => "Add To Do's",
-    'edit_todos' => "Edit To Do's",
-    'delete_todos' => "Delete To Do's",
+    'add_todos' => 'Add To Do\'s',
+    // 'add_todos' => "Add To Do's",
+    'edit_todos' => 'Edit To Do\'s',
+    // 'edit_todos' => "Edit To Do's",
+    // "delete_todos" => "Delete To Dos",
+    'delete_todos' => 'Delete To Do\'s',
     'attendance_report' => 'Attendance report',
     'is_present' => 'Is Present',
     'days_present' => 'Days Present',
@@ -338,4 +341,7 @@ return [
     'example' => 'Example',
     'add_overtime_hour' => 'Add overtime hour',
     'edit_overtime_hour' => 'Edit overtime hour',
+
+    'select_employee_glorious_this_month' => 'Select Glorious Employee For This Month',
+    'employee_glorious_this_month' => 'Glorious Employee For This Month',
 ];
