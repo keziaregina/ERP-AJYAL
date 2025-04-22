@@ -117,3 +117,41 @@
     @show_tooltip(__('lang_v1.tax_payer_id_help'))
     {!! Form::text('bank_details[tax_payer_id]', !empty($bank_details['tax_payer_id']) ? $bank_details['tax_payer_id'] : null, ['class' => 'form-control', 'id' => 'tax_payer_id', 'placeholder' => __( 'lang_v1.tax_payer_id') ]); !!}
 </div>
+
+{{-- Employee BIC CODE --}}
+<div class="form-group col-md-3">
+
+    {{-- FIXME: dinamically add options --}}
+    {{-- <label for="options">Select or create:</label>
+    <select class="bic-select form-control">
+        <option>orange</option>
+        <option>white</option>
+        <option>purple</option>
+    </select>
+       --}}
+         
+</div>
+
+
+@section('extra_scripts')
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+@endsection
+
+
+@section('custom_scripts')
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".bic-select").select2({
+            tags: true,
+            placeholder: "Select or create...",
+            width: '100%'
+        });
+    });
+</script>
+@endsection

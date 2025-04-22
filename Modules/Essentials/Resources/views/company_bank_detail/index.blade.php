@@ -100,23 +100,6 @@
                         @foreach ($employeeTypes as $key => $value)
                             <option value="{{ $key }}" {{ $companyBankDetail && $companyBankDetail->employee_type_id == $key ? 'selected' : '' }}>{{ $value }}</option>
                         @endforeach
-                        {{-- @if ($companyBankDetail)
-                            @if ($companyBankDetail->employee_type_id == 'C')
-                                <option value="C" selected>@lang('essentials::lang.civil_number')</option>
-                            @else
-                                <option value="P" selected>@lang('essentials::lang.passport_number')</option>
-                            @endif
-                        @else
-                            <option value="C">@lang('essentials::lang.civil_number')</option>
-                            <option value="P">@lang('essentials::lang.passport_number')</option>
-                        @endif --}}
-                        {{-- @foreach ($employees as $employee)
-                            @if ($gloriousEmployeeThisMonth && $employee['id'] == $gloriousEmployeeThisMonth->user_id)
-                                <option value="{{ $employee['id'] }}" selected>{{ $employee['full_name'] }}</option>
-                            @else   
-                                <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>   
-                            @endif
-                        @endforeach --}}
                     </select>
                 </div>
 

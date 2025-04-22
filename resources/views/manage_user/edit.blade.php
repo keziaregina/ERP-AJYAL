@@ -2,6 +2,17 @@
 
 @section('title', __( 'user.edit_user' ))
 
+@section('css')
+<style>
+  
+</style>
+@endsection
+{{-- 
+@section('extra_scripts')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+@endsection --}}
+
 @section('content')
 
 <!-- Content Header (Page header) -->
@@ -209,7 +220,16 @@
     {!! Form::close() !!}
   @stop
 @section('javascript')
+
+{{-- Select2 --}}
+{{-- <script>
+   $(".my-select2").select2({
+        tags: true
+      });
+</script> --}}
+
 <script type="text/javascript">
+
   $(document).ready(function(){
     __page_leave_confirmation('#user_edit_form');
     
