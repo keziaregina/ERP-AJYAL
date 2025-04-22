@@ -4,6 +4,7 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -205,6 +206,49 @@ class User extends Authenticatable
     }
 
     /**
+     * Return list of users dropdown for a business with active status only
+     * 
+     * @param int $business_id int
+     * @param boolean $prepend_none
+     * @param boolean $include_commission_agents
+     * @return array 
+     */
+
+    public static function forDropdownWithActive($business_id, $prepend_none = true, $include_commission_agents = false, $prepend_all = false, $check_location_permission = false, $location_id = null) {
+        $query = User::where('business_id', $business_id)
+                    ->where('status', 'active')
+                    ->user();
+
+        if (! $include_commission_agents) {
+            $query->where('is_cmmsn_agnt', 0);
+        }
+
+        if ($check_location_permission) {
+            $query->onlyPermittedLocations();
+        }
+
+        if (! empty($location_id)) {
+            $query->where('location_id', $location_id);
+        }
+
+        $all_users = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
+        $users = $all_users->pluck('full_name', 'id');
+
+        //Prepend none
+        if ($prepend_none) {
+            $users = $users->prepend(__('lang_v1.none'), '');
+        }
+
+        //Prepend all
+        if ($prepend_all) {
+            $users = $users->prepend(__('lang_v1.all'), '');
+        }
+
+        return $users;
+    }
+
+
+    /**
      * Return list of sales commission agents dropdown for a business
      *
      * @param $business_id int
@@ -323,5 +367,44 @@ class User extends Authenticatable
         }
 
         return $img_src;
+    }
+
+
+    /**\
+     * User's overtime hours relation
+     */
+
+    public function employeeOvertimes(): HasMany {
+        return $this->hasMany(EmployeeOvertime::class, 'user_id', 'id');
+    }
+
+    /**
+     * Summary of getActiveEmployeesPerBusiness
+     * @param mixed $businessId
+     * @return \Illuminate\Support\Collection<mixed, array{full_name: mixed, id: mixed>|\Illuminate\Support\Collection<mixed, mixed>}
+     */
+    public static function getActiveEmployeesPerBusiness($businessId = null) {
+        $rawEmployees = self::forDropdownWithActive(business_id: $businessId);
+            
+        $employees = collect($rawEmployees)->each(function ($employeeId, $employeName) {
+            return [
+                'id' => $employeeId,
+                'full_name' => $employeName
+            ];
+        });
+        $employees = [];
+
+        foreach ($rawEmployees as $key => $value) {
+            $employees[] = [
+                'id' => $key,
+                'full_name' => $value
+            ];
+        }
+        
+        $employees = collect($employees)->filter(function ($employee) {
+            return isset($employee['id']) && $employee['id'] != '' && $employee['id'] != null;
+        });
+
+        return $employees;
     }
 }

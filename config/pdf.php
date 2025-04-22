@@ -12,7 +12,7 @@ return [
     'margin_header'            => 0,
     'margin_footer'            => 0,
     'orientation'              => 'L',
-    'title'                    => 'Laravel mPDF',
+    'title'                    => 'Ajyal Almadina - Export PDF',
     'subject'                  => '',
     'author'                   => '',
     'watermark'                => '',

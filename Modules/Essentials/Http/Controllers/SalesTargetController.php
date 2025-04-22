@@ -2,14 +2,15 @@
 
 namespace Modules\Essentials\Http\Controllers;
 
+use DB;
 use App\User;
 use App\Utils\ModuleUtil;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Modules\Essentials\Entities\EssentialsUserSalesTarget;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
+use Modules\Essentials\Entities\EssentialsUserSalesTarget;
 
 class SalesTargetController extends Controller
 {
@@ -44,9 +45,15 @@ class SalesTargetController extends Controller
             $users = User::where('business_id', $business_id)
                         ->user()
                         ->where('allow_login', 1)
+                        ->where('status', 'active')
                         ->select(['id',
                             DB::raw("CONCAT(COALESCE(surname, ''), ' ', COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as full_name"), ]);
+            // $users = User::getActiveEmployeesPerBusiness(businessId: $business_id)->values()->toArray();
 
+            Log::info("users on sales targer------------>");
+            Log::info(json_encode($users, JSON_PRETTY_PRINT));
+
+            // die;
             return Datatables::of($users)
                 ->addColumn(
                     'action',

@@ -151,7 +151,7 @@ class EssentialsLeaveController extends Controller
         }
         $users = [];
         if ($can_crud_all_leave || auth()->user()->can('essentials.approve_leave')) {
-            $users = User::forDropdown($business_id, false);
+            $users = User::forDropdownWithActive($business_id, false);
         }
         $leave_statuses = $this->leave_statuses;
 
@@ -178,7 +178,7 @@ class EssentialsLeaveController extends Controller
 
         $employees = [];
         if (auth()->user()->can('essentials.crud_all_leave')) {
-            $employees = User::forDropdown($business_id, false, false, false, true);
+            $employees = User::forDropdownWithActive($business_id, false, false, false, true);
         }
 
         return view('essentials::leave.create')->with(compact('leave_types', 'instructions', 'employees'));

@@ -61,6 +61,60 @@
                             <p class="help-block text-muted">@lang('essentials::lang.payroll_cant_be_deleted_if_final')</p>
                         </div>
                     </div><br><br>
+                    
+                    <!-- Payroll Calculation Formulas Section -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">@lang('essentials::lang.payroll_calculation_formulas')</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>@lang('essentials::lang.absent_calculation')</label>
+                                                <div class="well well-sm">
+                                                    <p><strong>@lang('essentials::lang.formula')</strong>: Basic salary ÷ 30 days × Number of absent days</p>
+                                                    <p><strong>@lang('essentials::lang.example')</strong>: <span id="absent_calculation_example">0</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>@lang('essentials::lang.vacation_calculation')</label>
+                                                <div class="well well-sm">
+                                                    <p><strong>@lang('essentials::lang.formula')</strong>: (Basic salary ÷ 30 days + Food allowance ÷ 30 days) × Number of vacation days</p>
+                                                    <p><strong>@lang('essentials::lang.example')</strong>: <span id="vacation_calculation_example">0</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>@lang('essentials::lang.glorious_employee_allowance')</label>
+                                                <div class="well well-sm">
+                                                    <p><strong>@lang('essentials::lang.formula')</strong>: Basic salary × 10%</p>
+                                                    <p><strong>@lang('essentials::lang.example')</strong>: <span id="glorious_employee_example">0</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>@lang('essentials::lang.sick_leave_calculation')</label>
+                                                <div class="well well-sm">
+                                                    <p><strong>@lang('essentials::lang.formula')</strong>: Basic salary ÷ 30 days × Number of sick leave days</p>
+                                                    <p><strong>@lang('essentials::lang.example')</strong>: <span id="sick_leave_example">0</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <table class="table" id="payroll_table">
                         <tr>
                             <th>

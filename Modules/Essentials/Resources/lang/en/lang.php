@@ -315,4 +315,27 @@ return [
     'days_present' => 'Days Present',
     'days_absent' => 'Days Absent',
     'attendace_report_for' => 'Attendance Report for',
+
+
+    // Overtime sheets
+    'overtime_sheets' => 'Overtime Sheets',
+    'manage_your_overtime_sheets' => 'Manage your overtime sheets',
+    'employee_name' => 'Employee Name',
+    'add_new_overtime' => 'Add Overtime Hour',
+    'select_overtime_hours' => 'Select Overtime Hours',
+    'overtime_hours' => 'Overtime Hours',
+    'legend' => 'Legend',
+    'vacation_leave' => 'Vacation Leave',
+    'glorious_employee_allowance' => 'Glorious Employee Allowance',
+    'sick_leave' => 'Sick Leave',
+    
+    // Payroll calculation formulas
+    'payroll_calculation_formulas' => 'Payroll Calculation Formulas',
+    'absent_calculation' => 'Absent Days Deduction',
+    'vacation_calculation' => 'Vacation Leave Deduction',
+    'sick_leave_calculation' => 'Sick Leave Allowance',
+    'formula' => 'Formula',
+    'example' => 'Example',
+    'add_overtime_hour' => 'Add overtime hour',
+    'edit_overtime_hour' => 'Edit overtime hour',
 ];

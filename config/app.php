@@ -203,7 +203,8 @@ return [
         Knox\Pesapal\PesapalServiceProvider::class,
 
         Barryvdh\DomPDF\ServiceProvider::class,
-        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class
+        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class, // used pdf laravel
+        Maatwebsite\Excel\ExcelServiceProvider::class,
     ],
 
     /*
@@ -231,7 +232,7 @@ return [
         'Pesapal' => Knox\Pesapal\Facades\Pesapal::class,
         'DomPDF' => Barryvdh\DomPDF\Facade\Pdf::class,
 
-        
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'PDH' => Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::class
     ])->toArray(),
 ];

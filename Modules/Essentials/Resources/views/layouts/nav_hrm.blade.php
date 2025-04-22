@@ -42,6 +42,8 @@
                     @if(auth()->user()->can('edit_essentials_settings'))
                         <li @if(request()->segment(1) == 'hrm' && request()->segment(2) == 'settings') class="active" @endif><a href="{{action([\Modules\Essentials\Http\Controllers\EssentialsSettingsController::class, 'edit'])}}">@lang('business.settings')</a></li>
                     @endif
+
+                    <li><a href="{{action([\Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'index'])}}">@lang('essentials::lang.overtime_sheets')</a></li>
                 </ul>
 
             </div><!-- /.navbar-collapse -->

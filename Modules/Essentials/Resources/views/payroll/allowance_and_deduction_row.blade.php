@@ -21,7 +21,7 @@
         {!! Form::text($name_col . '[]', !empty($name) ? $name : null, ['class' => 'form-control input-sm' ]); !!}
     </td>
     <td>
-        {!! Form::select($type_col . '[]', ['fixed' => __('lang_v1.fixed'), 'percent' => __('lang_v1.percentage')], $amount_type, ['class' => 'form-control input-sm amount_type' ]); !!}
+        {!! Form::select($type_col . '[]', ['fixed' => __('lang_v1.fixed'), 'percent' => __('lang_v1.percentage'), 'overtime' => __('lang_v1.overtime')], $amount_type, ['class' => 'form-control input-sm amount_type' ]); !!}
         <div class="input-group percent_field @if($amount_type != 'percent') hide @endif">
             {!! Form::text($percent_col . '[]', @num_format($percent), ['class' => 'form-control input-sm input_number percent']); !!}
             <span class="input-group-addon"><i class="fa fa-percent"></i></span>

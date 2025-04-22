@@ -162,7 +162,8 @@ class PayrollController extends Controller
 
         $employees = [];
         if (auth()->user()->can('essentials.create_payroll')) {
-            $employees = $this->__getEmployeesByLocation($business_id);
+            // $employees = $this->__getEmployeesByLocation($business_id);
+            $employees = User::forDropdownWithActive(business_id: $business_id);
         }
         $departments = Category::forDropdown($business_id, 'hrm_department');
         $designations = Category::forDropdown($business_id, 'hrm_designation');
@@ -1159,7 +1160,8 @@ class PayrollController extends Controller
         try {
             $location_id = $request->get('location_id');
 
-            $employees = $this->__getEmployeesByLocation($business_id, $location_id);
+            // $employees = $this->__getEmployeesByLocation($business_id, $location_id);
+            $employees = User::forDropdownWithActive(business_id: $business_id, location_id: $location_id);
 
             //dynamically generate dropdown
             $employees_html = view('essentials::payroll.partials.employee_dropdown')
