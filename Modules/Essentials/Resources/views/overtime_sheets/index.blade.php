@@ -138,18 +138,6 @@
                     @else
                         <p>-</p>
                     @endif
-                    {{-- <select name="user_id" id="user_id" class="form-control" required>
-                        <option value="">@lang('essentials::lang.select_employee')</option>
-                        @foreach ($employees as $employee)
-                            <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
-                        @endforeach
-                    </select> --}}
-
-                    {{-- @can('essentials.add_overtime_hour')
-                    @slot('tool') --}}
-                     
-                    {{-- @endslot
-                @endcan --}}
                 </div>
             </div>
 
@@ -188,13 +176,13 @@
                         </div>
                             
                         <div class="form-group">
-                            {{-- <label for="overtime_hours">@lang('essentials::lang.overtime_hours')</label>
+                            <label for="overtime_hours">@lang('essentials::lang.overtime_hours')</label>
                             <select name="overtime_hours" id="overtime_hours" class="form-control" required>
                                 <option value="">@lang('essentials::lang.select_overtime_hours')</option>
                                 @foreach ($overtimeOptions as $key => $value)
                                     <option value="{{ $key }}">{{ $value }}</option>
                                 @endforeach
-                            </select> --}}
+                            </select>
                         </div>
                     </div>
                     

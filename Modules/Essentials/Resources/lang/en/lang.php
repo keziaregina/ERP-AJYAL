@@ -344,4 +344,19 @@ return [
 
     'select_employee_glorious_this_month' => 'Select Glorious Employee For This Month',
     'employee_glorious_this_month' => 'Glorious Employee For This Month',
+
+    'company_bank_detail' => 'Company Bank Detail',
+    'manage_your_company_bank_detail' => 'Manage Your Company Bank Detail',
+
+    'employer_cr_no' => 'Employer CR No',
+    'payer_cr_no' => 'Payer CR No',
+    'payer_bank_short_name' => 'Payer Bank Short Name',
+    'payer_account_number' => 'Payer Account Number',
+
+
+    'civil_number' => 'Civil Number',
+    'passport_number' => 'Passport Number',
+    
+    'employee_type' => 'Employee Type',
+    'select_employee_type' => 'Select Employee Type',
 ];

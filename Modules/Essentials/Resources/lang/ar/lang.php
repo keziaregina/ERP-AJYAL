@@ -343,4 +343,19 @@ return[
 
     'employee_glorious_this_month' => 'الموظف المتميز لهذا الشهر',
 
+    'company_bank_detail' => 'تفاصيل بنك الشركة',
+
+    'manage_your_company_bank_detail' => 'إدارة تفاصيل حسابك البنكي للشركة'
+
+
+    'employer_cr_no' => 'Employer CR No',
+    'payer_cr_no' => 'Payer CR No',
+    'payer_bank_short_name' => 'Payer Bank Short Name',
+    'payer_account_number' => 'Payer Account Number',
+
+    'civil_number' => 'الرقم المدني',
+    'passport_number' => 'رقم جواز السفر',
+
+    'select_employee_type' => 'حدد نوع الموظف',
+    'employee_type' => 'نوع الموظف',
 ];

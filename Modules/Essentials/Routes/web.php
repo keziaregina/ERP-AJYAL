@@ -3,6 +3,7 @@
 // use App\Http\Controllers\Modules;
 // use Illuminate\Support\Facades\Route;
 
+use Modules\Essentials\Http\Controllers\CompanyBankDetailController;
 use Modules\Essentials\Http\Controllers\OvertimeSheetController;
 use Modules\Essentials\Http\Controllers\GloriousEmployeeController;
 
@@ -103,5 +104,8 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
 
         // Route for glorious employee
         Route::resource('glorious-employee', GloriousEmployeeController::class);
+
+        // Route for company bank detail
+        Route::resource('company-bank-details', CompanyBankDetailController::class);
     });
 });
