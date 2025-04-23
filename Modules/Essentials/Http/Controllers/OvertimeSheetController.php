@@ -41,6 +41,8 @@ class OvertimeSheetController extends Controller
 
             $daysInMonth = Carbon::now()->month(date('m'))->daysInMonth;
             $overtimeOptions = EmployeeOvertime::OVERTIME_HOURS;
+            $findKey = array_search('Glorious Employee Allowance', $overtimeOptions);
+            unset($overtimeOptions[$findKey]);
 
             // Get overtime data for the current month
             $overtimeData = $this->getOvertimeDataForCurrentMonth();
