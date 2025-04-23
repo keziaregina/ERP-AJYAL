@@ -136,6 +136,22 @@
     </select>
   </div>
 
+  {{-- Salary Frecuency --}}
+<div class="form-group col-md-3">
+    <label for="color-select">Select or Create Salary Code</label>
+    <select name="salary_code" id="user_salary_code" placeholder="" autocomplete="off">
+        <option disabled selected>Select Salary Code</option>
+        @foreach ($salaryCode as $Scode)
+        
+        @if ($Scode['id'] == $user->salary_id)
+        <option value="{{ $Scode['id'] }}" selected>{{ $Scode['name'] }}</option>
+        @else
+        <option value="{{ $Scode['id'] }}">{{ $Scode['name'] }}</option>
+        @endif
+        @endforeach
+    </select>
+  </div>
+
 
 @section('extra_scripts')
     <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
@@ -153,6 +169,15 @@
 {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
 <script>
     new TomSelect("#user_bank_code", {
+      create: true,
+      maxItems: 1,
+      persist: false,
+	createOnBlur: true,
+    });
+  </script>
+
+<script>
+    new TomSelect("#user_salary_code", {
       create: true,
       maxItems: 1,
       persist: false,

@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Events\UserCreatedOrModified;
+use App\SalaryFrequency;
 use Spatie\Activitylog\Models\Activity;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -206,6 +207,7 @@ class ManageUserController extends Controller
 
         $businessId = Auth::user()->business_id;
         $bicCode = EmployeeBicCode::where('business_id', $businessId)->get();
+        $salaryCode = SalaryFrequency::where('business_id', $businessId)->get();
 
         $roles = $this->getRolesArray($business_id);
 
@@ -227,7 +229,7 @@ class ManageUserController extends Controller
         $form_partials = $this->moduleUtil->getModuleData('moduleViewPartials', ['view' => 'manage_user.edit', 'user' => $user]);
         
         return view('manage_user.edit')
-                ->with(compact('roles', 'user', 'contact_access', 'is_checked_checkbox', 'locations', 'permitted_locations', 'form_partials', 'username_ext', 'bicCode'));
+                ->with(compact('roles', 'user', 'contact_access', 'is_checked_checkbox', 'locations', 'permitted_locations', 'form_partials', 'username_ext', 'bicCode', 'salaryCode'));
     }
 
     /**
@@ -265,6 +267,17 @@ class ManageUserController extends Controller
                     'business_id' => Auth::user()->business_id,
                 ]);
                 $user_data['bic_id'] = $newBic->id;
+            }
+
+            $salary = SalaryFrequency::find($request->salary_code);
+            if ($salary) {
+                $user_data['salary_id'] = $request->salary_code;
+            } else {
+                $newSalary = SalaryFrequency::create([
+                    'name' => $request->salary_code,
+                    'business_id' => Auth::user()->business_id,
+                ]);
+                $user_data['salary_id'] = $newSalary->id;
             }
 
             $user_data['status'] = ! empty($request->input('is_active')) ? 'active' : 'inactive';
