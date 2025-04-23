@@ -11,6 +11,8 @@
             /* background-color: #007bff; */
         }        
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
 @endsection
 
 @section('content')
@@ -47,7 +49,7 @@
                     Excel
                 </a>
             </div>
-            @can('essentials.add_overtime_hour')
+            @can('essentials.add_overtime_hour', 'essentials.edit_overtime_hour')
                 @slot('tool')
                     <div class="box-tools">
                         <!-- Button trigger modal -->
@@ -104,19 +106,31 @@
                 <form action="{{ action([\Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'store']) }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <div class="form-group">
+                        <div class="form-group {{ auth()->user()->hasRole('Admin#1') ?: 'hidden' }}">
                             <label for="user_id">@lang('essentials::lang.employee_name')</label>
                             <select name="user_id" id="user_id" class="form-control" required>
-                                <option value="">@lang('essentials::lang.select_employee')</option>
-                                @foreach ($employees as $employee)
-                                    <option value="{{ $employee->id }}">{{ $employee->full_name }}</option>
-                                @endforeach
+                                @if (auth()->user()->hasRole('Admin#1'))
+                                    <option value="">@lang('essentials::lang.select_employee')</option>
+                                    @foreach ($employees as $employee)
+                                        <option value="{{ $employee->id }}">{{ $employee->full_name }}</option>
+                                    @endforeach
+                                @else
+                                    <option selected value="{{ auth()->user()->id}}">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</option>
+                                @endif
+                                
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label for="date">@lang('essentials::lang.date')</label>
-                            <input type="date" name="date" id="date" class="form-control" value="{{ date('Y-m-d') }}" disabled>
+                            @if (auth()->user()->hasRole('Admin#1'))
+                                <input type="text" name="date" id="date" 
+                                class="form-control datepicker"
+                                value="{{ date('Y-m-d') }}"
+                                max="{{ date('Y-m-d') }}">
+                            @else
+                                <input type="date" name="date" id="date" class="form-control" value="{{ date('Y-m-d') }}" disabled>
+                            @endif
                         </div>
                             
                         <div class="form-group">
@@ -140,4 +154,31 @@
         </div>
     </div>
         
+@endsection
+
+@section('javascript')
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            flatpickr(".datepicker", {
+                dateFormat: "Y-m-d",
+                maxDate: "today",
+                minDate: firstDayOfMonth,
+                disable: [
+                    function(date) {
+                        return date > today;
+                    }
+                ],
+                @if(!auth()->user()->hasRole('Admin#1'))
+                defaultDate: "today",
+                @endif
+                theme: "material_blue",
+                showMonths: 1,
+                static: true
+            });
+        });
+    </script>
 @endsection
