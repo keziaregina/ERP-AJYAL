@@ -120,31 +120,46 @@
 
 {{-- Employee BIC CODE --}}
 <div class="form-group col-md-3">
-
-    {{-- FIXME: dinamically add options --}}
-    {{-- <label for="options">Select or create:</label>
-    <select class="bic-select form-control">
-        <option>orange</option>
-        <option>white</option>
-        <option>purple</option>
+    <label for="color-select">Select or Create Bic Code</label>
+    {{-- <input id="user_bank_code" value="salkdhsa" autocomplete="off" placeholder=""> --}}
+    {{-- @dd($bicCode) --}}
+    <select name="bic_code" id="user_bank_code" placeholder="" autocomplete="off">
+        <option disabled selected>Select Bic Code</option>
+        @foreach ($bicCode as $code)
+        
+        @if ($code['id'] == $user->bic_id)
+        <option value="{{ $code['id'] }}" selected>{{ $code['name'] }}</option>
+        @else
+        <option value="{{ $code['id'] }}">{{ $code['name'] }}</option>
+        @endif
+        @endforeach
     </select>
-       --}}
-         
-</div>
+  </div>
 
 
 @section('extra_scripts')
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
+{{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 
 @endsection
 
 
 @section('custom_scripts')
 {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
+<script>
+    new TomSelect("#user_bank_code", {
+      create: true,
+      maxItems: 1,
+      persist: false,
+	createOnBlur: true,
+    });
+  </script>
+
 <script type="text/javascript">
     $(document).ready(function(){
         $(".bic-select").select2({
