@@ -116,6 +116,7 @@ $(document).ready( function () {
                     sick_leave_days = result.sick_leave_days || 0;
                     glorious_employee = result.glorious_employee || false;
                     overtime_hours = result.overtime_hours || 0;
+                    decimal_breakpoint = result.decimal_breakpoint || 3;
 
                     // Calculate absent deduction
                     let daily_rate = total / 30;
@@ -151,22 +152,22 @@ $(document).ready( function () {
 
                     // Add deductions to the deductions table
                     if (absent_deduction > 0) {
-                        addDeductionRow(id, 'Absent Days Deduction', absent_deduction);
+                        addDeductionRow(id, 'Absent Days Deduction', absent_deduction.toFixed(decimal_breakpoint));
                     }
                     if (vacation_deduction > 0) {
-                        addDeductionRow(id, 'Vacation Leave Deduction', vacation_deduction);
+                        addDeductionRow(id, 'Vacation Leave Deduction', vacation_deduction.toFixed(decimal_breakpoint));
                     }
 
                     // Add allowances to the allowance table
                     if (glorious_allowance > 0) {
-                        addAllowanceRow(id, 'Glorious Employee Allowance', glorious_allowance);
+                        addAllowanceRow(id, 'Glorious Employee Allowance', glorious_allowance.toFixed(decimal_breakpoint));
                     }
                     // if (sick_leave_allowance > 0) {
                     //     addAllowanceRow(id, 'Sick Leave Allowance', sick_leave_allowance);
                     // }
 
                     if (overtime_earnings > 0) {
-                        addAllowanceRow(id, 'Overtime Earnings', overtime_earnings);
+                        addAllowanceRow(id, 'Overtime Earnings', overtime_earnings.toFixed(decimal_breakpoint));
                     }
 
                     // Recalculate totals

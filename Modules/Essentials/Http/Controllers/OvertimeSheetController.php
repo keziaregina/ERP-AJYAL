@@ -6,6 +6,7 @@ use App\User;
 use Carbon\Carbon;
 use App\Utils\Util;
 use App\EmployeeOvertime;
+use App\GloriousEmployee;
 use App\Utils\ModuleUtil;
 use App\Utils\BusinessUtil;
 use Illuminate\Http\Request;
@@ -14,8 +15,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Exports\OvertimeSheetExport;
-use App\GloriousEmployee;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Essentials\Utils\EssentialsUtil;
@@ -276,6 +277,8 @@ class OvertimeSheetController extends Controller
             //     ->whereDate('created_at', '>=', $start_date)
             //     ->whereDate('created_at', '<=', $end_date)
             //     ->get();
+            $decimalBreakPoint = Auth::user()->business->currency_precision;
+
             $overtime_records = EmployeeOvertime::where('user_id', $user_id)
                 ->where('month', date('m'))
                 ->where('year', date('Y'))
@@ -324,12 +327,13 @@ class OvertimeSheetController extends Controller
             ],JSON_PRETTY_PRINT));
 
             return response()->json([
-                'success' => true,
-                'overtime_hours' => $total_overtime,
-                'absent_days' => $absent_days,
-                'vacation_days' => $vacation_days,
-                'sick_leave_days' => $sick_leave_days,
-                'glorious_employee' => $glorious_employee
+                'success'            => true,
+                'overtime_hours'     => $total_overtime,
+                'absent_days'        => $absent_days,
+                'vacation_days'      => $vacation_days,
+                'sick_leave_days'    => $sick_leave_days,
+                'glorious_employee'  => $glorious_employee,
+                'decimal_breakpoint' => $decimalBreakPoint
             ]);
 
         } catch (\Exception $e) {
