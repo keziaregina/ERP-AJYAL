@@ -18,4 +18,5 @@ return [
     'expense_report' => 'تقرير المصاريف',
     'activity_log' => 'سجل الأنشطة',
     'contacts_report' => 'تقرير الاتصالات',
+    'overtime'=> 'تقرير الوقت الإضافي',
 ];

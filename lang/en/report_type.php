@@ -18,4 +18,5 @@ return [
     'expense_report'             => 'Expense Report',
     'activity_log'               => 'Activity Log',
     'contacts_report'            => 'Contacts Report',
+    'overtime'                   => 'Overtime Report',
 ];
