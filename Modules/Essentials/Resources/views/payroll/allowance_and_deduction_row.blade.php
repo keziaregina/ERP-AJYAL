@@ -15,6 +15,7 @@
 
     $amount_type = !empty($amount_type) ? $amount_type : 'fixed';
     $percent = $amount_type == 'percent' && !empty($percent) ?  $percent : 0;
+
 @endphp
 <tr>
     <td>
@@ -29,14 +30,23 @@
         </div>
     </td>
     
+    {{-- @dump($name)
+    @dump($val_col)
+    @dump($value) --}}
     {{-- Overtime Hours --}}
+    @if ($type == 'allowance' && str_contains($name, 'Overtime') )
     <td>
         @php
             $readonly = $amount_type == 'percent' ? 'readonly' : '';
         @endphp
-        {!! Form::text($val_col . '[]',  0, ['class' => 'form-control input-sm value_field input_number ' . $val_class, $readonly ]); !!}
-        {{-- {!! Form::text($val_col . '[]', !empty($value) ? @num_format((float) $value) : 0, ['class' => 'form-control input-sm value_field input_number ' . $val_class, $readonly ]); !!} --}}
+        {!! Form::text('payrolls['.$employee.'][overtime_hours][]',  0, ['class' => 'form-control input-sm value_field input_number ' . 'overtime_hours', $readonly ]); !!}
     </td>
+    @elseif ($type == 'allowance' && !str_contains($name, 'Overtime') )
+        <td>
+
+        </td>
+    @endif
+    {{-- @dump($name) --}}
 
     <td>
         @php

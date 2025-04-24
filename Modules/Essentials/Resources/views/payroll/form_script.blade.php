@@ -79,6 +79,44 @@ $(document).ready( function () {
         calculateTotalGrossAmount();
     });
 
+    // On overtime hours change
+    $(document).on('change', '.overtime_hours', function() {
+        let id = $(this).parent().parent().parent().parent().data('id');
+        let hours = __read_number($(this));
+        let $this = $(this); // Store reference to use inside AJAX
+
+        $.ajax({
+            method: "GET",
+            url: '/hrm/get-attendance-data',
+            data: {
+                'user_id': id,
+                'month': $("input[name='transaction_date']").val()
+            },
+            success: function(result) {
+                let overtime_fee = result.overtime_fee || 0;
+                let decimal_breakpoint = result.decimal_breakpoint || 3;
+                
+                // Calculate overtime pay (hours * overtime_fee)
+                let overtimePay = hours * overtime_fee;
+                console.log('Overtime Fee:', overtime_fee);
+                console.log('Hours:', hours);
+                console.log('Overtime Pay:', overtimePay);
+                
+                // Update the allowance amount
+                __write_number($this.closest('tr').find('input.allowance'), overtimePay.toFixed(decimal_breakpoint), false, 2);
+                
+                // Update the total allowance
+                // let total_allowance = __read_number($this.closest('tr').find('input.allowance'));
+                // __write_number($this.closest('tr').find('input.allowance'), total_allowance + overtimePay.toFixed(decimal_breakpoint), false, 2);
+
+                // Recalculate totals
+                calculateTotal(id);
+                calculateTotalAllowances(id);
+                calculateTotalGrossAmount();
+            }
+        });
+    });
+
     function calculateTotal(id) {
         try {
             //calculate basic salary
@@ -117,14 +155,21 @@ $(document).ready( function () {
                     glorious_employee = result.glorious_employee || false;
                     overtime_hours = result.overtime_hours || 0;
                     decimal_breakpoint = result.decimal_breakpoint || 3;
+                    overtime_fee = result.overtime_fee || 0;
+
+                    // console.log("basic salary");
+                    // console.log(total);
 
                     // Calculate absent deduction
                     let daily_rate = total / 30;
                     let absent_deduction = daily_rate * absent_days;
+
                     
                     // Calculate vacation deduction
                     let vacation_deduction = 0;
                     if (vacation_days > 0) {
+                        console.log("vacation days");
+                        console.log(vacation_days);
                         let daily_food_allowance = food_allowance / 30;
                         vacation_deduction = (daily_rate + daily_food_allowance) * vacation_days;
                     }
@@ -144,24 +189,34 @@ $(document).ready( function () {
                     // Calculate overtime earnings
                     let overtime_earnings = 0;
                     if (overtime_hours > 0) {
-                        overtime_earnings = daily_rate * overtime_hours;
+                        // overtime_earnings = daily_rate * overtime_hours;
+                        overtime_earnings = overtime_fee * overtime_hours;
                     }
 
                     // Update the example calculations in the formulas section
                     updateFormulaExamples(id, daily_rate, absent_days, vacation_days, food_allowance, total, sick_leave_days);
 
+                    // Clear the deductions table
+                    $("table#deductions_table_"+id+" tbody").empty();
+
                     // Add deductions to the deductions table
                     if (absent_deduction > 0) {
                         addDeductionRow(id, 'Absent Days Deduction', absent_deduction.toFixed(decimal_breakpoint));
+                    } else {
+                        addDeductionRow(id, 'Absent Days Deduction', 0);
                     }
+
+
                     if (vacation_deduction > 0) {
                         addDeductionRow(id, 'Vacation Leave Deduction', vacation_deduction.toFixed(decimal_breakpoint));
+                    } else {
+                        addDeductionRow(id, 'Vacation Leave Deduction', 0);
                     }
 
                     // Add allowances to the allowance table
                     if (glorious_allowance > 0) {
                         addAllowanceRow(id, 'Glorious Employee Allowance', glorious_allowance.toFixed(decimal_breakpoint));
-                    }
+                    } 
                     // if (sick_leave_allowance > 0) {
                     //     addAllowanceRow(id, 'Sick Leave Allowance', sick_leave_allowance);
                     // }
@@ -216,6 +271,10 @@ $(document).ready( function () {
                     <td></td>
                 </tr>
             `;
+            // // Clear all fields
+            // $("table#deductions_table_"+id+" tbody").empty();
+
+            // Append the new row
             $("table#deductions_table_"+id+" tbody").append(row);
         } catch (error) {
             console.error('Error in addDeductionRow:', error);
@@ -247,8 +306,12 @@ $(document).ready( function () {
     function calculateTotalAllowances(id) {
         let total_allowance = 0;
         $("table#allowance_table_"+id).find('tbody tr').each(function () {
+            // console.log($(this).find('input.allowance'));
             total_allowance += __read_number($(this).find('input.allowance'));
         });
+
+        console.log("TOTAL ALLOWANCE");
+        console.log(total_allowance);
         $('#total_allowances_'+id).text(__currency_trans_from_en(total_allowance, true));
         return total_allowance;
     }
@@ -259,6 +322,10 @@ $(document).ready( function () {
             total_deduction += __read_number($(this).find('input.deduction'));
         });
         $('#total_deductions_'+id).text(__currency_trans_from_en(total_deduction, true));
+
+        console.log("TOTAL DEDUCTION");
+        console.log(total_deduction);
+
         return total_deduction;
     }
 
@@ -267,7 +334,19 @@ $(document).ready( function () {
         let total_allowances = calculateTotalAllowances(id);
         let total_deductions = calculateTotalDeductions(id);
         
+        console.log("BASIC SALARY");
+        console.log(basic_salary);
+        console.log("TOTAL ALLOWANCES");
+        console.log(total_allowances);
+        console.log("TOTAL DEDUCTIONS");
+        console.log(total_deductions);
+
+        
+
         let gross_amount = basic_salary + total_allowances - total_deductions;
+
+        console.log("GROSS AMOUNT");    
+        console.log(gross_amount);
         
         // Update the gross amount display and hidden input
         $('#gross_amount_text_'+id).text(__currency_trans_from_en(gross_amount, true));

@@ -183,6 +183,13 @@ class OvertimeSheetController extends Controller
                         $overtimeData[$overtime->day] = $overtime->total_hour;
                     }
                 }
+                
+                // Log::info("EMPLOYEE-------------->");
+                // Log::info(json_encode($employee['id'],JSON_PRETTY_PRINT));
+
+                // Log::info("OVERTIME DATA-------------->");
+                // Log::info(json_encode($overtimeData,JSON_PRETTY_PRINT));
+
 
                 $filteredOvertimeData = collect(array_values($overtimeData))->filter(function ($value) {
                     return $value != 'A' && $value != 'VL' && $value != 'GE' && $value != 'SL';
@@ -235,6 +242,8 @@ class OvertimeSheetController extends Controller
             // Format the total to ensure minutes have two digits
             $totalAllOvertime = number_format($totalAllOvertime, 2, '.', '');
 
+            Log::info(json_encode($totalAllOvertime,JSON_PRETTY_PRINT));
+
             // Add the total to the result
             $resultWithTotal = [
                 'employees' => $result,
@@ -278,12 +287,20 @@ class OvertimeSheetController extends Controller
             //     ->whereDate('created_at', '<=', $end_date)
             //     ->get();
             $decimalBreakPoint = Auth::user()->business->currency_precision;
+            $overtimeBonusFee = Auth::user()->business->essentialsAllowanceAndDeductions()->where('description', 'ساعات عمل إضافية Overtime')->first()->amount;
+
+            Log::info(json_encode($overtimeBonusFee,JSON_PRETTY_PRINT));
+            Log::info(json_encode("id user"));
+            Log::info(json_encode($user_id));
 
             $overtime_records = EmployeeOvertime::where('user_id', $user_id)
                 ->where('month', date('m'))
                 ->where('year', date('Y'))
                 // ->whereDate('created_at', '<=', $end_date)
                 ->get();
+
+            Log::info(json_encode($overtime_records,JSON_PRETTY_PRINT));
+                
 
             $overtime_hours = EmployeeOvertime::where('user_id', $user_id)
                 ->where('month', date('m'))
@@ -333,7 +350,8 @@ class OvertimeSheetController extends Controller
                 'vacation_days'      => $vacation_days,
                 'sick_leave_days'    => $sick_leave_days,
                 'glorious_employee'  => $glorious_employee,
-                'decimal_breakpoint' => $decimalBreakPoint
+                'decimal_breakpoint' => $decimalBreakPoint,
+                'overtime_fee'       => $overtimeBonusFee
             ]);
 
         } catch (\Exception $e) {
