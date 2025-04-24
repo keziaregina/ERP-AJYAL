@@ -326,4 +326,5 @@ return [
     'overtime_hours' => 'Overtime Hours',
     'add_overtime_hour' => 'Add overtime hour',
     'edit_overtime_hour' => 'Edit overtime hour',
+    'export_overtime_hour' => 'Export overtime hour',
 ];
