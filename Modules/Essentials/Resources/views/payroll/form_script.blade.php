@@ -187,11 +187,11 @@ $(document).ready( function () {
                     // }
 
                     // Calculate overtime earnings
-                    let overtime_earnings = 0;
-                    if (overtime_hours > 0) {
-                        // overtime_earnings = daily_rate * overtime_hours;
-                        overtime_earnings = overtime_fee * overtime_hours;
-                    }
+                    // let overtime_earnings = 0;
+                    // if (overtime_hours > 0) {
+                    //     // overtime_earnings = daily_rate * overtime_hours;
+                    //     overtime_earnings = overtime_fee * overtime_hours;
+                    // }
 
                     // Update the example calculations in the formulas section
                     updateFormulaExamples(id, daily_rate, absent_days, vacation_days, food_allowance, total, sick_leave_days);
@@ -221,9 +221,9 @@ $(document).ready( function () {
                     //     addAllowanceRow(id, 'Sick Leave Allowance', sick_leave_allowance);
                     // }
 
-                    if (overtime_earnings > 0) {
-                        addAllowanceRow(id, 'Overtime Earnings', overtime_earnings.toFixed(decimal_breakpoint));
-                    }
+                    // if (overtime_earnings > 0) {
+                    //     addAllowanceRow(id, 'Overtime Earnings', overtime_earnings.toFixed(decimal_breakpoint));
+                    // }
 
                     // Recalculate totals
                     calculateTotalAllowances(id);
