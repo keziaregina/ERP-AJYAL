@@ -360,4 +360,5 @@ return [
     
     'employee_type' => 'Employee Type',
     'select_employee_type' => 'Select Employee Type',
+    'export_company_bank' => 'Export Company Bank Detail Button',
 ];

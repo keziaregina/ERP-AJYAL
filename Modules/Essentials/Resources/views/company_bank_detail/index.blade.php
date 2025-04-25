@@ -26,6 +26,7 @@
                 <h1>Company Bank Detail</h1>
             </div>
         @endcomponent --}}
+        @can('essentials.export_company_bank')
         <div class="tw-flex tw-gap-2 tw-mb-4">
             {{-- <a href="{{ route('pdfovertime') }}"  class="tw-dw-btn tw-bg-gradient-to-r tw-from-red-600 tw-to-red-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center"> --}}
             <a href="#"  class="bg-black tw-dw-btn tw-bg-gradient-to-r tw-from-red-600 tw-to-red-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
@@ -51,6 +52,7 @@
                 Excel
             </a>
         </div>
+        @endcan
 
         <form action="{{ action([\Modules\Essentials\Http\Controllers\CompanyBankDetailController::class, 'store']) }}" method="POST">
             @csrf
