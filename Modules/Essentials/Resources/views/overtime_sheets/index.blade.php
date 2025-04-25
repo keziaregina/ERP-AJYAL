@@ -27,29 +27,6 @@
     {{-- Main content --}}
     <section class="content">
         @component('components.widget', ['class' => 'box-primary', 'title' => __('essentials::lang.manage_your_overtime_sheets')])
-            <div class="tw-flex tw-gap-2 tw-mb-4">
-                <a href="{{ route('pdfovertime') }}"  class="tw-dw-btn tw-bg-gradient-to-r tw-from-red-600 tw-to-red-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    PDF
-                </a>
-                <a href="{{ route('excelovertime') }}" class="tw-dw-btn tw-bg-gradient-to-r tw-from-green-600 tw-to-green-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    Excel
-                </a>
-            </div>
-            @can('essentials.add_overtime_hour')
             @can('essentials.export_overtime_hour')
                 <div class="tw-flex tw-gap-2 tw-mb-4">
                     <a href="{{ route('pdfovertime') }}" class="tw-dw-btn tw-bg-gradient-to-r tw-from-red-600 tw-to-red-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
@@ -223,6 +200,52 @@
                                 @endforeach
                             </select>
                         </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+
+    {{-- Select Employee Glorious --}}
+    <div class="modal fade" id="selectGEModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">@lang('essentials::lang.select_employee_glorious_this_month')</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form action="{{ action([\Modules\Essentials\Http\Controllers\GloriousEmployeeController::class, 'store']) }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="user_id">@lang('essentials::lang.employee_name')</label>
+                            <select name="user_id" id="user_id" class="form-control" required>
+                                <option value="">@lang('essentials::lang.select_employee')</option>
+                                @foreach ($employees as $employee)
+                                    @if ($gloriousEmployeeThisMonth && $employee['id'] == $gloriousEmployeeThisMonth->user_id)
+                                        <option value="{{ $employee['id'] }}" selected>{{ $employee['full_name'] }}</option>
+                                    @else   
+                                        <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>   
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="date">@lang('essentials::lang.date')</label>
+                            <input type="text" name="date" id="date" class="form-control" value="{{ date('M, Y') }}" disabled>
+                        </div>
+                        
                     </div>
                     
                     <div class="modal-footer">
