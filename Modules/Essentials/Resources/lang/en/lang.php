@@ -307,9 +307,12 @@ return [
     'sales_targets' => 'Sales targets',
     'get_current_location' => 'Get current location',
     'payroll_cant_be_deleted_if_final' => 'Payroll can not be deleted if status is final',
-    'add_todos' => "Add To Do's",
-    'edit_todos' => "Edit To Do's",
-    'delete_todos' => "Delete To Do's",
+    'add_todos' => 'Add To Do\'s',
+    // 'add_todos' => "Add To Do's",
+    'edit_todos' => 'Edit To Do\'s',
+    // 'edit_todos' => "Edit To Do's",
+    // "delete_todos" => "Delete To Dos",
+    'delete_todos' => 'Delete To Do\'s',
     'attendance_report' => 'Attendance report',
     'is_present' => 'Is Present',
     'days_present' => 'Days Present',
@@ -339,4 +342,22 @@ return [
     'add_overtime_hour' => 'Add overtime hour',
     'edit_overtime_hour' => 'Edit overtime hour',
     'export_overtime_hour' => 'Export overtime hour',
+
+    'select_employee_glorious_this_month' => 'Select Glorious Employee For This Month',
+    'employee_glorious_this_month' => 'Glorious Employee For This Month',
+
+    'company_bank_detail' => 'Company Bank Detail',
+    'manage_your_company_bank_detail' => 'Manage Your Company Bank Detail',
+
+    'employer_cr_no' => 'Employer CR No',
+    'payer_cr_no' => 'Payer CR No',
+    'payer_bank_short_name' => 'Payer Bank Short Name',
+    'payer_account_number' => 'Payer Account Number',
+
+
+    'civil_number' => 'Civil Number',
+    'passport_number' => 'Passport Number',
+    
+    'employee_type' => 'Employee Type',
+    'select_employee_type' => 'Select Employee Type',
 ];

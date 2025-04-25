@@ -27,6 +27,9 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') - {{ Session::get('business.name') }}</title>
+    
+    @yield('extra_scripts')
+
 
     @include('layouts.partials.css')
     
@@ -129,6 +132,9 @@
 
         @include('layouts.partials.javascripts')
 
+        @yield('custom_scripts')
+
+
         <div class="modal fade view_modal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel"></div>
 
         @if (!empty($__additional_views) && is_array($__additional_views))
@@ -139,6 +145,21 @@
         <div>
 
             <div class="overlay tw-hidden"></div>
+
+            
+            {{-- @push('extra_scripts')
+            {{--<link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+            <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+            <script>
+              new TomSelect("#color-select", {
+                create: true
+              });
+            </script>
+            @endpush 
+            --}}
+
+
+
 </body>
 <style>
     @media print {
