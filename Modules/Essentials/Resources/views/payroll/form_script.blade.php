@@ -140,6 +140,7 @@ $(document).ready( function () {
             let sick_leave_days = 0;
             let glorious_employee = false;
 
+            let allowance_deduction_data = [];
 
             $.ajax({
                 method: "GET",
@@ -151,6 +152,9 @@ $(document).ready( function () {
                     console.log("result");
                     console.log(result);
                     console.log("result------------>");
+                    // allowance_deduction_data = result;
+                    allowances = result.allowances;
+                    deductions = result.deductions;
                 }
             })
 
@@ -164,8 +168,6 @@ $(document).ready( function () {
                     'month': $("input[name='transaction_date']").val()
                 },
                 success: function(result) {
-                    console.log("result");
-                    console.log(result);
                     absent_days = result.absent_days || 0;
                     vacation_days = result.vacation_days || 0;
                     sick_leave_days = result.sick_leave_days || 0;
@@ -176,9 +178,6 @@ $(document).ready( function () {
                     isGloriousEmployee = result.glorious_employee;
                     ge_amount = result.ge_amount || 0;
 
-                    // console.log("basic salary");
-                    // console.log(total);
-
                     // Calculate absent deduction
                     let daily_rate = total / 30;
                     let absent_deduction = daily_rate * absent_days;
@@ -187,8 +186,6 @@ $(document).ready( function () {
                     // Calculate vacation deduction
                     let vacation_deduction = 0;
                     if (vacation_days > 0) {
-                        console.log("vacation days");
-                        console.log(vacation_days);
                         let daily_food_allowance = food_allowance / 30;
                         vacation_deduction = (daily_rate + daily_food_allowance) * vacation_days;
                     }
@@ -201,6 +198,19 @@ $(document).ready( function () {
                         console.log(glorious_allowance);
                     }
 
+                    // Clear the allowance table
+                    $("table#allowance_table_"+id+" tbody").empty();
+                    $("table#deductions_table_"+id+" tbody").empty();
+
+                    // foreach the allowance_deduction_data
+                    $.each(allowances, function(key, value) {
+                        // console.log("key");
+                        // console.log(key);
+                        // console.log("val");
+                        // console.log(value);
+                        addAllowanceRow(id, value.amount_type, value.name, parseFloat(value.amount).toFixed(decimal_breakpoint));
+                    });
+
                     // Add sick leave allowance if applicable
                     let sick_leave_allowance = 0;
                     // if (sick_leave_days > 0) {
@@ -210,16 +220,7 @@ $(document).ready( function () {
                     // Calculate overtime earnings
                     let overtime_earnings = 0;
                     if (overtime_hours > 0) {
-                        // overtime_earnings = daily_rate * overtime_hours;
-                        // console.log("overtime hours");
-                        // console.log(overtime_hours);
-
-                        // console.log("overtime fee");
-                        // console.log(overtime_fee);
                         overtime_earnings = overtime_fee * overtime_hours;
-
-                        // console.log("overtime earnings");
-                        // console.log(overtime_earnings);
                     }
 
                     // Update the example calculations in the formulas section
@@ -227,33 +228,36 @@ $(document).ready( function () {
 
                     // Clear the deductions table
 
-                    // $("table#deductions_table_"+id+" tbody").empty();
-                    // $("table#allowance_table_"+id+" tbody").empty();
-
                     // Add deductions to the deductions table
+                    $.each(deductions, function(key, value) {
+                        if (value.name.includes('Social Security Deductions')) {
+                            amount = total * parseFloat(value.amount) / 100;
+                            addDeductionForSocialSecurity(id, value.amount_type, value.name, parseFloat(value.amount).toFixed(decimal_breakpoint) + ' %', parseFloat(amount).toFixed(decimal_breakpoint));
+                        } else {
+                            addDeductionRow(id, value.amount_type, value.name, parseFloat(value.amount).toFixed(decimal_breakpoint));
+                        }
+                    });
+
                     if (absent_deduction > 0) {
-                        addDeductionRow(id, 'Absent Days Deduction', absent_deduction.toFixed(decimal_breakpoint));
+                        addDeductionRow(id, 'Fixed', 'Absent Days Deduction', absent_deduction.toFixed(decimal_breakpoint));
                     } else {
-                        addDeductionRow(id, 'Absent Days Deduction', 0);
+                        addDeductionRow(id, 'Fixed', 'Absent Days Deduction', 0);
                     }
 
                     if (vacation_deduction > 0) {
-                        addDeductionRow(id, 'Vacation Leave Deduction', vacation_deduction.toFixed(decimal_breakpoint));
+                        addDeductionRow(id, 'Fixed', 'Vacation Leave Deduction', vacation_deduction.toFixed(decimal_breakpoint));
                     } else {
-                        addDeductionRow(id, 'Vacation Leave Deduction', 0);
+                        addDeductionRow(id, 'Fixed', 'Vacation Leave Deduction', 0);
                     }
 
                     // Add allowances to the allowance table
-                    if (glorious_allowance > 0) {
-                        console.log("glorious allowance here    ");
-                        console.log(glorious_allowance);
-                        // addAllowanceRow(id, 'Glorious Employee Allowance', glorious_allowance.toFixed(decimal_breakpoint));
-                        addAllowanceRow(id, 'Glorious employee allowance (GE) الموظف المجيد', glorious_allowance);
-                    }
+                    // if (glorious_allowance > 0) {
+                    //     console.log("glorious allowance here");
+                    //     console.log(glorious_allowance);
+                    //     addAllowanceRow(id, 'Glorious employee allowance (GE) الموظف المجيد', glorious_allowance);
+                    // }
 
                     if (overtime_earnings > 0) {
-                        // addAllowanceRow(id, 'Overtime Earnings', overtime_earnings.toFixed(decimal_breakpoint));
-                        // addAllowanceForOvertime(id, 'Overtime Earnings', overtime_hours, overtime_earnings.toFixed(decimal_breakpoint));
                         addAllowanceForOvertime(id, 'ساعات عمل إضافية Overtime', overtime_hours, overtime_earnings.toFixed(decimal_breakpoint));
                     }
 
@@ -287,7 +291,7 @@ $(document).ready( function () {
         $('#sick_leave_example').text(__currency_trans_from_en(sick_leave_example, true));
     }
 
-    function addDeductionRow(id, description, amount) {
+    function addDeductionRow(id, type = 'Fixed', description, amount) {
         try {
             let row = `
                 <tr>
@@ -295,7 +299,7 @@ $(document).ready( function () {
                         <input type="text" name="payrolls[${id}][deductions][description][]" value="${description}" class="form-control" readonly>
                     </td>
                     <td>
-                        <input type="text" value="fixed" class="form-control" readonly>
+                        <input type="text" value="${type}" class="form-control" readonly>
                     </td>
                     <td>
                         <input type="text" name="payrolls[${id}][deductions][amount][]" value="${amount}" class="form-control input_number deduction" readonly>
@@ -313,7 +317,31 @@ $(document).ready( function () {
         }
     }
 
-    function addAllowanceRow(id, description, amount) {
+    function addDeductionForSocialSecurity(id, type = 'Fixed', description, percentage, amount) {
+        try {
+            let row = `
+                <tr>
+                    <td>
+                        <input type="text" name="payrolls[${id}][deductions][description][]" value="${description}" class="form-control" readonly>
+                    </td>
+                    <td>
+                        <input type="text" value="${type}" class="form-control" readonly>
+                        <input type="text" value="${percentage}" class="form-control" readonly>
+                    </td>
+                    <td>
+                        <input type="text" name="payrolls[${id}][deductions][amount][]" value="${amount}" class="form-control input_number deduction" readonly>
+                    </td>
+                    <td></td>
+                </tr>
+            `;
+          
+            $("table#deductions_table_"+id+" tbody").append(row);
+        } catch (error) {
+            console.error('Error in addDeductionRow:', error);
+        }
+    }
+
+    function addAllowanceRow(id, type = 'Fixed', description, amount) {
         try {
             let row = `
                 <tr>
@@ -321,7 +349,7 @@ $(document).ready( function () {
                         <input type="text" name="payrolls[${id}][allowances][description][]" value="${description}" class="form-control" readonly>
                     </td>
                     <td>
-                        <input type="text" value="fixed" class="form-control" readonly>
+                        <input type="text" value="${type}" class="form-control" readonly>
                     </td>
                     <td>
                         <input type="text"  value="-" class="form-control input_number " readonly>
@@ -332,6 +360,9 @@ $(document).ready( function () {
                     <td></td>
                 </tr>
             `;
+            // // Clear all fields
+
+            // Append the new row
             $("table#allowance_table_"+id+" tbody").append(row);
         } catch (error) {
             console.error('Error in addAllowanceRow:', error);
@@ -346,7 +377,7 @@ $(document).ready( function () {
                         <input type="text" name="payrolls[${id}][allowances][description][]" value="${description}" class="form-control" readonly>
                     </td>
                     <td>
-                        <input type="text" value="fixed" class="form-control" readonly>
+                        <input type="text" value="Fixed" class="form-control" readonly>
                     </td>
                     <td>
                         <input type="text" name="payrolls[${id}][allowances][overtime_hours][]" value="${overtime_hours}" class="form-control input_number overtime_hours" readonly>

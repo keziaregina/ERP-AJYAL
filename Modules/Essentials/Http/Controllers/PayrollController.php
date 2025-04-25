@@ -387,6 +387,7 @@ class PayrollController extends Controller
         return redirect()->action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'index'])->with('status', $output);
     }
 
+    // FIXME: on submit payroll
     private function getAllowanceAndDeductionJson($payroll)
     {
         $allowance_names = $payroll['allowance_names'];

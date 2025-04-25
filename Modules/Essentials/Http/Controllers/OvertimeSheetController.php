@@ -494,30 +494,57 @@ class OvertimeSheetController extends Controller
                 end_date: Carbon::now()->endOfMonth()
             );
 
-            // Log::info("ALLOW DEDUCT");
-            // Log::info(json_encode($employeeAllowDeduct,JSON_PRETTY_PRINT));
-
             $payrolls = [];
+
+            $allowances = [];
+            $deductions = [];
+
             foreach ($employeeAllowDeduct as $ad) {
+                Log::info("ad----------->");
+                Log::info(json_encode($ad,JSON_PRETTY_PRINT));
+
                 if ($ad->type == 'allowance') {
-                    $payrolls['allowances'][$ad->description][] = $ad->amount;
-                    // $payrolls['allowances']['allowance_amounts'][] = $ad->amount_type == 'fixed' ? $ad->amount : 0;
-                    // $payrolls['allowances']['allowance_types'][] = $ad->amount_type;
-                    // $payrolls['allowances']['allowance_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                    // $allowances[$ad->description] = $ad->amount;
+                    $allowances[] = [
+                        'name' => $ad->description,
+                        'amount' => $ad->amount,
+                        'amount_type' => $ad->amount_type == 'percent' ? 'Percentage' : 'Fixed',
+                    ];
                 } else {
-                    $payrolls['deductions'][$ad->description][] = $ad->amount;
-                    // $payrolls['deductions']['deduction_names'][] = $ad->description;
-                    // $payrolls['deductions']['deduction_amounts'][] = $ad->amount_type == 'fixed' ? $ad->amount : 0;
-                    // $payrolls['deductions']['deduction_types'][] = $ad->amount_type;
-                    // $payrolls['deductions']['deduction_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                    // $payrolls['deduction'][$ad->description] = $ad->amount;
+                    $deductions[] = [
+                        'name' => $ad->description,
+                        'amount' => $ad->amount,
+                        'amount_type' => $ad->amount_type == 'percent' ? 'Percentage' : 'Fixed',
+                    ];
                 }
             }
 
-            Log::info("PAYROL");
-            Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
+            $allowances = array_filter($allowances, function ($allowance) {
+                // return !str_contains($key, 'Overtime');
+                return !str_contains($allowance['name'], 'Overtime');
+            });
+
+            $deductions = array_filter($deductions, function ($deduction) {
+                return !str_contains($deduction['name'], 'Absant');
+            });
+
+            Log::info("alow");
+            Log::info(json_encode($allowances,JSON_PRETTY_PRINT));
+
+            Log::info("deducts");
+            Log::info(json_encode($deductions,JSON_PRETTY_PRINT));
 
             // die;
-            return $payrolls;
+            // Log::info("PAYROL");
+            // Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
+            // // die;
+
+            // die;
+            return [
+                'allowances' => $allowances,
+                'deductions' => $deductions
+            ];
 
 
         } catch (\Exception $exception) {
