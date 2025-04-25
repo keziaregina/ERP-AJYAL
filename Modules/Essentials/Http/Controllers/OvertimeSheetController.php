@@ -287,20 +287,47 @@ class OvertimeSheetController extends Controller
             //     ->whereDate('created_at', '<=', $end_date)
             //     ->get();
             $decimalBreakPoint = Auth::user()->business->currency_precision;
-            $overtimeBonusFee = Auth::user()->business->essentialsAllowanceAndDeductions()->where('description', 'ساعات عمل إضافية Overtime')->first()->amount;
+            // $overtimeBonusFee = Auth::user()->business->essentialsAllowanceAndDeductions()->where('description', 'ساعات عمل إضافية Overtime')->first()->amount;
+            $allowancesDeducDatas = Auth::user()->business->essentialsAllowanceAndDeductions->pluck('amount', 'description');
 
-            Log::info(json_encode($overtimeBonusFee,JSON_PRETTY_PRINT));
-            Log::info(json_encode("id user"));
-            Log::info(json_encode($user_id));
+            $finalAllowanceDeduct = [];
+            foreach ($allowancesDeducDatas as $desc => $amount) {
+                // $finalAllowanceDeduct['overtime_fee'] = 
+                switch ($desc) {
+                    case 'ساعات عمل إضافية Overtime':
+                        $finalAllowanceDeduct['overtime_fee'] = $amount;
+                        break;
+                    case 'علاوة أكل Food Allowances':
+                        $finalAllowanceDeduct['food_allowance_1'] = $amount;
+                        break;
+                    case 'علاوة أكل-Food Allowances':
+                        $finalAllowanceDeduct['food_allowance_2'] = $amount;
+                        break;
+                    case 'Social Security Deductions الحماية الإجتماعية':
+                        $finalAllowanceDeduct['social_security'] = $amount;
+                        break;
+                    case 'Glorious employee allowance (GE) الموظف المجيد':
+                        $finalAllowanceDeduct['ge_amount'] = $amount;
+                        break;
+                }
+            }
+
+            $isGloriousEmployee = GloriousEmployee::where('month', date('m'))
+            ->where('year', date('Y'))
+            ->where('user_id', $user_id)
+            ->first();
+
+            Log::info(date('m'));
+            Log::info(date('Y'));
+            Log::info($user_id);
+
+            Log::info(json_encode($isGloriousEmployee,JSON_PRETTY_PRINT));
 
             $overtime_records = EmployeeOvertime::where('user_id', $user_id)
                 ->where('month', date('m'))
                 ->where('year', date('Y'))
                 // ->whereDate('created_at', '<=', $end_date)
                 ->get();
-
-            Log::info(json_encode($overtime_records,JSON_PRETTY_PRINT));
-                
 
             $overtime_hours = EmployeeOvertime::where('user_id', $user_id)
                 ->where('month', date('m'))
@@ -315,7 +342,8 @@ class OvertimeSheetController extends Controller
             $absent_days = 0;
             $vacation_days = 0;
             $sick_leave_days = 0;
-            $glorious_employee = false;
+            // $glorious_employee = false;
+            $glorious_employee = $isGloriousEmployee ? true : false;
 
             foreach ($overtime_records as $record) {
                 switch ($record->total_hour) {
@@ -340,7 +368,8 @@ class OvertimeSheetController extends Controller
                 'absent_days' => $absent_days,
                 'vacation_days' => $vacation_days,
                 'sick_leave_days' => $sick_leave_days,
-                'glorious_employee' => $glorious_employee
+                'glorious_employee' => $glorious_employee,
+                ...$finalAllowanceDeduct
             ],JSON_PRETTY_PRINT));
 
             return response()->json([
@@ -351,7 +380,8 @@ class OvertimeSheetController extends Controller
                 'sick_leave_days'    => $sick_leave_days,
                 'glorious_employee'  => $glorious_employee,
                 'decimal_breakpoint' => $decimalBreakPoint,
-                'overtime_fee'       => $overtimeBonusFee
+                ...$finalAllowanceDeduct
+                // 'overtime_fee'       => $overtimeBonusFee
             ]);
 
         } catch (\Exception $e) {
@@ -451,5 +481,48 @@ class OvertimeSheetController extends Controller
             ), 
             'overtime_sheet-'.now()->format('F_Y').'.xlsx'
         );        
+    }
+
+    public function getAllowDeduct(Request $request) {
+        try {
+            Log::info("business id");
+            Log::info(Auth::user()->business_id);
+            $employeeAllowDeduct = $this->essentialsUtil->getEmployeeAllowancesAndDeductions(
+                business_id: Auth::user()->business_id,
+                user_id: $request->user_id,
+                start_date: Carbon::now()->startOfMonth(),
+                end_date: Carbon::now()->endOfMonth()
+            );
+
+            // Log::info("ALLOW DEDUCT");
+            // Log::info(json_encode($employeeAllowDeduct,JSON_PRETTY_PRINT));
+
+            $payrolls = [];
+            foreach ($employeeAllowDeduct as $ad) {
+                if ($ad->type == 'allowance') {
+                    $payrolls['allowances'][$ad->description][] = $ad->amount;
+                    // $payrolls['allowances']['allowance_amounts'][] = $ad->amount_type == 'fixed' ? $ad->amount : 0;
+                    // $payrolls['allowances']['allowance_types'][] = $ad->amount_type;
+                    // $payrolls['allowances']['allowance_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                } else {
+                    $payrolls['deductions'][$ad->description][] = $ad->amount;
+                    // $payrolls['deductions']['deduction_names'][] = $ad->description;
+                    // $payrolls['deductions']['deduction_amounts'][] = $ad->amount_type == 'fixed' ? $ad->amount : 0;
+                    // $payrolls['deductions']['deduction_types'][] = $ad->amount_type;
+                    // $payrolls['deductions']['deduction_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                }
+            }
+
+            Log::info("PAYROL");
+            Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
+
+            // die;
+            return $payrolls;
+
+
+        } catch (\Exception $exception) {
+            Log::error("ERROR on get allow deduct data -> " . $exception->getMessage());
+            throw $exception;
+        }
     }
 }

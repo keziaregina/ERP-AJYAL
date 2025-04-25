@@ -201,7 +201,7 @@
                                                 <tr>
                                                     <th class="col-md-5">@lang('essentials::lang.description')</th>
                                                     <th class="col-md-3">@lang('essentials::lang.amount_type')</th>
-                                                    <th class="col-md-5">@lang('essentials::lang.overtime_hours')</th>
+                                                    <th class="col-md-1">@lang('essentials::lang.overtime_hours')</th>
                                                     <th class="col-md-3">@lang('sale.amount')</th>
                                                     <th class="col-md-1">&nbsp;</th>
                                                 </tr>

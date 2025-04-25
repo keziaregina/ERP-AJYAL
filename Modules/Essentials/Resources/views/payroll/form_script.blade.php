@@ -140,6 +140,21 @@ $(document).ready( function () {
             let sick_leave_days = 0;
             let glorious_employee = false;
 
+
+            $.ajax({
+                method: "GET",
+                url: '/hrm/get-user-allow-deduct',
+                data: {
+                    'user_id': id
+                },
+                success: function(result) {
+                    console.log("result");
+                    console.log(result);
+                    console.log("result------------>");
+                }
+            })
+
+            // TODO: this one 
             // Get attendance data from overtime sheet
             $.ajax({
                 method: "GET",
@@ -149,6 +164,8 @@ $(document).ready( function () {
                     'month': $("input[name='transaction_date']").val()
                 },
                 success: function(result) {
+                    console.log("result");
+                    console.log(result);
                     absent_days = result.absent_days || 0;
                     vacation_days = result.vacation_days || 0;
                     sick_leave_days = result.sick_leave_days || 0;
@@ -156,6 +173,8 @@ $(document).ready( function () {
                     overtime_hours = result.overtime_hours || 0;
                     decimal_breakpoint = result.decimal_breakpoint || 3;
                     overtime_fee = result.overtime_fee || 0;
+                    isGloriousEmployee = result.glorious_employee;
+                    ge_amount = result.ge_amount || 0;
 
                     // console.log("basic salary");
                     // console.log(total);
@@ -176,8 +195,10 @@ $(document).ready( function () {
 
                     // Add glorious employee allowance if applicable
                     let glorious_allowance = 0;
-                    if (glorious_employee) {
-                        glorious_allowance = total * 0.1; // 10% of basic salary
+                    if (isGloriousEmployee) {
+                        glorious_allowance = ge_amount; // 10% of basic salary
+                        console.log("glorious allowance");
+                        console.log(glorious_allowance);
                     }
 
                     // Add sick leave allowance if applicable
@@ -187,17 +208,27 @@ $(document).ready( function () {
                     // }
 
                     // Calculate overtime earnings
-                    // let overtime_earnings = 0;
-                    // if (overtime_hours > 0) {
-                    //     // overtime_earnings = daily_rate * overtime_hours;
-                    //     overtime_earnings = overtime_fee * overtime_hours;
-                    // }
+                    let overtime_earnings = 0;
+                    if (overtime_hours > 0) {
+                        // overtime_earnings = daily_rate * overtime_hours;
+                        // console.log("overtime hours");
+                        // console.log(overtime_hours);
+
+                        // console.log("overtime fee");
+                        // console.log(overtime_fee);
+                        overtime_earnings = overtime_fee * overtime_hours;
+
+                        // console.log("overtime earnings");
+                        // console.log(overtime_earnings);
+                    }
 
                     // Update the example calculations in the formulas section
                     updateFormulaExamples(id, daily_rate, absent_days, vacation_days, food_allowance, total, sick_leave_days);
 
                     // Clear the deductions table
-                    $("table#deductions_table_"+id+" tbody").empty();
+
+                    // $("table#deductions_table_"+id+" tbody").empty();
+                    // $("table#allowance_table_"+id+" tbody").empty();
 
                     // Add deductions to the deductions table
                     if (absent_deduction > 0) {
@@ -205,7 +236,6 @@ $(document).ready( function () {
                     } else {
                         addDeductionRow(id, 'Absent Days Deduction', 0);
                     }
-
 
                     if (vacation_deduction > 0) {
                         addDeductionRow(id, 'Vacation Leave Deduction', vacation_deduction.toFixed(decimal_breakpoint));
@@ -215,15 +245,17 @@ $(document).ready( function () {
 
                     // Add allowances to the allowance table
                     if (glorious_allowance > 0) {
-                        addAllowanceRow(id, 'Glorious Employee Allowance', glorious_allowance.toFixed(decimal_breakpoint));
-                    } 
-                    // if (sick_leave_allowance > 0) {
-                    //     addAllowanceRow(id, 'Sick Leave Allowance', sick_leave_allowance);
-                    // }
+                        console.log("glorious allowance here    ");
+                        console.log(glorious_allowance);
+                        // addAllowanceRow(id, 'Glorious Employee Allowance', glorious_allowance.toFixed(decimal_breakpoint));
+                        addAllowanceRow(id, 'Glorious employee allowance (GE) الموظف المجيد', glorious_allowance);
+                    }
 
-                    // if (overtime_earnings > 0) {
-                    //     addAllowanceRow(id, 'Overtime Earnings', overtime_earnings.toFixed(decimal_breakpoint));
-                    // }
+                    if (overtime_earnings > 0) {
+                        // addAllowanceRow(id, 'Overtime Earnings', overtime_earnings.toFixed(decimal_breakpoint));
+                        // addAllowanceForOvertime(id, 'Overtime Earnings', overtime_hours, overtime_earnings.toFixed(decimal_breakpoint));
+                        addAllowanceForOvertime(id, 'ساعات عمل إضافية Overtime', overtime_hours, overtime_earnings.toFixed(decimal_breakpoint));
+                    }
 
                     // Recalculate totals
                     calculateTotalAllowances(id);
@@ -292,6 +324,9 @@ $(document).ready( function () {
                         <input type="text" value="fixed" class="form-control" readonly>
                     </td>
                     <td>
+                        <input type="text"  value="-" class="form-control input_number " readonly>
+                    </td>
+                    <td>
                         <input type="text" name="payrolls[${id}][allowances][amount][]" value="${amount}" class="form-control input_number allowance" readonly>
                     </td>
                     <td></td>
@@ -300,6 +335,31 @@ $(document).ready( function () {
             $("table#allowance_table_"+id+" tbody").append(row);
         } catch (error) {
             console.error('Error in addAllowanceRow:', error);
+        }
+    }
+
+    function addAllowanceForOvertime(id, description, overtime_hours, amount) {
+        try {
+            let row = `
+                <tr>
+                    <td>
+                        <input type="text" name="payrolls[${id}][allowances][description][]" value="${description}" class="form-control" readonly>
+                    </td>
+                    <td>
+                        <input type="text" value="fixed" class="form-control" readonly>
+                    </td>
+                    <td>
+                        <input type="text" name="payrolls[${id}][allowances][overtime_hours][]" value="${overtime_hours}" class="form-control input_number overtime_hours" readonly>
+                    </td>
+                    <td>
+                        <input type="text" name="payrolls[${id}][allowances][amount][]" value="${amount}" class="form-control input_number allowance" readonly>
+                    </td>
+                    <td></td>
+                </tr>
+            `;
+            $("table#allowance_table_"+id+" tbody").append(row);
+        } catch (error) {
+            console.error('Error in addAllowanceForOvertime:', error);
         }
     }
 

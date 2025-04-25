@@ -30,18 +30,14 @@
         </div>
     </td>
     
-    {{-- @dump($name)
-    @dump($val_col)
-    @dump($value) --}}
-    {{-- Overtime Hours --}}
-    @if ($type == 'allowance' && str_contains($name, 'Overtime') )
+    @if ($type == 'allowance' && !empty($name) && str_contains($name, 'Overtime') )
     <td>
         @php
             $readonly = $amount_type == 'percent' ? 'readonly' : '';
         @endphp
         {!! Form::text('payrolls['.$employee.'][overtime_hours][]',  0, ['class' => 'form-control input-sm value_field input_number ' . 'overtime_hours', $readonly ]); !!}
     </td>
-    @elseif ($type == 'allowance' && !str_contains($name, 'Overtime') )
+    @elseif ($type == 'allowance' && !empty($name) && !str_contains($name, 'Overtime') )
         <td>
 
         </td>

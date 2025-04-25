@@ -2,15 +2,16 @@
 
 namespace Modules\Essentials\Utils;
 
-use App\Transaction;
-use App\Utils\Util;
 use DB;
+use App\Utils\Util;
+use App\Transaction;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
-use Modules\Essentials\Entities\EssentialsAllowanceAndDeduction;
-use Modules\Essentials\Entities\EssentialsAttendance;
+use Modules\Essentials\Entities\Shift;
 use Modules\Essentials\Entities\EssentialsLeave;
 use Modules\Essentials\Entities\EssentialsUserShift;
-use Modules\Essentials\Entities\Shift;
+use Modules\Essentials\Entities\EssentialsAttendance;
+use Modules\Essentials\Entities\EssentialsAllowanceAndDeduction;
 
 class EssentialsUtil extends Util
 {
@@ -78,6 +79,13 @@ class EssentialsUtil extends Util
         $query = EssentialsAllowanceAndDeduction::join('essentials_user_allowance_and_deductions as euad', 'euad.allowance_deduction_id', '=', 'essentials_allowances_and_deductions.id')
                 ->where('business_id', $business_id)
                 ->where('euad.user_id', $user_id);
+
+        Log::info("start date");
+        Log::info($start_date);
+
+        Log::info("end date");
+        Log::info($end_date);
+                
 
         //Filter if applicable one
         if (! empty($start_date) && ! empty($end_date)) {
