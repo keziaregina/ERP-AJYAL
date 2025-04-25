@@ -195,7 +195,7 @@ return [
     'attendance_by_shift' => 'Attendance by shift',
     'attendance_by_date' => 'Attendance by date',
     'present' => 'Present',
-    'absent' => 'Absent',
+    'absent' => 'Absent - غائب',
     'shift' => 'Shift',
     'no_data_found' => 'No data found',
     'import_attendance' => 'Import Attendance',
@@ -328,9 +328,9 @@ return [
     'select_overtime_hours' => 'Select Overtime Hours',
     'overtime_hours' => 'Overtime Hours',
     'legend' => 'Legend',
-    'vacation_leave' => 'Vacation Leave',
-    'glorious_employee_allowance' => 'Glorious Employee Allowance',
-    'sick_leave' => 'Sick Leave',
+    'vacation_leave' => 'Vacation Leave - إجازة سنوية',
+    'glorious_employee_allowance' => 'Glorious Employee Allowance - بدل الموظف المتميز',
+    'sick_leave' => 'Sick Leave - إجازة مرضية',
     
     // Payroll calculation formulas
     'payroll_calculation_formulas' => 'Payroll Calculation Formulas',
