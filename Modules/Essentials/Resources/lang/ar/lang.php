@@ -338,4 +338,5 @@ return[
     'example' => 'مثال',
     'add_overtime_hour' => 'إضافة ساعة عمل إضافية',
     'edit_overtime_hour' => 'تعديل ساعة العمل الإضافي',
+    'export_overtime_hour' => 'تصدير ساعة العمل الإضافي',
 ];

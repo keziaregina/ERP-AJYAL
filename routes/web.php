@@ -273,6 +273,7 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::get('/reports/service-staff-line-orders', [ReportController::class, 'serviceStaffLineOrders']);
     Route::get('/reports/table-report', [ReportController::class, 'getTableReport']);
     Route::get('/reports/profit-loss', [ReportController::class, 'getProfitLoss']);
+    Route::get('/reports/overtime-report', [ReportController::class, 'getOvertimeReport']);
     Route::get('/reports/get-opening-stock', [ReportController::class, 'getOpeningStock']);
     Route::get('/reports/purchase-sell', [ReportController::class, 'getPurchaseSell']);
     Route::get('/reports/customer-supplier', [ReportController::class, 'getCustomerSuppliers']);

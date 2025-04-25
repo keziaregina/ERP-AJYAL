@@ -68,6 +68,7 @@ class ReportSettingsController extends Controller
             'register_report'            => __('report_type.register_report'),
             'expense_report'             => __('report_type.expense_report'),
             'activity_log'               => __('report_type.activity_log'),
+            'overtime'                   => __('report_type.overtime'),
         ];
     }
 
@@ -76,8 +77,10 @@ class ReportSettingsController extends Controller
         if (! auth()->user()->can('report_settings.access')) {
             abort(403, 'Unauthorized action.');
         }
+        
         $users = User::all()->pluck('first_name', 'id');
         $reportTypes = $this->getReportTypes();
+        
         $intervals = [
             'daily'=> __('report_settings.daily'), 
             'weekly'=> __('report_settings.weekly'), 

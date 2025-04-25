@@ -309,6 +309,11 @@ class DataController extends Controller
                 'label' => __('essentials::lang.edit_overtime_hour'),
                 'default' => false,
             ],
+            [
+                'value' => 'essentials.export_overtime_hour',
+                'label' => __('essentials::lang.export_overtime_hour'),
+                'default' => false,
+            ],
         ];
     }
 

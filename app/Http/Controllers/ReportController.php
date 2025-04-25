@@ -27,9 +27,14 @@ use App\Utils\ProductUtil;
 use App\Utils\TransactionUtil;
 use App\Variation;
 use Datatables;
-use DB;
+// use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
+use App\EmployeeOvertime;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 class ReportController extends Controller
 {
@@ -4050,5 +4055,170 @@ class ReportController extends Controller
         $suppliers = Contact::suppliersDropdown($business_id);
 
         return view('report.gst_purchase_report')->with(compact('suppliers', 'taxes'));
+    }
+
+    public function getOvertimeReport()
+    {
+        try {
+            $businessId = request()->session()->get('user.business_id');
+            $employees = $this->getEmployeesByLocation(businessId: $businessId);
+            $daysInMonth = Carbon::now()->month(date('m'))->daysInMonth;
+            $overtimeOptions = EmployeeOvertime::OVERTIME_HOURS;
+
+            // Get overtime data for the current month
+            $overtimeData = $this->getOvertimeDataForCurrentMonth();
+            $overtimeDatas = $overtimeData['employees'];
+            $totalAllOvertime = $overtimeData['total_all_overtime'];
+
+            return view('report.overtime_report')->with(compact('employees', 'daysInMonth', 'overtimeOptions', 'overtimeDatas', 'totalAllOvertime'));
+        } catch (\Exception $e) {
+            Log::error("error on index overtime: "  . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    private function getEmployeesByLocation($businessId, $locationId = null)
+    {
+        try {
+            $query = User::query()
+            ->whereHas('roles', function ( Builder $query) {
+                $query->whereNotIn('id', [1]);
+            });
+
+            if (! empty($locationId)) {
+                $query->where('location_id', $locationId);
+            } else {
+                $query->whereNull('location_id');
+            }
+
+            $query = $query->where('business_id', $businessId)
+                ->where('status', 'active');
+
+            $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
+
+            return $employees;
+        } catch (\Exception $e) {
+            Log::error("error get employees: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Get overtime data for users in the current month
+     * 
+     * @return \Illuminate\Support\Collection
+     */
+    private function getOvertimeDataForCurrentMonth()
+    {
+        try {
+            $currentMonth = date('m');
+
+            $currentYear = date('Y');
+
+            $businessId = request()->session()->get('user.business_id');
+
+            // Get all active employees
+            $query = User::query();
+
+            if (! empty($locationId)) {
+                $query->where('location_id', $locationId);
+            } else {
+                $query->whereNull('location_id');
+            }
+
+            $query = $query->where('business_id', $businessId)
+                ->where('status', 'active');
+
+            $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
+
+            // Get all overtime records for the current month
+            $overtimeRecords = EmployeeOvertime::where('month', $currentMonth)
+                ->where('year', $currentYear)
+                ->whereIn('user_id', $employees->pluck('id'))
+                ->get();
+
+            // Group overtime records by user_id
+            $overtimeByUser = $overtimeRecords->groupBy('user_id');
+
+            // Process the data to create a structured format
+            $result = $employees->map(function ($employee) use ($overtimeByUser, $currentMonth) {
+                $overtimeData = [];
+
+                // Initialize all days with null values
+                for ($day = 1; $day <= now()->daysInMonth; $day++) {
+                    $overtimeData[str_pad($day, 2, '0', STR_PAD_LEFT)] = null;
+                }
+
+                // Fill in the actual overtime data if user has any records
+                if ($overtimeByUser->has($employee->id)) {
+                    foreach ($overtimeByUser->get($employee->id) as $overtime) {
+                        $overtimeData[$overtime->day] = $overtime->total_hour;
+                    }
+                }
+
+                $filteredOvertimeData = collect(array_values($overtimeData))->filter(function ($value) {
+                    return $value != 'A' && $value != 'VL' && $value != 'GE' && $value != 'SL';
+                })->toArray();
+
+                // Calculate total overtime hours properly handling minutes
+                $totalOvertimeMonthly = 0;
+                $totalHours = 0;
+                $totalMinutes = 0;
+                
+                foreach ($filteredOvertimeData as $overtimeValue) {
+                    if (is_numeric($overtimeValue)) {
+                        // Split the value into hours and minutes
+                        $parts = explode('.', (string)$overtimeValue);
+                        $hours = (int)$parts[0];
+                        $minutes = isset($parts[1]) ? (int)$parts[1] : 0;
+                        
+                        // Add to totals
+                        $totalHours += $hours;
+                        $totalMinutes += $minutes;
+                    }
+                }
+                
+                // Convert excess minutes to hours
+                $additionalHours = floor($totalMinutes / 60);
+                $remainingMinutes = $totalMinutes % 60;
+                
+                // Calculate final total with proper formatting for minutes
+                $totalOvertimeMonthly = $totalHours + $additionalHours + ($remainingMinutes / 100);
+                
+                // Format to ensure minutes always have two digits
+                $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 2, '.', '');
+
+                return [
+                    'user_id' => $employee->id,
+                    'full_name' => $employee->full_name,
+                    'overtime_data' => $overtimeData,
+                    'total_overtime_by_month' => $totalOvertimeMonthly
+                ];
+            });
+
+            Log::info(json_encode($result,JSON_PRETTY_PRINT));
+
+            // Calculate total overtime across all employees
+            $totalAllOvertime = 0;
+            foreach ($result as $employeeData) {
+                $totalAllOvertime += (float)$employeeData['total_overtime_by_month'];
+            }
+            
+            // Format the total to ensure minutes have two digits
+            $totalAllOvertime = number_format($totalAllOvertime, 2, '.', '');
+
+            // Add the total to the result
+            $resultWithTotal = [
+                'employees' => $result,
+                'total_all_overtime' => $totalAllOvertime
+            ];
+
+            Log::info(json_encode($resultWithTotal,JSON_PRETTY_PRINT));
+
+            return $resultWithTotal;
+        } catch (\Exception $e) {
+            Log::error("error getting overtime data: " . $e->getMessage());
+            throw $e;
+        }
     }
 }

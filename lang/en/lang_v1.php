@@ -1549,5 +1549,6 @@ return [
     'cogs' => 'COGS:',
     'cogs_help_text' => 'Cost of Goods Sold = Starting inventory(opening stock) + purchases − ending inventory(closing stock)',
     'overall_summary' => 'Overall Summary',
-    'overtime' => 'Overtime Hours'
+    'overtime' => 'Overtime Hours',
+    'overtime_report' => 'Overtime Report',
 ];
