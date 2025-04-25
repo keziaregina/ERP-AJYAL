@@ -67,14 +67,19 @@ class OvertimeSheetController extends Controller
     {
         
         try {
-            $date = $request->date;
-            $day = date('d', strtotime($date));
 
             $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'overtime_hours' => ['required', Rule::in(array_keys(EmployeeOvertime::OVERTIME_HOURS))],
-                // 'date' => 'required|date'
+                'date' => 'nullable|date'
             ]);
+
+            if ( $request->date != null) {
+                $date = $request->date;
+                $day = date('d', strtotime($date));
+            } else {
+                $day = date('d');
+            }
 
             $overtimeHour = EmployeeOvertime::updateOrCreate([
                 'user_id' => $request->user_id,
