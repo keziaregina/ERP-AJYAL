@@ -77,9 +77,10 @@ class ReportSettingsController extends Controller
         if (! auth()->user()->can('report_settings.access')) {
             abort(403, 'Unauthorized action.');
         }
+        
         $users = User::all()->pluck('first_name', 'id');
         $reportTypes = $this->getReportTypes();
-        dd($reportTypes);
+        
         $intervals = [
             'daily'=> __('report_settings.daily'), 
             'weekly'=> __('report_settings.weekly'), 
