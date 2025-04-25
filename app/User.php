@@ -412,4 +412,6 @@ class User extends Authenticatable
     public function employeeBankCode(): BelongsTo {
         return $this->belongsTo(EmployeeBicCode::class, 'bic_id', 'id');
     }
+
+    // public function essentialsAllowanceAndDeductions()
 }

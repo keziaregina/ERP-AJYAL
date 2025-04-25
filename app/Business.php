@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Essentials\Entities\EssentialsAllowanceAndDeduction;
 
 class Business extends Model
 {
@@ -128,5 +129,9 @@ class Business extends Model
         ', '.$location->state.'<br>'.$location->country.', '.$location->zip_code;
 
         return $address;
+    }
+
+    public function essentialsAllowanceAndDeductions() {
+        return $this->hasMany(EssentialsAllowanceAndDeduction::class, 'business_id', 'id');
     }
 }

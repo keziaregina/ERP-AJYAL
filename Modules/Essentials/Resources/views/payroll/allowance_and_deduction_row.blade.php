@@ -15,18 +15,35 @@
 
     $amount_type = !empty($amount_type) ? $amount_type : 'fixed';
     $percent = $amount_type == 'percent' && !empty($percent) ?  $percent : 0;
+
 @endphp
 <tr>
     <td>
         {!! Form::text($name_col . '[]', !empty($name) ? $name : null, ['class' => 'form-control input-sm' ]); !!}
     </td>
     <td>
-        {!! Form::select($type_col . '[]', ['fixed' => __('lang_v1.fixed'), 'percent' => __('lang_v1.percentage'), 'overtime' => __('lang_v1.overtime')], $amount_type, ['class' => 'form-control input-sm amount_type' ]); !!}
+        {!! Form::select($type_col . '[]', ['fixed' => __('lang_v1.fixed'), 'percent' => __('lang_v1.percentage')], $amount_type, ['class' => 'form-control input-sm amount_type' ]); !!}
+        {{-- {!! Form::select($type_col . '[]', ['fixed' => __('lang_v1.fixed'), 'percent' => __('lang_v1.percentage'), 'overtime' => __('lang_v1.overtime')], $amount_type, ['class' => 'form-control input-sm amount_type' ]); !!} --}}
         <div class="input-group percent_field @if($amount_type != 'percent') hide @endif">
             {!! Form::text($percent_col . '[]', @num_format($percent), ['class' => 'form-control input-sm input_number percent']); !!}
             <span class="input-group-addon"><i class="fa fa-percent"></i></span>
         </div>
     </td>
+    
+    @if ($type == 'allowance' && !empty($name) && str_contains($name, 'Overtime') )
+    <td>
+        @php
+            $readonly = $amount_type == 'percent' ? 'readonly' : '';
+        @endphp
+        {!! Form::text('payrolls['.$employee.'][overtime_hours][]',  0, ['class' => 'form-control input-sm value_field input_number ' . 'overtime_hours', $readonly ]); !!}
+    </td>
+    @elseif ($type == 'allowance' && !empty($name) && !str_contains($name, 'Overtime') )
+        <td>
+
+        </td>
+    @endif
+    {{-- @dump($name) --}}
+
     <td>
         @php
             $readonly = $amount_type == 'percent' ? 'readonly' : '';

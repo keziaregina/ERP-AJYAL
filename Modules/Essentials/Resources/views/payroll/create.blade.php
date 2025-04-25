@@ -201,6 +201,7 @@
                                                 <tr>
                                                     <th class="col-md-5">@lang('essentials::lang.description')</th>
                                                     <th class="col-md-3">@lang('essentials::lang.amount_type')</th>
+                                                    <th class="col-md-1">@lang('essentials::lang.overtime_hours')</th>
                                                     <th class="col-md-3">@lang('sale.amount')</th>
                                                     <th class="col-md-1">&nbsp;</th>
                                                 </tr>
@@ -226,7 +227,7 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <th colspan="2">@lang('sale.total')</th>
+                                                    <th colspan="3">@lang('sale.total')</th>
                                                     <td><span id="total_allowances_{{$employee}}" class="display_currency" data-currency_symbol="true">{{$total_allowances}}</span></td>
                                                     <td>&nbsp;</td>
                                                 </tr>
