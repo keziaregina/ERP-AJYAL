@@ -170,7 +170,7 @@
                                 @if (auth()->user()->hasRole('Admin#1'))
                                     <option value="">@lang('essentials::lang.select_employee')</option>
                                     @foreach ($employees as $employee)
-                                        <option value="{{ $employee->id }}">{{ $employee->full_name }}</option>
+                                        <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
                                     @endforeach
                                 @else
                                     <option selected value="{{ auth()->user()->id}}">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</option>
