@@ -257,20 +257,30 @@
 								<th>#</th>
 								<th>@lang( 'product.product_name' )</th>
 								<th>@lang( 'purchase.purchase_quantity' )</th>
+								@can('essentials.purchase_price')
 								<th>@lang( 'lang_v1.unit_cost_before_discount' )</th>
+								@endcan
 								<th>@lang( 'lang_v1.discount_percent' )</th>
+								@can('essentials.purchase_price')
 								<th>@lang( 'purchase.unit_cost_before_tax' )</th>
+								@endcan
 								<th class="{{$hide_tax}}">@lang( 'purchase.subtotal_before_tax' )</th>
 								<th class="{{$hide_tax}}">@lang( 'purchase.product_tax' )</th>
+								@can('essentials.purchase_price')
 								<th class="{{$hide_tax}}">@lang( 'purchase.net_cost' )</th>
+								@endcan
+								@can('essentials.purchase_price')
 								<th>@lang( 'purchase.line_total' )</th>
+								@endcan
 								<th class="@if(!session('business.enable_editing_product_from_purchase')) hide @endif">
 									@lang( 'lang_v1.profit_margin' )
 								</th>
+								@can('essentials.purchase_price')
 								<th>
 									@lang( 'purchase.unit_selling_price' )
 									<small>(@lang('product.inc_of_tax'))</small>
 								</th>
+								@endcan
 								@if(session('business.enable_lot_number'))
 									<th>
 										@lang('lang_v1.lot_number')
@@ -303,6 +313,7 @@
 								<input type="hidden" id="st_before_tax_input" value=0>
 							</td>
 						</tr>
+						@can('essentials.purchase_price')
 						<tr>
 							<th class="col-md-7 text-right">@lang( 'purchase.net_total_amount' ):</th>
 							<td class="col-md-5 text-left">
@@ -311,6 +322,7 @@
 								<input type="hidden" id="total_subtotal_input" value=0  name="total_before_tax">
 							</td>
 						</tr>
+						@endcan
 					</table>
 				</div>
 
@@ -584,6 +596,10 @@
 @endsection
 
 @section('javascript')
+	<script>
+	    window.userCanPurchasePrice = @json(Auth::user()->can('essentials.purchase_price'));
+	</script>
+	{{-- untuk memanggil data semua product --}}
 	<script src="{{ asset('js/purchase.js?v=' . $asset_v) }}"></script>
 	<script src="{{ asset('js/product.js?v=' . $asset_v) }}"></script>
 	<script type="text/javascript">

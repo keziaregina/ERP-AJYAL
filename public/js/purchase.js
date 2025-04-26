@@ -758,9 +758,12 @@ $(document).ready(function() {
         var sp_element = tr.find('input.default_sell_price');
         __write_number(sp_element, unit_sp);
 
-        var cp_element = tr.find('input.purchase_unit_cost_without_discount');
-        __write_number(cp_element, unit_cost);
-        cp_element.change();
+        // cost???
+        if (window.userCanPurchasePrice) {
+            var cp_element = tr.find('input.purchase_unit_cost_without_discount');
+            __write_number(cp_element, unit_cost);
+            cp_element.change();
+        }
     });
     toggle_search();
 });
@@ -792,12 +795,12 @@ function get_purchase_entry_row(product_id, variation_id) {
         });
     }
 }
-
+// ada kemungkinan
 function append_purchase_lines(data, row_count, trigger_change = false) {
     $(data)
         .find('.purchase_quantity')
         .each(function() {
-            row = $(this).closest('tr');
+            row = $(this).closest('tr'); 
 
             $('#purchase_entry_table tbody').append(
                 update_purchase_entry_row_values(row)

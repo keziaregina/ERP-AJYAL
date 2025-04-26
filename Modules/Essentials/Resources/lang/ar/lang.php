@@ -360,4 +360,5 @@ return[
     'select_employee_type' => 'حدد نوع الموظف',
     'employee_type' => 'نوع الموظف',
     'export_company_bank' => 'زر تفاصيل بنك شركة التصدير',
+    'purchase_price' => 'إضافة سعر صفحة الشراء'
 ];
