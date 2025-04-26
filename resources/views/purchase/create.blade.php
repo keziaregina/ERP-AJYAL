@@ -264,7 +264,9 @@
 								@can('essentials.purchase_price')
 								<th>@lang( 'purchase.unit_cost_before_tax' )</th>
 								@endcan
+								@can('essentials.purchase_price')
 								<th class="{{$hide_tax}}">@lang( 'purchase.subtotal_before_tax' )</th>
+								@endcan
 								<th class="{{$hide_tax}}">@lang( 'purchase.product_tax' )</th>
 								@can('essentials.purchase_price')
 								<th class="{{$hide_tax}}">@lang( 'purchase.net_cost' )</th>
@@ -595,11 +597,18 @@
 <!-- /.content -->
 @endsection
 
+@php
+	$userCanPurchasePrice = Auth::user()->can('essentials.purchase_price');
+@endphp
+
 @section('javascript')
 	<script>
+	    // userCanPurchasePrice = @json(Auth::user()->can('essentials.purchase_price'));
 	    window.userCanPurchasePrice = @json(Auth::user()->can('essentials.purchase_price'));
+	    console.log(window.userCanPurchasePrice);
 	</script>
 	{{-- untuk memanggil data semua product --}}
+	{{-- <script src="{{ asset('js/purchase.js?v=' . $asset_v . '&userCanPurchasePrice=' . $userCanPurchasePrice) }}"></script> --}}
 	<script src="{{ asset('js/purchase.js?v=' . $asset_v) }}"></script>
 	<script src="{{ asset('js/product.js?v=' . $asset_v) }}"></script>
 	<script type="text/javascript">

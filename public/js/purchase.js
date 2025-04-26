@@ -829,10 +829,28 @@ function append_purchase_lines(data, row_count, trigger_change = false) {
     }
 }
 
+
 function update_purchase_entry_row_values(row) {
+    // Get the URL parameters
+    // const urlParams = new URLSearchParams(window.location.search);
+    // const userCanPurchasePrice = urlParams.get('userCanPurchasePrice');
+    // console.log(userCanPurchasePrice);
+    console.log("test");
+    console.log(window.userCanPurchasePrice);
+
+    // console.log({{ Auth::user()->can('essentials.purchase_price') }});
+
     if (typeof row != 'undefined') {
+        console.log("testes");
+        console.log(userCanPurchasePrice);
+        // console.log(window.userCanPurchasePrice);
+
         var quantity = __read_number(row.find('.purchase_quantity'), true);
-        var unit_cost_price = __read_number(row.find('.purchase_unit_cost'), true);
+
+        if (window.userCanPurchasePrice) {
+            var unit_cost_price = __read_number(row.find('.purchase_unit_cost'), true);
+        }
+
         var row_subtotal_before_tax = quantity * unit_cost_price;
 
         var tax_rate = parseFloat(
