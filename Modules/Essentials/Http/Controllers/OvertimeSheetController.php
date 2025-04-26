@@ -504,14 +504,12 @@ class OvertimeSheetController extends Controller
                 Log::info(json_encode($ad,JSON_PRETTY_PRINT));
 
                 if ($ad->type == 'allowance') {
-                    // $allowances[$ad->description] = $ad->amount;
                     $allowances[] = [
                         'name' => $ad->description,
                         'amount' => $ad->amount,
                         'amount_type' => $ad->amount_type == 'percent' ? 'Percentage' : 'Fixed',
                     ];
                 } else {
-                    // $payrolls['deduction'][$ad->description] = $ad->amount;
                     $deductions[] = [
                         'name' => $ad->description,
                         'amount' => $ad->amount,
@@ -521,7 +519,6 @@ class OvertimeSheetController extends Controller
             }
 
             $allowances = array_filter($allowances, function ($allowance) {
-                // return !str_contains($key, 'Overtime');
                 return !str_contains($allowance['name'], 'Overtime');
             });
 
@@ -529,18 +526,6 @@ class OvertimeSheetController extends Controller
                 return !str_contains($deduction['name'], 'Absant');
             });
 
-            Log::info("alow");
-            Log::info(json_encode($allowances,JSON_PRETTY_PRINT));
-
-            Log::info("deducts");
-            Log::info(json_encode($deductions,JSON_PRETTY_PRINT));
-
-            // die;
-            // Log::info("PAYROL");
-            // Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
-            // // die;
-
-            // die;
             return [
                 'allowances' => $allowances,
                 'deductions' => $deductions

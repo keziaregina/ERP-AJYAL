@@ -192,11 +192,9 @@ $(document).ready( function () {
 
                     // Add glorious employee allowance if applicable
                     let glorious_allowance = 0;
-                    if (isGloriousEmployee) {
-                        glorious_allowance = ge_amount; // 10% of basic salary
-                        console.log("glorious allowance");
-                        console.log(glorious_allowance);
-                    }
+                    // if (isGloriousEmployee) {
+                    //     glorious_allowance = ge_amount; // 10% of basic salary
+                    // }
 
                     // Clear the allowance table
                     $("table#allowance_table_"+id+" tbody").empty();
@@ -204,11 +202,13 @@ $(document).ready( function () {
 
                     // foreach the allowance_deduction_data
                     $.each(allowances, function(key, value) {
-                        // console.log("key");
-                        // console.log(key);
-                        // console.log("val");
-                        // console.log(value);
-                        addAllowanceRow(id, value.amount_type, value.name, parseFloat(value.amount).toFixed(decimal_breakpoint));
+                        if (value.name.includes('Glorious employee allowance')) {
+                            if (isGloriousEmployee) {
+                                addAllowanceRow(id, value.amount_type, value.name, parseFloat(value.amount).toFixed(decimal_breakpoint));
+                            }
+                        } else {
+                            addAllowanceRow(id, value.amount_type, value.name, parseFloat(value.amount).toFixed(decimal_breakpoint));
+                        }
                     });
 
                     // Add sick leave allowance if applicable
@@ -299,7 +299,8 @@ $(document).ready( function () {
                         <input type="text" name="payrolls[${id}][deductions][description][]" value="${description}" class="form-control" readonly>
                     </td>
                     <td>
-                        <input type="text" value="${type}" class="form-control" readonly>
+                        <input type="text" name="payrolls[${id}][deductions][amount_type][]" value="${type}" class="form-control" readonly>
+                        <input type="text" name="payrolls[${id}][deductions][percentage][]" value="0" class="form-control hidden" readonly>
                     </td>
                     <td>
                         <input type="text" name="payrolls[${id}][deductions][amount][]" value="${amount}" class="form-control input_number deduction" readonly>
@@ -325,8 +326,8 @@ $(document).ready( function () {
                         <input type="text" name="payrolls[${id}][deductions][description][]" value="${description}" class="form-control" readonly>
                     </td>
                     <td>
-                        <input type="text" value="${type}" class="form-control" readonly>
-                        <input type="text" value="${percentage}" class="form-control" readonly>
+                        <input type="text" name="payrolls[${id}][deductions][amount_type][]" value="${type}" class="form-control" readonly>
+                        <input type="text" name="payrolls[${id}][deductions][percentage][]" value="${percentage}" class="form-control" readonly>
                     </td>
                     <td>
                         <input type="text" name="payrolls[${id}][deductions][amount][]" value="${amount}" class="form-control input_number deduction" readonly>
@@ -349,7 +350,7 @@ $(document).ready( function () {
                         <input type="text" name="payrolls[${id}][allowances][description][]" value="${description}" class="form-control" readonly>
                     </td>
                     <td>
-                        <input type="text" value="${type}" class="form-control" readonly>
+                        <input type="text" name="payrolls[${id}][allowances][amount_type][]" value="${type}" class="form-control" readonly>
                     </td>
                     <td>
                         <input type="text"  value="-" class="form-control input_number " readonly>
@@ -377,7 +378,7 @@ $(document).ready( function () {
                         <input type="text" name="payrolls[${id}][allowances][description][]" value="${description}" class="form-control" readonly>
                     </td>
                     <td>
-                        <input type="text" value="Fixed" class="form-control" readonly>
+                        <input type="text" name="payrolls[${id}][allowances][amount_type][]" value="Fixed" class="form-control" readonly>
                     </td>
                     <td>
                         <input type="text" name="payrolls[${id}][allowances][overtime_hours][]" value="${overtime_hours}" class="form-control input_number overtime_hours" readonly>
