@@ -529,3 +529,5 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone'])
     Route::get('/sells/invoice-url/{id}', [SellPosController::class, 'showInvoiceUrl']);
     Route::get('/show-notification/{id}', [HomeController::class, 'showNotification']);
 });
+
+Route::get('/payroll/pdf', [App\Http\Controllers\PayrollController::class, 'generatePayrollPdf'])->name('payroll.pdf');
