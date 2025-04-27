@@ -124,6 +124,7 @@ class ManageUserController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
         if (! auth()->user()->can('user.create')) {
             abort(403, 'Unauthorized action.');
         }
@@ -235,6 +236,7 @@ class ManageUserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        dd($request->all());
         //Disable in demo
         $notAllowed = $this->moduleUtil->notAllowedInDemo();
         if (! empty($notAllowed)) {

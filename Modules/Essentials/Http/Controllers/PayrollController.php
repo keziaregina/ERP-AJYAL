@@ -114,6 +114,9 @@ class PayrollController extends Controller
                 }
             }
 
+            // Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
+            Log::info(json_encode($payrolls->get(),JSON_PRETTY_PRINT));
+
             return Datatables::of($payrolls)
                 ->addColumn(
                     'action',
@@ -319,6 +322,8 @@ class PayrollController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // dd($request->all());
+
         try {
             $transaction_date = $request->input('transaction_date');
             $payrolls = $request->input('payrolls');
@@ -327,6 +332,7 @@ class PayrollController extends Controller
             $payroll_group['name'] = $request->input('payroll_group_name');
             $payroll_group['status'] = $request->input('payroll_group_status');
             $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('total_gross_amount'));
+            // $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('payrolls[0][final_total]'));
             $payroll_group['location_id'] = $request->input('location_id');
             $payroll_group['created_by'] = auth()->user()->id;
 
@@ -341,7 +347,9 @@ class PayrollController extends Controller
                 $payroll['type'] = 'payroll';
                 $payroll['payment_status'] = 'due';
                 $payroll['status'] = 'final';
-                $payroll['total_before_tax'] = $payroll['final_total'];
+                $payroll['payroll_month'] = date('m');
+                // $payroll['total_before_tax'] = $payroll['final_total'];
+                $payroll['total_before_tax'] = $payroll['total'];
                 $payroll['essentials_amount_per_unit_duration'] = $this->moduleUtil->num_uf($payroll['essentials_amount_per_unit_duration']);
 
                 $allowances_and_deductions = $this->getAllowanceAndDeductionJson($payroll);

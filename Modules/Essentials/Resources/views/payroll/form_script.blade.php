@@ -426,14 +426,12 @@ $(document).ready( function () {
         let total_allowances = calculateTotalAllowances(id);
         let total_deductions = calculateTotalDeductions(id);
         
-        console.log("BASIC SALARY");
-        console.log(basic_salary);
-        console.log("TOTAL ALLOWANCES");
-        console.log(total_allowances);
-        console.log("TOTAL DEDUCTIONS");
-        console.log(total_deductions);
-
-        
+        // console.log("BASIC SALARY");
+        // console.log(basic_salary);
+        // console.log("TOTAL ALLOWANCES");
+        // console.log(total_allowances);
+        // console.log("TOTAL DEDUCTIONS");
+        // console.log(total_deductions);
 
         let gross_amount = basic_salary + total_allowances - total_deductions;
 

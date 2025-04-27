@@ -60,6 +60,7 @@ class UserController extends Controller
      */
     public function updateProfile(Request $request)
     {
+        // dd($request->all());
         //Disable in demo
         $notAllowed = $this->moduleUtil->notAllowedInDemo();
         if (! empty($notAllowed)) {

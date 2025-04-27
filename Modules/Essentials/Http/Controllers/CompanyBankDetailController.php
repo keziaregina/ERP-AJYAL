@@ -2,11 +2,14 @@
 
 namespace Modules\Essentials\Http\Controllers;
 
+use App\Transaction;
 use App\CompanyBankDetail;
 use Illuminate\Http\Request;
+use App\Exports\SifExcelExport;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CompanyBankDetailController extends Controller {
     function index() {
@@ -40,6 +43,33 @@ class CompanyBankDetailController extends Controller {
             //throw $th;
             Log::error('ERROR on store company bank detail : '. $e->getMessage());
             throw $e;
+        }
+    }
+
+
+    // Using transaction table
+    function exportExcel() {
+        try {
+            $transactionPayrolls = Transaction::where('business_id', auth()->user()->business_id)
+                                                ->where('type', 'payroll')
+                                                ->where('payroll_month', date('m'))
+                                                ->with(['transaction_for'])
+                                                ->get()->toArray();
+                                                // ->get();
+
+            // $totalSalary = $transactionPayrolls->sum('final_total');
+            // $numberOfRecords = $transactionPayrolls->count();
+
+            // dd($totalSalary);
+            dd($transactionPayrolls);
+            $companyBankDetail = CompanyBankDetail::where('business_id', auth()->user()->business_id)->get()->first();
+
+            dd($companyBankDetail->toArray());
+            // Log::info(json_encode($transactionPayrolls, JSON_PRETTY_PRINT));
+
+            return Excel::download(new SifExcelExport($transactionPayrolls, $companyBankDetail, $totalSalary, $numberOfRecords), 'sif_excel.xlsx');
+        } catch (\Throwable $th) {
+            //throw $th;
         }
     }
 }
