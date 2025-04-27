@@ -413,5 +413,9 @@ class User extends Authenticatable
         return $this->belongsTo(EmployeeBicCode::class, 'bic_id', 'id');
     }
 
+    public function employeeSalaryFrequency(): BelongsTo {
+        return $this->belongsTo(SalaryFrequency::class, 'salary_id', 'id');
+    }
+
     // public function essentialsAllowanceAndDeductions()
 }

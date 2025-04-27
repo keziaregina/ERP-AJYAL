@@ -241,6 +241,7 @@ class ManageUserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        dd($request->all());
         //Disable in demo
         $notAllowed = $this->moduleUtil->notAllowedInDemo();
         if (! empty($notAllowed)) {
@@ -376,6 +377,8 @@ class ManageUserController extends Controller
            
             event(new UserCreatedOrModified($user, 'updated'));
             
+        dd($request->all());
+
             $output = ['success' => 1,
                 'msg' => __('user.user_update_success'),
             ];

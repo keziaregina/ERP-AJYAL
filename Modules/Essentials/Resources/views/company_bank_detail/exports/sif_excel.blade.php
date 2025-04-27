@@ -18,7 +18,7 @@
             <td>{{ $companyBankDetail->payer_account_number }}</td>
             <td>{{ date('Y') }}</td>
             <td>{{ date('m') }}</td>
-            <td>{{ $totalSalary }}</td>
+            <td>{{ number_format($totalSalary, 3, '.', ',') }}</td>
             <td>{{ $numberOfRecords }}</td>
             <td>Salary</td>
         </tr>
@@ -48,13 +48,39 @@
     <tbody>
         @foreach ($transactionPayrolls as $transactionPayroll)
             <tr>
-                <td>{{ $companyBankDetail->employee_id_type }}</td>
-                <td>{{ $companyBankDetail->employee_id_type }}</td>
-                {{-- <td>{{ $companyBankDetail->employee_id }}</td>
-                <td>{{ $transactionPayroll['ref_no'] }}</td>
-                <td>{{ $transactionPayroll['employee_name'] }}</td>
-                <td>{{ $transactionPayroll['employee_bic_code'] }}</td>
-                <td>{{ $transactionPayroll['employee_account'] }}</td> --}}
+                <td>{{ $companyBankDetail->employee_type_id }}</td>
+                @if ($companyBankDetail->employee_type_id == 'C')
+                    <td>{{ $transactionPayroll->transaction_for->custom_field_4 }}</td>
+                @else
+                    <td>{{ $transactionPayroll->transaction_for->custom_field_2 }}</td>
+                @endif
+                <td>{{ $loop->index + 1 }}</td>
+
+                <td>{{ $transactionPayroll->transaction_for->first_name }}</td>
+                <td>{{ $transactionPayroll->transaction_for?->employeeBankCode?->name ?? '-' }}</td>
+                
+                {{-- <td>{{ $transactionPayroll->transaction_for->bank_details->{'account_number'} }}</td> --}}
+                @php
+                    $bankDetails = json_decode($transactionPayroll->transaction_for->bank_details);
+                @endphp
+                <td>{{ $bankDetails->{'account_number'} }}</td>
+
+                <td>{{ $transactionPayroll->transaction_for?->employeeSalaryFrequency?->name ?? '-' }}</td>
+
+                <td>{{ $transactionPayroll->working_days }}</td>
+
+                <td>{{ number_format($transactionPayroll->final_total, 3, '.', ',') }}</td>
+
+                <td>{{ number_format($transactionPayroll->total_before_tax, 3, '.', ',') }}</td>
+
+                {{-- <td>{{ $transactionPayroll->total_extra_hours }}</td> --}}
+                <td>{{ $transactionPayroll->extra_hours }}</td>
+
+                <td>{{ number_format($transactionPayroll->essentials_allowances, 3, '.', ',') }}</td>
+
+                <td>{{ number_format($transactionPayroll->essentials_deductions, 3, '.', ',') }}</td>
+
+                <td>{{ number_format($transactionPayroll->social_security_deductions, 3, '.', ',') }}</td>
                 
             </tr>
         @endforeach

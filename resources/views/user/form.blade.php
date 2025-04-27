@@ -138,9 +138,9 @@
 
   {{-- Salary Frecuency --}}
 <div class="form-group col-md-3">
-    <label for="color-select">Select or Create Salary Code</label>
+    <label for="color-select">Select or Create Salary Frequency</label>
     <select name="salary_code" id="user_salary_code" placeholder="" autocomplete="off">
-        <option disabled selected>Select Salary Code</option>
+        <option disabled selected>Select Salary Frequency</option>
         @foreach ($salaryCode as $Scode)
         
         @if ($Scode['id'] == $user->salary_id)

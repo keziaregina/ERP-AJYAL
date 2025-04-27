@@ -3,6 +3,8 @@
 namespace Modules\Essentials\Http\Controllers;
 
 use App\Transaction;
+use App\EmployeeOvertime;
+use App\SifExportCounter;
 use App\CompanyBankDetail;
 use Illuminate\Http\Request;
 use App\Exports\SifExcelExport;
@@ -46,30 +48,67 @@ class CompanyBankDetailController extends Controller {
         }
     }
 
+    function addSifExportCounter() {
+        $sifCount = SifExportCounter::updateOrCreate([
+            'business_id' => auth()->user()->business_id,
+            'date' => date('Y-m-d')
+        ]);
 
+        $sifCount->count++;
+        $sifCount->save();
+        return $sifCount;
+    }
     // Using transaction table
     function exportExcel() {
         try {
-            $transactionPayrolls = Transaction::where('business_id', auth()->user()->business_id)
+            $datas = Transaction::where('business_id', auth()->user()->business_id)
                                                 ->where('type', 'payroll')
                                                 ->where('payroll_month', date('m'))
                                                 ->with(['transaction_for'])
-                                                ->get()->toArray();
-                                                // ->get();
+                                                ->get();
 
-            // $totalSalary = $transactionPayrolls->sum('final_total');
-            // $numberOfRecords = $transactionPayrolls->count();
+            $transactionPayrolls = $datas->map(function ($data) {
+                $essentials_allowances = json_decode($data->essentials_allowances);
+                $data->essentials_allowances = array_sum($essentials_allowances->{'allowance_amounts'});
+                $essentials_deductions = json_decode($data->essentials_deductions);
+                $data->essentials_deductions = array_sum($essentials_deductions->{'deduction_amounts'});
 
-            // dd($totalSalary);
-            dd($transactionPayrolls);
+                $socialSecurityAmount = null;
+
+                foreach ($essentials_deductions->deduction_names as $key => $deduction_name) {
+                    if (strpos($deduction_name, 'Social Security Deductions') !== false) {
+                        $socialSecurityAmount = $essentials_deductions->deduction_amounts[$key];
+                        break;
+                    }
+                }
+
+                $employeeOvertime = EmployeeOvertime::where('user_id', $data->transaction_for->id)
+                ->where('month', date('m'))
+                ->where('year', date('Y'))
+                ->whereNotIn('total_hour', ['A','SL','VL','GE'])
+                ->get();
+
+                $data->social_security_deductions = $socialSecurityAmount;
+                $data->extra_hours = array_sum($employeeOvertime->pluck('total_hour')->toArray());
+                $data->working_days = array_sum($employeeOvertime->pluck('total_hour')->toArray());
+
+                return $data;
+
+            });
+
+            $totalSalary = $transactionPayrolls->sum('final_total');
+            $numberOfRecords = $transactionPayrolls->count();
+
             $companyBankDetail = CompanyBankDetail::where('business_id', auth()->user()->business_id)->get()->first();
 
-            dd($companyBankDetail->toArray());
-            // Log::info(json_encode($transactionPayrolls, JSON_PRETTY_PRINT));
+            $sifExportCounter = $this->addSifExportCounter();
+            $fileFormat = 'SIF_'. $companyBankDetail->employer_cr_no .'_'. $companyBankDetail->payer_bank_short_name . '_' . date('Ymd') . '_' . $sifExportCounter->count . '.xlsx';
 
-            return Excel::download(new SifExcelExport($transactionPayrolls, $companyBankDetail, $totalSalary, $numberOfRecords), 'sif_excel.xlsx');
-        } catch (\Throwable $th) {
+            return Excel::download(new SifExcelExport($transactionPayrolls, $companyBankDetail, $totalSalary, $numberOfRecords), $fileFormat);
+        } catch (\Exception $e) {
             //throw $th;
+            Log::error('ERROR on exportExcel : '. $e->getMessage());
+            throw $e;
         }
     }
 }
