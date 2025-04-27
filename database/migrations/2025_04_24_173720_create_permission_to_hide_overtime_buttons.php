@@ -19,7 +19,7 @@ return new class extends Migration
         ];
 
         foreach ($data as $d) {
-            Permission::create($d);
+            Permission::updateOrCreate($d);
         }        
     }
 
