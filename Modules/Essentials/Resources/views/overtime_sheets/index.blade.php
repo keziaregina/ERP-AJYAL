@@ -11,6 +11,8 @@
             /* background-color: #007bff; */
         }        
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
 @endsection
 
 @section('content')
@@ -25,29 +27,31 @@
     {{-- Main content --}}
     <section class="content">
         @component('components.widget', ['class' => 'box-primary', 'title' => __('essentials::lang.manage_your_overtime_sheets')])
-            <div class="tw-flex tw-gap-2 tw-mb-4">
-                <a href="{{ route('pdfovertime') }}"  class="tw-dw-btn tw-bg-gradient-to-r tw-from-red-600 tw-to-red-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    PDF
-                </a>
-                <a href="{{ route('excelovertime') }}" class="tw-dw-btn tw-bg-gradient-to-r tw-from-green-600 tw-to-green-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    Excel
-                </a>
-            </div>
-            @can('essentials.add_overtime_hour')
+            @can('essentials.export_overtime_hour')
+                <div class="tw-flex tw-gap-2 tw-mb-4">
+                    <a href="{{ route('pdfovertime') }}" class="tw-dw-btn bg-black tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        PDF
+                    </a>
+                    <a href="{{ route('excelovertime') }}" class="tw-dw-btn bg-black tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Excel
+                    </a>
+                </div>    
+            @endcan
+            @can('essentials.add_overtime_hour', 'essentials.edit_overtime_hour')
                 @slot('tool')
                     <div class="box-tools">
                         <!-- Button trigger modal -->
@@ -160,19 +164,31 @@
                 <form action="{{ action([\Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'store']) }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <div class="form-group">
+                        <div class="form-group {{ auth()->user()->hasRole('Admin#1') ?: 'hidden' }}">
                             <label for="user_id">@lang('essentials::lang.employee_name')</label>
                             <select name="user_id" id="user_id" class="form-control" required>
-                                <option value="">@lang('essentials::lang.select_employee')</option>
-                                @foreach ($employees as $employee)
-                                    <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
-                                @endforeach
+                                @if (auth()->user()->hasRole('Admin#1'))
+                                    <option value="">@lang('essentials::lang.select_employee')</option>
+                                    @foreach ($employees as $employee)
+                                        <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
+                                    @endforeach
+                                @else
+                                    <option selected value="{{ auth()->user()->id}}">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</option>
+                                @endif
+                                
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label for="date">@lang('essentials::lang.date')</label>
-                            <input type="date" name="date" id="date" class="form-control" value="{{ date('Y-m-d') }}" disabled>
+                            @if (auth()->user()->hasRole('Admin#1'))
+                                <input type="text" name="date" id="date" 
+                                class="form-control datepicker"
+                                value="{{ date('Y-m-d') }}"
+                                max="{{ date('Y-m-d') }}">
+                            @else
+                                <input type="date" name="date" id="date" class="form-control" value="{{ date('Y-m-d') }}" disabled>
+                            @endif
                         </div>
                             
                         <div class="form-group">
@@ -242,4 +258,31 @@
         </div>
     </div>
         
+@endsection
+
+@section('javascript')
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            flatpickr(".datepicker", {
+                dateFormat: "Y-m-d",
+                maxDate: "today",
+                minDate: firstDayOfMonth,
+                disable: [
+                    function(date) {
+                        return date > today;
+                    }
+                ],
+                @if(!auth()->user()->hasRole('Admin#1'))
+                defaultDate: "today",
+                @endif
+                theme: "material_blue",
+                showMonths: 1,
+                static: true
+            });
+        });
+    </script>
 @endsection

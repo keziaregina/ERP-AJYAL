@@ -41,6 +41,8 @@ class OvertimeSheetController extends Controller
 
             $daysInMonth = Carbon::now()->month(date('m'))->daysInMonth;
             $overtimeOptions = EmployeeOvertime::OVERTIME_HOURS;
+            $findKey = array_search('Glorious Employee Allowance', $overtimeOptions);
+            unset($overtimeOptions[$findKey]);
 
             // Get overtime data for the current month
             $overtimeData = $this->getOvertimeDataForCurrentMonth();
@@ -69,11 +71,12 @@ class OvertimeSheetController extends Controller
 
             $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'overtime_hours' => ['required', Rule::in(array_keys(EmployeeOvertime::OVERTIME_HOURS))]
+                'overtime_hours' => ['required', Rule::in(array_keys(EmployeeOvertime::OVERTIME_HOURS))],
+                // 'date' => 'required|date'
             ]);
 
             $overtimeHour = EmployeeOvertime::updateOrCreate([
-                'user_id' =>  $request->user_id,
+                'user_id' => $request->user_id,
                 'day' => date('d'),
                 'month' => date('m'),
                 'year' => date('Y'),

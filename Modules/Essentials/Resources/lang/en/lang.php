@@ -341,6 +341,7 @@ return [
     'example' => 'Example',
     'add_overtime_hour' => 'Add overtime hour',
     'edit_overtime_hour' => 'Edit overtime hour',
+    'export_overtime_hour' => 'Export overtime hour',
 
     'select_employee_glorious_this_month' => 'Select Glorious Employee For This Month',
     'employee_glorious_this_month' => 'Glorious Employee For This Month',

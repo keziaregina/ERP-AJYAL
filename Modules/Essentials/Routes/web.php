@@ -3,6 +3,8 @@
 // use App\Http\Controllers\Modules;
 // use Illuminate\Support\Facades\Route;
 
+use App\EmployeeBicCode;
+use App\Http\Controllers\EmployeeBicCodeController;
 use Modules\Essentials\Http\Controllers\CompanyBankDetailController;
 use Modules\Essentials\Http\Controllers\OvertimeSheetController;
 use Modules\Essentials\Http\Controllers\GloriousEmployeeController;
@@ -110,5 +112,8 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
         // Route for company bank detail
         Route::get('/company-bank-detail/export-excel', [CompanyBankDetailController::class, 'exportExcel'])->name('sif-export-excel');
         Route::resource('company-bank-details', CompanyBankDetailController::class);
+
+        // Route for Employee Bic Code
+        Route::resource('/bic-code', EmployeeBicCodeController::class);
     });
 });

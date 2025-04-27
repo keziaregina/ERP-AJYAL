@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\EmployeeBicCode;
+use App\SalaryFrequency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class EmployeeBicCodeController extends Controller
+class SalaryFrequencyController extends Controller
 {
     function index() {
         $businessId = Auth::user()->business_id;
 
-        $bicCode = EmployeeBicCode::where('business_id', $businessId)->get();
+        $salaryCode = SalaryFrequency::where('business_id', $businessId)->get();
 
-        return $bicCode;
+        return $salaryCode;
     }
-    
 }

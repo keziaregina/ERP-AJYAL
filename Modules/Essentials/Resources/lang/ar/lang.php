@@ -324,7 +324,7 @@ return[
     'add_new_overtime' => 'إضافة ساعة عمل إضافية',
     'select_overtime_hours' => 'حدد ساعات العمل الإضافي',
     'overtime_hours' => 'ساعات العمل الإضافي',
-    'legend' => 'مفتاح',
+    'legend' => 'مفاتيح رموز التقرير',
     'vacation_leave' => 'إجازة سنوية',
     'glorious_employee_allowance' => 'بدل الموظف المتميز',
     'sick_leave' => 'إجازة مرضية',
@@ -338,6 +338,7 @@ return[
     'example' => 'مثال',
     'add_overtime_hour' => 'إضافة ساعة عمل إضافية',
     'edit_overtime_hour' => 'تعديل ساعة العمل الإضافي',
+    'export_overtime_hour' => 'تصدير ساعة العمل الإضافي',
 
     'select_employee_glorious_this_month' => 'اختر الموظف المتميز لهذا الشهر',
 

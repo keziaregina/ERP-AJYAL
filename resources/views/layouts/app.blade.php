@@ -38,7 +38,6 @@
 
     @yield('css')
 
-
 </head>
 <body
     class="tw-font-sans tw-antialiased tw-text-gray-900 tw-bg-gray-100 @if ($pos_layout) hold-transition lockscreen @else hold-transition skin-@if (!empty(session('business.theme_color'))){{ session('business.theme_color') }}@else{{ 'blue-light' }} @endif sidebar-mini @endif" >
@@ -146,6 +145,20 @@
         <div>
 
             <div class="overlay tw-hidden"></div>
+
+            
+            {{-- @push('extra_scripts')
+            {{--<link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+            <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+            <script>
+              new TomSelect("#color-select", {
+                create: true
+              });
+            </script>
+            @endpush 
+            --}}
+
+
 
 </body>
 <style>

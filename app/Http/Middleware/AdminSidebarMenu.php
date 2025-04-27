@@ -562,6 +562,13 @@ class AdminSidebarMenu
                 $menu->dropdown(
                     __('report.reports'),
                     function ($sub) use ($enabled_modules, $is_admin) {
+                        if (auth()->user()->can('overtime_report.view')) {
+                            $sub->url(
+                                action([\App\Http\Controllers\ReportController::class, 'getOvertimeReport']),
+                                __('report.overtime'),
+                                ['icon' => '', 'active' => request()->segment(2) == 'overtime-report']
+                            );
+                        }
                         if (auth()->user()->can('profit_loss_report.view')) {
                             $sub->url(
                                 action([\App\Http\Controllers\ReportController::class, 'getProfitLoss']),
