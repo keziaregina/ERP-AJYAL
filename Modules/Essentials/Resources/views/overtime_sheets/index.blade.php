@@ -164,21 +164,17 @@
                 <form action="{{ action([\Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'store']) }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <div class="form-group {{ auth()->user()->hasRole('Admin#1') ?: 'hidden' }}">
+                        <div class="form-group">
                             <label for="user_id">@lang('essentials::lang.employee_name')</label>
                             <select name="user_id" id="user_id" class="form-control" required>
-                                @if (auth()->user()->hasRole('Admin#1'))
-                                    <option value="">@lang('essentials::lang.select_employee')</option>
-                                    @foreach ($employees as $employee)
-                                        <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
-                                    @endforeach
-                                @else
-                                    <option selected value="{{ auth()->user()->id}}">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</option>
-                                @endif
-                                
+                                <option value="">@lang('essentials::lang.select_employee')</option>
+                                @foreach ($employees as $employee)
+                                    <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
+                                @endforeach
+                            {{-- <option selected value="{{ auth()->user()->id}}">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</option> --}}                                        
                             </select>
                         </div>
-
+                                                
                         <div class="form-group">
                             <label for="date">@lang('essentials::lang.date')</label>
                             @if (auth()->user()->hasRole('Admin#1'))

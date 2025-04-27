@@ -346,7 +346,7 @@ return[
 
     'company_bank_detail' => 'تفاصيل بنك الشركة',
 
-    'manage_your_company_bank_detail' => 'إدارة تفاصيل حسابك البنكي للشركة'
+    'manage_your_company_bank_detail' => 'إدارة تفاصيل حسابك البنكي للشركة',
 
 
     'employer_cr_no' => 'Employer CR No',
@@ -359,4 +359,6 @@ return[
 
     'select_employee_type' => 'حدد نوع الموظف',
     'employee_type' => 'نوع الموظف',
+    'export_company_bank' => 'زر تفاصيل بنك شركة التصدير',
+    'purchase_price' => 'إضافة سعر صفحة الشراء'
 ];

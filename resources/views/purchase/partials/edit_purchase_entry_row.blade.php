@@ -14,16 +14,23 @@
                 <th>#</th>
                 <th>@lang( 'product.product_name' )</th>
                 <th>@if(empty($is_purchase_order)) @lang( 'purchase.purchase_quantity' ) @else @lang( 'lang_v1.order_quantity' ) @endif</th>
+                @can('essentials.purchase_price')
                 <th>@lang( 'lang_v1.unit_cost_before_discount' )</th>
+                @endcan
                 <th>@lang( 'lang_v1.discount_percent' )</th>
+                @can('essentials.purchase_price')
                 <th>@lang( 'purchase.unit_cost_before_tax' )</th>
+                @endcan
                 <th class="{{$hide_tax}}">@lang( 'purchase.subtotal_before_tax' )</th>
                 <th class="{{$hide_tax}}">@lang( 'purchase.product_tax' )</th>
+                @can('essentials.purchase_price')
                 <th class="{{$hide_tax}}">@lang( 'purchase.net_cost' )</th>
+                @endcan
                 <th>@lang( 'purchase.line_total' )</th>
                 <th class="@if(!session('business.enable_editing_product_from_purchase') || !empty($is_purchase_order)) hide @endif">
                     @lang( 'lang_v1.profit_margin' )
                 </th>
+                @can('essentials.purchase_price')
                 @if(empty($is_purchase_order))
                     <th>@lang( 'purchase.unit_selling_price') <small>(@lang('product.inc_of_tax'))</small></th>
                     @if(session('business.enable_lot_number'))
@@ -35,6 +42,7 @@
                         <th>@lang('product.mfg_date') / @lang('product.exp_date')</th>
                     @endif
                 @endif
+                @endcan
                 <th>
                     <i class="fa fa-trash" aria-hidden="true"></i>
                 </th>

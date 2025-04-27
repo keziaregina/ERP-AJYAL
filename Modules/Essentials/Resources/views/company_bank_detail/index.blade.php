@@ -26,6 +26,7 @@
                 <h1>Company Bank Detail</h1>
             </div>
         @endcomponent --}}
+        @can('essentials.export_company_bank')
         <div class="tw-flex tw-gap-2 tw-mb-4">
             <a href="{{ route('payroll.pdf') }}"  class="bg-black tw-dw-btn tw-bg-gradient-to-r tw-from-red-600 tw-to-red-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
@@ -50,6 +51,7 @@
                 Excel
             </a>
         </div>
+        @endcan
 
         <form action="{{ action([\Modules\Essentials\Http\Controllers\CompanyBankDetailController::class, 'store']) }}" method="POST">
             @csrf

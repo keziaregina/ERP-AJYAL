@@ -314,6 +314,16 @@ class DataController extends Controller
                 'label' => __('essentials::lang.export_overtime_hour'),
                 'default' => false,
             ],
+            [
+                'value' => 'essentials.export_company_bank',
+                'label' => __('essentials::lang.export_company_bank'),
+                'default' => false,
+            ],
+            [
+                'value' => 'essentials.purchase_price',
+                'label' => __('essentials::lang.purchase_price'),
+                'default' => false,
+            ],
         ];
     }
 
