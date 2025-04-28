@@ -104,9 +104,9 @@ class CompanyBankDetailController extends Controller {
             $companyBankDetail = CompanyBankDetail::where('business_id', auth()->user()->business_id)->get()->first();
 
             $sifExportCounter = $this->addSifExportCounter();
-            $fileFormat = 'SIF_'. $companyBankDetail->employer_cr_no .'_'. $companyBankDetail->payer_bank_short_name . '_' . date('Ymd') . '_' . $sifExportCounter->count . '.xlsx';
+            $fileFormat = 'SIF_'. $companyBankDetail->employer_cr_no .'_'. $companyBankDetail->payer_bank_short_name . '_' . date('Ymd') . '_' . $sifExportCounter->count . '.xls';
 
-            return Excel::download(new SifExcelExport($transactionPayrolls, $companyBankDetail, $totalSalary, $numberOfRecords), $fileFormat);
+            return Excel::download(new SifExcelExport($transactionPayrolls, $companyBankDetail, $totalSalary, $numberOfRecords), $fileFormat, \Maatwebsite\Excel\Excel::XLS);
         } catch (\Exception $e) {
             //throw $th;
             Log::error('ERROR on exportExcel : '. $e->getMessage());
