@@ -15,6 +15,8 @@ return [
     'edit' => 'Edit',
     'save' => 'Save',
     'update' => 'Update',
+    'generate_as_sif' => 'Generate as SIF',
+    'generate_as_pdf' => 'Generate as PDF',
     'action' => 'Action',
     'actions' => 'Actions',
     'view' => 'View',

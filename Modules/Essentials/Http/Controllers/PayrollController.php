@@ -73,6 +73,7 @@ class PayrollController extends Controller
 
         if (request()->ajax()) {
             $payrolls = $this->essentialsUtil->getPayrollQuery($business_id);
+            // \Log::info(json_encode($payrolls, JSON_PRETTY_PRINT));
 
             if ($can_view_all_payroll) {
                 if (! empty(request()->input('user_id'))) {
@@ -121,6 +122,7 @@ class PayrollController extends Controller
                 ->addColumn(
                     'action',
                     function ($row) {
+                        // \Log::info(json_encode($row, JSON_PRETTY_PRINT));
                         $html = '<div class="btn-group">
                                     <button type="button" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-info tw-w-max dropdown-toggle" 
                                         data-toggle="dropdown" aria-expanded="false">'.
@@ -758,6 +760,20 @@ class PayrollController extends Controller
                                             .__('purchase.add_payment').
                                     '</a>
                                 </li>';
+                        }
+
+                        if ( $row->status == 'final' && $row->payment_status != 'paid') {
+                            $html .= '<li>
+                            <a href="#" data-href="#" data-container="#" class="btn-modal">
+                                <i class="fa fa-regular fa-file" aria-hidden="true"></i> '.__('messages.generate_as_sif').'
+                            </a>
+                            </li>';
+
+                            $html .= '<li>
+                            <a href="#" data-href="#" data-container="#" class="btn-modal">
+                                <i class="fa fa-regular fa-file" aria-hidden="true"></i> '.__('messages.generate_as_pdf').'
+                            </a>
+                            </li>';
                         }
 
                         $html .= '</ul></div>';
