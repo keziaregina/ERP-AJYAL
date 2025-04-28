@@ -5,6 +5,8 @@
      'edit' => 'تعديل',
      'save' => 'حفظ',
      'update' => 'تحديث',
+     'generate_as_sif' => 'توليدها بصيغة SIF',
+     'generate_as_pdf' => 'توليدها بصيغة PDF',
      'action' => 'خيار',
      'actions' => 'خيارات',
      'view' => 'فحص',

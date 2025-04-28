@@ -134,6 +134,10 @@ class PayrollController extends Controller
                             $html .= '<li><a href="'.action([\App\Http\Controllers\TransactionPaymentController::class, 'addPayment'], [$row->id]).'" class="add_payment_modal"><i class="fa fa-money"></i> '.__('purchase.add_payment').'</a></li>';
                         }
 
+                        $html .= '<li><a href="#" data-href="#" data-container="#" class="btn-modal"><i class="fa fa-regular fa-file" aria-hidden="true"></i> '.__('messages.generate_as_sif').'</a></li>';
+
+                        $html .= '<li><a href="#" data-href="#" data-container="#" class="btn-modal"><i class="fa fa-regular fa-file" aria-hidden="true"></i> '.__('messages.generate_as_pdf').'</a></li>';
+
                         $html .= '</ul></div>';
 
                         return $html;
