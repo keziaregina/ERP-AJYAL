@@ -27,8 +27,8 @@
     {{-- Main content --}}
     <section class="content">
         @component('components.widget', ['class' => 'box-primary', 'title' => __('essentials::lang.manage_your_overtime_sheets')])
-            @can('essentials.export_overtime_hour')
                 <div class="tw-flex tw-gap-2 tw-mb-4">
+                    @can('essentials.export_overtime_hour')
                     <a href="{{ route('pdfovertime') }}" class="tw-dw-btn bg-black tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -48,10 +48,18 @@
                             <polyline points="10 9 9 9 8 9"></polyline>
                         </svg>
                         Excel
-                    </a>
+                    </a> 
+                    @endcan              
+                    @can('essentials.edit_overtime_hour')               
+                        <div class="box-tools">
+                            <!-- Button trigger modal -->
+                            <button type="button" class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right" data-toggle="modal" data-target="#exampleModalCenter">                        
+                            @lang('essentials::lang.edit_overtime_hour')
+                            </button>
+                        </div>           
+                    @endcan
                 </div>    
-            @endcan
-            @can('essentials.add_overtime_hour', 'essentials.edit_overtime_hour')
+            @can('essentials.add_overtime_hour')
                 @slot('tool')
                     <div class="box-tools">
                         <!-- Button trigger modal -->
@@ -164,21 +172,17 @@
                 <form action="{{ action([\Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'store']) }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <div class="form-group {{ auth()->user()->hasRole('Admin#1') ?: 'hidden' }}">
+                        <div class="form-group">
                             <label for="user_id">@lang('essentials::lang.employee_name')</label>
                             <select name="user_id" id="user_id" class="form-control" required>
-                                @if (auth()->user()->hasRole('Admin#1'))
-                                    <option value="">@lang('essentials::lang.select_employee')</option>
-                                    @foreach ($employees as $employee)
-                                        <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
-                                    @endforeach
-                                @else
-                                    <option selected value="{{ auth()->user()->id}}">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</option>
-                                @endif
-                                
+                                <option value="">@lang('essentials::lang.select_employee')</option>
+                                @foreach ($employees as $employee)
+                                    <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
+                                @endforeach
+                            {{-- <option selected value="{{ auth()->user()->id}}">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</option> --}}                                        
                             </select>
                         </div>
-
+                                                
                         <div class="form-group">
                             <label for="date">@lang('essentials::lang.date')</label>
                             @if (auth()->user()->hasRole('Admin#1'))
