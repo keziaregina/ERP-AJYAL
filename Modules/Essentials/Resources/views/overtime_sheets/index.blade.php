@@ -27,8 +27,8 @@
     {{-- Main content --}}
     <section class="content">
         @component('components.widget', ['class' => 'box-primary', 'title' => __('essentials::lang.manage_your_overtime_sheets')])
-            @can('essentials.export_overtime_hour')
                 <div class="tw-flex tw-gap-2 tw-mb-4">
+                    @can('essentials.export_overtime_hour')
                     <a href="{{ route('pdfovertime') }}" class="tw-dw-btn bg-black tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -48,7 +48,8 @@
                             <polyline points="10 9 9 9 8 9"></polyline>
                         </svg>
                         Excel
-                    </a>                
+                    </a> 
+                    @endcan              
                     @can('essentials.edit_overtime_hour')               
                         <div class="box-tools">
                             <!-- Button trigger modal -->
@@ -58,7 +59,6 @@
                         </div>           
                     @endcan
                 </div>    
-            @endcan
             @can('essentials.add_overtime_hour')
                 @slot('tool')
                     <div class="box-tools">
