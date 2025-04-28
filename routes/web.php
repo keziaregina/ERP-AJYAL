@@ -530,4 +530,4 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone'])
     Route::get('/show-notification/{id}', [HomeController::class, 'showNotification']);
 });
 
-Route::get('/payroll/pdf', [App\Http\Controllers\PayrollController::class, 'generatePayrollPdf'])->name('payroll.pdf');
+Route::get('/payroll/pdf/{id}', [App\Http\Controllers\PayrollController::class, 'generatePayrollPdf'])->name('payroll.pdf');

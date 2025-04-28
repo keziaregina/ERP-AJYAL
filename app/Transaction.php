@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Essentials\Entities\PayrollGroup;
 
 class Transaction extends Model
 {
@@ -407,5 +408,12 @@ class Transaction extends Model
         return $sales_orders;
     }
 
-   
+   public function payrollGroup()
+   {
+       return $this->belongsTo(
+           \Modules\Essentials\Entities\PayrollGroup::class,
+           'id',
+           'transaction_id'
+       )->join('essentials_payroll_group_transactions', 'essentials_payroll_groups.id', '=', 'essentials_payroll_group_transactions.payroll_group_id');
+   }
 }

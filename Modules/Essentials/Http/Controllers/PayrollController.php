@@ -19,6 +19,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use App\Events\TransactionPaymentAdded;
+use Exception;
 use Yajra\DataTables\Facades\DataTables;
 use Modules\Essentials\Utils\EssentialsUtil;
 use Modules\Essentials\Entities\PayrollGroup;
@@ -698,7 +699,8 @@ class PayrollController extends Controller
 
     public function payrollGroupDatatable(Request $request)
     {
-        $business_id = request()->session()->get('user.business_id');
+        try {
+            $business_id = request()->session()->get('user.business_id');
         $is_admin = $this->moduleUtil->is_admin(auth()->user(), $business_id);
         if (! (auth()->user()->can('superadmin') || $is_admin || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
             abort(403, 'Unauthorized action.');
@@ -761,25 +763,25 @@ class PayrollController extends Controller
                                     '</a>
                                 </li>';
                         }
-
+                        
                         if ( $row->status == 'final' && $row->payment_status != 'paid') {
                             $html .= '<li>
-                            <a href="#" data-href="#" data-container="#" class="btn-modal">
-                                <i class="fa fa-regular fa-file" aria-hidden="true"></i> '.__('messages.generate_as_sif').'
+                            <a href="' .route('sif-export-excel', ['id' => $row->id]). '" target="_blank">
+                                <i class="fa fa-regular fa-file" aria-hpayroll_group_idden="true"></i> '.__('messages.generate_as_sif').'
                             </a>
                             </li>';
-
+                            
                             $html .= '<li>
-                            <a href="#" data-href="#" data-container="#" class="btn-modal">
+                            <a href="' .route('payroll.pdf', ['id' => $row->id]). '" target="_blank">
                                 <i class="fa fa-regular fa-file" aria-hidden="true"></i> '.__('messages.generate_as_pdf').'
                             </a>
                             </li>';
-                        }
+                        }                        
 
                         $html .= '</ul></div>';
 
                         return $html;
-                    }
+                    }                    
                 )
                 ->editColumn('status', '
                     @lang("sale.".$status)
@@ -810,6 +812,10 @@ class PayrollController extends Controller
                 ->rawColumns(['action', 'added_by', 'created_at', 'status', 'gross_total', 'payment_status', 'location_name'])
                 ->make(true);
         }
+        } catch (Exception $e) {
+            Log::error("Error " . $e->getMessage());
+            throw $e->getMessage();
+        } 
     }
 
     public function viewPayrollGroup($id)

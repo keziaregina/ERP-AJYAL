@@ -59,13 +59,15 @@ class CompanyBankDetailController extends Controller {
         return $sifCount;
     }
     // Using transaction table
-    function exportExcel() {
+    function exportExcel($id) {
         try {
-            $datas = Transaction::where('business_id', auth()->user()->business_id)
-                                                ->where('type', 'payroll')
-                                                ->where('payroll_month', date('m'))
-                                                ->with(['transaction_for'])
-                                                ->get();
+            $datas = Transaction::leftJoin('essentials_payroll_group_transactions', 'transactions.id', '=', 'essentials_payroll_group_transactions.transaction_id')
+            ->where('essentials_payroll_group_transactions.payroll_group_id', $id)
+            ->where('business_id', auth()->user()->business_id)
+            ->where('type', 'payroll')
+            ->where('payroll_month', date('m'))
+            ->with(['transaction_for'])
+            ->get();
 
             $transactionPayrolls = $datas->map(function ($data) {
                 $essentials_allowances = json_decode($data->essentials_allowances);
