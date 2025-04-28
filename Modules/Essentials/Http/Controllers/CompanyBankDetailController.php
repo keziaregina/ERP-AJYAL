@@ -59,8 +59,10 @@ class CompanyBankDetailController extends Controller {
         return $sifCount;
     }
     // Using transaction table
-    function exportExcel() {
+    function exportExcel($id) {
         try {
+            // Log::info("test");
+            // Log::info($id);
             $datas = Transaction::where('business_id', auth()->user()->business_id)
                                                 ->where('type', 'payroll')
                                                 ->where('payroll_month', date('m'))

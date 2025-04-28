@@ -16,8 +16,9 @@ class PayrollController extends Controller
     /**
      * Generate payroll PDF report
      */
-    public function generatePayrollPdf()
+    public function generatePayrollPdf($id)
     {
+        // Log::info($id);
         try {
             // Get payroll transactions for current month
             // $transactions = Transaction::where('business_id', auth()->user()->business_id)

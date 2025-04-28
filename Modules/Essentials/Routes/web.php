@@ -110,7 +110,7 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
         Route::resource('glorious-employee', GloriousEmployeeController::class);
 
         // Route for company bank detail
-        Route::get('/company-bank-detail/export-excel', [CompanyBankDetailController::class, 'exportExcel'])->name('sif-export-excel');
+        Route::get('/company-bank-detail/export-excel/{id}', [CompanyBankDetailController::class, 'exportExcel'])->name('sif-export-excel');
         Route::resource('company-bank-details', CompanyBankDetailController::class);
 
         // Route for Employee Bic Code
