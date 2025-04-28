@@ -53,7 +53,7 @@
                     @can('essentials.edit_overtime_hour')               
                         <div class="box-tools">
                             <!-- Button trigger modal -->
-                            <button type="button" class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right" data-toggle="modal" data-target="#exampleModalCenter">                        
+                            <button type="button" class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right" data-toggle="modal" data-target="#editModal">                        
                             @lang('essentials::lang.edit_overtime_hour')
                             </button>
                         </div>           
@@ -164,6 +164,65 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLongTitle">Add Overtime</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form action="{{ action([\Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'store']) }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="user_id">@lang('essentials::lang.employee_name')</label>
+                            <select name="user_id" id="user_id" class="form-control" required>
+                                <option value="">@lang('essentials::lang.select_employee')</option>
+                                @foreach ($employees as $employee)
+                                    <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
+                                @endforeach
+                            {{-- <option selected value="{{ auth()->user()->id}}">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</option> --}}                                        
+                            </select>
+                        </div>
+                                                
+                        <div class="form-group">
+                            <label for="date">@lang('essentials::lang.date')</label>
+                            @if (auth()->user()->hasRole('Admin#1'))
+                                <input type="text" name="date" id="date" 
+                                class="form-control datepicker"
+                                value="{{ date('Y-m-d') }}"
+                                max="{{ date('Y-m-d') }}">
+                            @else
+                                <input type="date" name="date" id="date" class="form-control" value="{{ date('Y-m-d') }}" disabled>
+                            @endif
+                        </div>
+                            
+                        <div class="form-group">
+                            <label for="overtime_hours">@lang('essentials::lang.overtime_hours')</label>
+                            <select name="overtime_hours" id="overtime_hours" class="form-control" required>
+                                <option value="">@lang('essentials::lang.select_overtime_hours')</option>
+                                @foreach ($overtimeOptions as $key => $value)
+                                    <option value="{{ $key }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Edit Overtime</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
