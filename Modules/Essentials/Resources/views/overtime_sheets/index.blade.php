@@ -48,10 +48,18 @@
                             <polyline points="10 9 9 9 8 9"></polyline>
                         </svg>
                         Excel
-                    </a>
+                    </a>                
+                    @can('essentials.edit_overtime_hour')               
+                        <div class="box-tools">
+                            <!-- Button trigger modal -->
+                            <button type="button" class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right" data-toggle="modal" data-target="#exampleModalCenter">                        
+                            @lang('essentials::lang.edit_overtime_hour')
+                            </button>
+                        </div>           
+                    @endcan
                 </div>    
             @endcan
-            @can('essentials.add_overtime_hour', 'essentials.edit_overtime_hour')
+            @can('essentials.add_overtime_hour')
                 @slot('tool')
                     <div class="box-tools">
                         <!-- Button trigger modal -->
