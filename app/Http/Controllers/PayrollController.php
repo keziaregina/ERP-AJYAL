@@ -18,7 +18,7 @@ class PayrollController extends Controller
      */
     public function generatePayrollPdf($id)
     {
-        // Log::info($id);
+        Log::info($id);
         try {
             // Get payroll transactions for current month
             // $transactions = Transaction::where('business_id', auth()->user()->business_id)
@@ -71,7 +71,9 @@ class PayrollController extends Controller
             // $companyBankDetail = CompanyBankDetail::where('business_id', auth()->user()->business_id)
             //     ->first();
 
-            $datas = Transaction::where('business_id', auth()->user()->business_id)
+            $datas = Transaction::leftJoin('essentials_payroll_group_transactions', 'transactions.id', '=', 'essentials_payroll_group_transactions.transaction_id')
+            ->where('essentials_payroll_group_transactions.payroll_group_id', $id)
+            ->where('business_id', auth()->user()->business_id)
             ->where('type', 'payroll')
             ->where('payroll_month', date('m'))
             ->with(['transaction_for'])
