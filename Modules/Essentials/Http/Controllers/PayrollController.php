@@ -764,7 +764,7 @@ class PayrollController extends Controller
                                 </li>';
                         }
                         
-                        if ( $row->status == 'final' && $row->payment_status != 'paid') {
+                        if ( $row->status == 'final' && $row->payment_status != 'paid' && auth()->user()->can('essentials.export_company_bank')) {                            
                             $html .= '<li>
                             <a href="' .route('sif-export-excel', ['id' => $row->id]). '" target="_blank">
                                 <i class="fa fa-regular fa-file" aria-hpayroll_group_idden="true"></i> '.__('messages.generate_as_sif').'
