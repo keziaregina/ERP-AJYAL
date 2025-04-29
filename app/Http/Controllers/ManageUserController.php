@@ -376,7 +376,6 @@ class ManageUserController extends Controller
            
             event(new UserCreatedOrModified($user, 'updated'));
             
-        dd($request->all());
 
             $output = ['success' => 1,
                 'msg' => __('user.user_update_success'),
@@ -392,7 +391,6 @@ class ManageUserController extends Controller
                 'msg' => $e->getMessage(),
             ];
         }
-        // dd($request->all());
         return redirect('users')->with('status', $output);
     }
 

@@ -325,7 +325,6 @@ class PayrollController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        // dd($request->all());
 
         try {
             $transaction_date = $request->input('transaction_date');
@@ -351,6 +350,7 @@ class PayrollController extends Controller
                 $payroll['payment_status'] = 'due';
                 $payroll['status'] = 'final';
                 $payroll['payroll_month'] = date('m');
+                // $payroll_group['gross_total'] = $this
                 // $payroll['total_before_tax'] = $payroll['final_total'];
                 $payroll['total_before_tax'] = $payroll['total'];
                 $payroll['essentials_amount_per_unit_duration'] = $this->moduleUtil->num_uf($payroll['essentials_amount_per_unit_duration']);
