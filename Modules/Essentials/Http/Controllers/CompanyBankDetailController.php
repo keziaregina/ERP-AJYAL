@@ -93,7 +93,8 @@ class CompanyBankDetailController extends Controller {
 
                 $data->social_security_deductions = $socialSecurityAmount;
                 $data->extra_hours = array_sum($employeeOvertime->pluck('total_hour')->toArray());
-                $data->working_days = array_sum($employeeOvertime->pluck('total_hour')->toArray());
+                // $data->working_days = array_sum($employeeOvertime->pluck('total_hour')->toArray());
+                $data->working_days = $employeeOvertime->count();
 
                 return $data;
 
