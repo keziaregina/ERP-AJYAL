@@ -2,18 +2,22 @@
 
 namespace Modules\Essentials\Http\Controllers;
 
-use App\User;
-use App\Utils\ModuleUtil;
 use DB;
+use App\User;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+use App\EmployeeOvertime;
+use App\Utils\ModuleUtil;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Modules\Essentials\Entities\EssentialsLeave;
-use Modules\Essentials\Entities\EssentialsLeaveType;
-use Modules\Essentials\Notifications\LeaveStatusNotification;
-use Modules\Essentials\Notifications\NewLeaveNotification;
+use Illuminate\Support\Facades\Log;
 use Spatie\Activitylog\Models\Activity;
 use Yajra\DataTables\Facades\DataTables;
+use Modules\Essentials\Entities\EssentialsLeave;
+use Modules\Essentials\Entities\EssentialsLeaveType;
+use Modules\Essentials\Notifications\NewLeaveNotification;
+use Modules\Essentials\Notifications\LeaveStatusNotification;
 
 class EssentialsLeaveController extends Controller
 {
@@ -192,6 +196,7 @@ class EssentialsLeaveController extends Controller
      */
     public function store(Request $request)
     {
+        // Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
         $business_id = request()->session()->get('user.business_id');
 
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
@@ -326,6 +331,7 @@ class EssentialsLeaveController extends Controller
 
     public function changeStatus(Request $request)
     {
+        // Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
         $business_id = request()->session()->get('user.business_id');
 
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module')) || ! auth()->user()->can('essentials.approve_leave')) {
@@ -341,6 +347,7 @@ class EssentialsLeaveController extends Controller
             $leave->status = $input['status'];
             $leave->status_note = $input['status_note'];
             $leave->save();
+            // Log::info(json_encode($leave, JSON_PRETTY_PRINT));
 
             $leave->status = $this->leave_statuses[$leave->status]['name'];
 
@@ -348,6 +355,39 @@ class EssentialsLeaveController extends Controller
 
             $leave->user->notify(new LeaveStatusNotification($leave));
 
+            $type = EssentialsLeave::with('leave_type')->find($leave->essentials_leave_type_id);
+
+            $map = [
+                'Sick Leave'     => 'SL',
+                'Vacation Leaves'=> 'VL',
+            ];
+
+            $short = $map[$type->leave_type->leave_type];
+
+                $startDate = $leave->start_date;
+                $endDate = $leave->end_date;
+                $range = CarbonPeriod::create($startDate, $endDate);
+            foreach ($range as $date) {
+                $days = date('d', strtotime($date));
+                $months = date('m', strtotime($date));
+                $years = date('Y', strtotime($date));
+                
+
+            if ($input['status'] == 'approved') {
+                $overTimeHour = EmployeeOvertime::updateOrCreate([
+                    'user_id' => $leave->user_id,
+                    'day' => $days,
+                    'month' => $months,
+                    'year' => $years,                    
+                ], [
+                    'total_hour' => $short,
+                ]);
+                }
+            // Log::info(json_encode($overTimeHour, JSON_PRETTY_PRINT));
+            // Log::info(json_encode($range, JSON_PRETTY_PRINT));    
+            }
+
+            
             $output = ['success' => true,
                 'msg' => __('lang_v1.updated_success'),
             ];

@@ -3,6 +3,7 @@
 namespace Modules\Essentials\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Essentials\Entities\EssentialsLeave;
 
 class EssentialsLeaveType extends Model
 {
@@ -19,5 +20,10 @@ class EssentialsLeaveType extends Model
                                     ->pluck('leave_type', 'id');
 
         return $leave_types;
+    }
+
+    public function Leave()
+    {
+        return $this->belongsTo(EssentialsLeave::class);
     }
 }
