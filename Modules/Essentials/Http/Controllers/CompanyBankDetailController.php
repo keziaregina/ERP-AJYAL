@@ -53,10 +53,11 @@ class CompanyBankDetailController extends Controller {
             'business_id' => auth()->user()->business_id,
             'date' => date('Y-m-d')
         ]);
-
+        
         $sifCount->count++;
         $sifCount->save();
-        return $sifCount;
+        $formattedCount = str_pad($sifCount->count, 3, '0', STR_PAD_LEFT);
+        return $formattedCount;
     }
     // Using transaction table
     function exportExcel($id) {
@@ -104,7 +105,7 @@ class CompanyBankDetailController extends Controller {
             $companyBankDetail = CompanyBankDetail::where('business_id', auth()->user()->business_id)->get()->first();
 
             $sifExportCounter = $this->addSifExportCounter();
-            $fileFormat = 'SIF_'. $companyBankDetail->employer_cr_no .'_'. $companyBankDetail->payer_bank_short_name . '_' . date('Ymd') . '_' . $sifExportCounter->count . '.xls';
+            $fileFormat = 'SIF_'. $companyBankDetail->employer_cr_no .'_'. $companyBankDetail->payer_bank_short_name . '_' . date('Ymd') . '_' . $sifExportCounter . '.xls';
 
             return Excel::download(new SifExcelExport($transactionPayrolls, $companyBankDetail, $totalSalary, $numberOfRecords), $fileFormat, \Maatwebsite\Excel\Excel::XLS);
         } catch (\Exception $e) {

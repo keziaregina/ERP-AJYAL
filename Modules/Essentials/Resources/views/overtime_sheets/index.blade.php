@@ -57,7 +57,7 @@
                             @lang('essentials::lang.edit_overtime_hour')
                             </button>
                         </div>           
-                    @endcan
+                    @endcan  
                 </div>    
             @can('essentials.add_overtime_hour')
                 @slot('tool')

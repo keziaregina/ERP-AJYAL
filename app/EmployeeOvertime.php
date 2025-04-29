@@ -29,6 +29,7 @@ class EmployeeOvertime extends Model
     }
 
     CONST OVERTIME_HOURS = [
+        "0" => "None",
         "0.30" => "30 Minutes",
         "1" => "1 Hours",
         "1.30" => "1.30 Hours",
