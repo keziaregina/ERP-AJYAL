@@ -18,59 +18,7 @@ class PayrollController extends Controller
      */
     public function generatePayrollPdf($id)
     {
-        Log::info($id);
         try {
-            // Get payroll transactions for current month
-            // $transactions = Transaction::where('business_id', auth()->user()->business_id)
-            //     ->where('type', 'payroll')
-            //     ->where('payroll_month', date('m'))
-            //     ->with(['transaction_for'])
-            //     ->get();
-
-            // // Process transaction data
-            // $payrollData = $transactions->map(function ($transaction) {
-            //     // Process allowances
-            //     $essentials_allowances = json_decode($transaction->essentials_allowances);
-            //     $total_allowances = array_sum($essentials_allowances->{'allowance_amounts'});
-
-            //     // Process deductions
-            //     $essentials_deductions = json_decode($transaction->essentials_deductions);
-            //     $total_deductions = array_sum($essentials_deductions->{'deduction_amounts'});
-
-            //     // Get social security deduction
-            //     $socialSecurityAmount = $this->getSocialSecurityAmount($essentials_deductions);
-
-            //     // Get overtime data
-            //     $employeeOvertime = $this->getEmployeeOvertime($transaction->transaction_for->id);
-                
-            //     // Calculate extra hours and working days
-            //     $extraHours = array_sum($employeeOvertime->pluck('total_hour')->toArray());
-            //     $workingDays = count($employeeOvertime);
-
-            //     // Format data for PDF
-            //     return [
-            //         'ref_no' => $transaction->id,
-            //         'employee_id_type' => 'C',
-            //         'employee_id_no' => $transaction->transaction_for->id,
-            //         'employee_name' => $transaction->transaction_for->full_name,
-            //         'bank_name' => 'BMCE', // Get from bank details if available
-            //         'account_number' => $transaction->transaction_for->bank_account_number ?? '',
-            //         'salary_freq' => 'M',
-            //         'no_of_days' => $workingDays,
-            //         'extra_hours' => number_format($extraHours, 2),
-            //         'basic_salary' => number_format($transaction->final_total - $total_allowances + $total_deductions, 2),
-            //         'extra_income' => number_format($total_allowances, 2),
-            //         'social_security_deduction' => number_format($socialSecurityAmount ?? 0, 2),
-            //         'net_salary' => number_format($transaction->final_total, 2),
-            //         'notes' => '',
-            //         'status' => 'Complete'
-            //     ];
-            // });
-
-            // // Get company bank details
-            // $companyBankDetail = CompanyBankDetail::where('business_id', auth()->user()->business_id)
-            //     ->first();
-
             $datas = Transaction::leftJoin('essentials_payroll_group_transactions', 'transactions.id', '=', 'essentials_payroll_group_transactions.transaction_id')
             ->where('essentials_payroll_group_transactions.payroll_group_id', $id)
             ->where('business_id', auth()->user()->business_id)

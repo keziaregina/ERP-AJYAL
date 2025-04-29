@@ -325,7 +325,9 @@ class PayrollController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-
+        // dd($request->all());
+        Log::info("payroll in store");
+        Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
         try {
             $transaction_date = $request->input('transaction_date');
             $payrolls = $request->input('payrolls');
@@ -333,7 +335,7 @@ class PayrollController extends Controller
             $payroll_group['business_id'] = $business_id;
             $payroll_group['name'] = $request->input('payroll_group_name');
             $payroll_group['status'] = $request->input('payroll_group_status');
-            $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('total_gross_amount'));
+            // $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('total_gross_amount'));
             // $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('payrolls[0][final_total]'));
             $payroll_group['location_id'] = $request->input('location_id');
             $payroll_group['created_by'] = auth()->user()->id;
@@ -342,7 +344,9 @@ class PayrollController extends Controller
 
             $payroll_group = PayrollGroup::create($payroll_group);
             $transaction_ids = [];
+            $payroll_gross_total = null;
             foreach ($payrolls as $key => $payroll) {
+                $payroll_gross_total += $payroll['final_total'];
                 $payroll['transaction_date'] = $transaction_date;
                 $payroll['business_id'] = $business_id;
                 $payroll['created_by'] = auth()->user()->id;
@@ -350,7 +354,7 @@ class PayrollController extends Controller
                 $payroll['payment_status'] = 'due';
                 $payroll['status'] = 'final';
                 $payroll['payroll_month'] = date('m');
-                // $payroll_group['gross_total'] = $this
+                // $payroll_group->gross_total = $payroll['total'];
                 // $payroll['total_before_tax'] = $payroll['final_total'];
                 $payroll['total_before_tax'] = $payroll['total'];
                 $payroll['essentials_amount_per_unit_duration'] = $this->moduleUtil->num_uf($payroll['essentials_amount_per_unit_duration']);
@@ -379,6 +383,8 @@ class PayrollController extends Controller
                     $transaction->transaction_for->notify(new PayrollNotification($transaction));
                 }
             }
+            $payroll_group->gross_total = $this->transactionUtil->num_uf($payroll_gross_total);
+            $payroll_group->save();
 
             $payroll_group->payrollGroupTransactions()->sync($transaction_ids);
 
