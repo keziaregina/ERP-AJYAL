@@ -259,25 +259,15 @@
 								<th>@lang( 'purchase.purchase_quantity' )</th>
 								@can('essentials.purchase_price')
 								<th>@lang( 'lang_v1.unit_cost_before_discount' )</th>
-								@endcan
 								<th>@lang( 'lang_v1.discount_percent' )</th>
-								@can('essentials.purchase_price')
 								<th>@lang( 'purchase.unit_cost_before_tax' )</th>
-								@endcan
-								@can('essentials.purchase_price')
 								<th class="{{$hide_tax}}">@lang( 'purchase.subtotal_before_tax' )</th>
-								@endcan
 								<th class="{{$hide_tax}}">@lang( 'purchase.product_tax' )</th>
-								@can('essentials.purchase_price')
 								<th class="{{$hide_tax}}">@lang( 'purchase.net_cost' )</th>
-								@endcan
-								@can('essentials.purchase_price')
 								<th>@lang( 'purchase.line_total' )</th>
-								@endcan
 								<th class="@if(!session('business.enable_editing_product_from_purchase')) hide @endif">
 									@lang( 'lang_v1.profit_margin' )
 								</th>
-								@can('essentials.purchase_price')
 								<th>
 									@lang( 'purchase.unit_selling_price' )
 									<small>(@lang('product.inc_of_tax'))</small>
@@ -333,6 +323,8 @@
 		</div>
 	@endcomponent
 
+
+	@can('essentials.purchase_price')
 	@component('components.widget', ['class' => 'box-primary'])
 		<div class="row">
 			<div class="col-sm-12">
@@ -390,7 +382,10 @@
 			</table>
 			</div>
 		</div>
-	@endcomponent
+		@endcomponent
+	@endcan
+
+	@can('essentials.purchase_price')
 	@component('components.widget', ['class' => 'box-primary'])
 	<div class="row">
 		<div class="col-md-4">
@@ -561,8 +556,10 @@
 			</div>
 		</div>
 	@endcomponent
+	@endcan
 	@component('components.widget', ['class' => 'box-primary', 'title' => __('purchase.add_payment')])
 		<div class="box-body payment_row">
+			@can('essentials.purchase_price')
 			<div class="row">
 				<div class="col-md-12">
 					<strong>@lang('lang_v1.advance_balance'):</strong> <span id="advance_balance_text">0</span>
@@ -577,6 +574,7 @@
 				</div>
 			</div>
 			<br>
+			@endcan
 			<div class="row">
 				<div class="col-sm-12 text-center">
 					<button type="button" id="submit_purchase_form" class="tw-dw-btn tw-dw-btn-primary tw-dw-btn-lg tw-text-white">@lang('messages.save')</button>

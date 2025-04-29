@@ -769,6 +769,7 @@ $(document).ready(function() {
 });
 
 function get_purchase_entry_row(product_id, variation_id) {
+    console.log('here')
     if (product_id) {
         var row_count = $('#row_count').val();
         var location_id = $('#location_id').val();
@@ -797,6 +798,8 @@ function get_purchase_entry_row(product_id, variation_id) {
 }
 // ada kemungkinan
 function append_purchase_lines(data, row_count, trigger_change = false) {
+    console.log('here 1')
+    console.log(data)
     $(data)
         .find('.purchase_quantity')
         .each(function() {
@@ -842,14 +845,15 @@ function update_purchase_entry_row_values(row) {
 
     if (typeof row != 'undefined') {
         console.log("testes");
+        console.log(row);
         console.log(userCanPurchasePrice);
         // console.log(window.userCanPurchasePrice);
 
         var quantity = __read_number(row.find('.purchase_quantity'), true);
 
-        if (window.userCanPurchasePrice) {
-            var unit_cost_price = __read_number(row.find('.purchase_unit_cost'), true);
-        }
+        var unit_cost_price = __read_number(row.find('.purchase_unit_cost'), true);
+        // // if (window.userCanPurchasePrice) {
+        // }
 
         var row_subtotal_before_tax = quantity * unit_cost_price;
 
