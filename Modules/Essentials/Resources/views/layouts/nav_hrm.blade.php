@@ -39,9 +39,13 @@
                         <li @if(request()->segment(1) == 'hrm' && request()->segment(2) == 'sales-target') class="active" @endif><a href="{{action([\Modules\Essentials\Http\Controllers\SalesTargetController::class, 'index'])}}">@lang('essentials::lang.sales_target')</a></li>
                     @endif
 
+                    @can('essentials.show_overtime_page')
                     <li><a href="{{action([\Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'index'])}}">@lang('essentials::lang.overtime_sheets')</a></li>
+                    @endcan
 
+                    @can('essentials.show_company_bank_page')
                     <li><a href="{{action([\Modules\Essentials\Http\Controllers\CompanyBankDetailController::class, 'index'])}}">@lang('essentials::lang.company_bank_detail')</a></li>
+                    @endcan
 
                     @if(auth()->user()->can('edit_essentials_settings'))
                         <li @if(request()->segment(1) == 'hrm' && request()->segment(2) == 'settings') class="active" @endif><a href="{{action([\Modules\Essentials\Http\Controllers\EssentialsSettingsController::class, 'edit'])}}">@lang('business.settings')</a></li>

@@ -30,7 +30,11 @@ class OvertimeSheetController extends Controller
         protected Util $commonUtil,
         protected TransactionUtil $transactionUtil,
         protected BusinessUtil $businessUtil
-    ) {}
+
+        
+    ) {
+        // $this->middleware('can:essentials.show_overtime_page');
+    }
 
     function index()
     {

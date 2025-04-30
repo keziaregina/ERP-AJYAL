@@ -362,4 +362,6 @@ return [
     'select_employee_type' => 'Select Employee Type',
     'export_company_bank' => 'Export Company Bank Detail Button',
     'purchase_price' => 'Add Purchase Page Price',
+    'show_overtime_page' => 'Show Overtime Page',
+    'show_company_bank_page' => 'Show Company Bank Page',
 ];

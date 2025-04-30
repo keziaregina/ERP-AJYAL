@@ -101,7 +101,7 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
 
         // Route for overtime sheets
         // Route::get('/overtime-sheet', [Modules\Essentials\Http\Controllers\OvertimeSheetController::class, 'index']);
-        Route::resource('overtime-sheets', Modules\Essentials\Http\Controllers\OvertimeSheetController::class);
+        Route::resource('overtime-sheets', Modules\Essentials\Http\Controllers\OvertimeSheetController::class)->middleware('can:essentials.show_overtime_page');
         Route::get('/print-pdf', [OvertimeSheetController::class, 'exportPdf'])->name('pdfovertime');
         Route::get('/print-excel', [OvertimeSheetController::class, 'exportExcel'])->name('excelovertime');
 
@@ -111,7 +111,7 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
 
         // Route for company bank detail
         Route::get('/company-bank-detail/export-excel/{id}', [CompanyBankDetailController::class, 'exportExcel'])->name('sif-export-excel');
-        Route::resource('company-bank-details', CompanyBankDetailController::class);
+        Route::resource('company-bank-details', CompanyBankDetailController::class)->middleware('can:essentials.show_company_bank_page');
 
         // Route for Employee Bic Code
         Route::resource('/bic-code', EmployeeBicCodeController::class);
