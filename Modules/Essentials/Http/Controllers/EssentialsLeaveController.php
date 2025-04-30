@@ -347,7 +347,8 @@ class EssentialsLeaveController extends Controller
             $leave->status = $input['status'];
             $leave->status_note = $input['status_note'];
             $leave->save();
-            // Log::info(json_encode($leave, JSON_PRETTY_PRINT));
+            
+            
 
             $leave->status = $this->leave_statuses[$leave->status]['name'];
 
@@ -355,14 +356,21 @@ class EssentialsLeaveController extends Controller
 
             $leave->user->notify(new LeaveStatusNotification($leave));
 
-            $type = EssentialsLeave::with('leave_type')->find($leave->essentials_leave_type_id);
+            // $type = EssentialsLeave::with('leave_type')->find($leave->essentials_leave_type_id);
 
-            $map = [
-                'Sick Leave'     => 'SL',
-                'Vacation Leaves'=> 'VL',
-            ];
+            Log::info("STATUS?????????????");
+            Log::info($leave->leave_type->leave_type);
 
-            $short = $map[$type->leave_type->leave_type];
+            $leave_status = null;
+                switch ($leave->leave_type->leave_type) {
+                    case 'Sick Leave':
+                        $leave_status = 'SL';
+                        break;
+                    case 'Vacation Leaves':
+                        $leave_status = 'VL';
+                        break;
+                }
+
 
                 $startDate = $leave->start_date;
                 $endDate = $leave->end_date;
@@ -380,7 +388,7 @@ class EssentialsLeaveController extends Controller
                     'month' => $months,
                     'year' => $years,                    
                 ], [
-                    'total_hour' => $short,
+                    'total_hour' => $leave_status,
                 ]);
                 }
             // Log::info(json_encode($overTimeHour, JSON_PRETTY_PRINT));
