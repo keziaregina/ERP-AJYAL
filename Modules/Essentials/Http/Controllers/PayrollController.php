@@ -546,6 +546,7 @@ class PayrollController extends Controller
         $total_work_duration = $this->essentialsUtil->getTotalWorkDuration('hour',
         $payroll->transaction_for->id, $business_id, $start_of_month->format('Y-m-d'),
         $end_of_month->format('Y-m-d'));
+   
 
         return view('essentials::payroll.show')
         ->with(compact('payroll', 'month_name', 'allowances', 'deductions', 'year', 'payment_types',

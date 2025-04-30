@@ -240,7 +240,8 @@
 						<td colspan="3" style="text-align: right;">
 							<div style="width: 43% !important;float: right;padding-right: 49px">
 								<span class="display_currency" data-currency_symbol="true">
-									{{$total_earnings - $total_deduction}}
+									{{-- {{$total_earnings - $total_deduction}} --}}
+									{{ $payroll->final_total }}
 								</span>
 							</div>
 							<div style="width: 57% !important;">
