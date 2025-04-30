@@ -21,6 +21,7 @@
     </section>
 
     <section class="content">
+        @include('essentials::layouts.nav_hrm')
         {{-- @component('components.widget', ['title' => __('essentials::lang.manage_your_company_bank_detail')])
             <div class="container">
                 <h1>Company Bank Detail</h1>
