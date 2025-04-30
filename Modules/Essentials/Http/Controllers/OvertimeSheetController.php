@@ -202,13 +202,6 @@ class OvertimeSheetController extends Controller
                     }
                 }
                 
-                // Log::info("EMPLOYEE-------------->");
-                // Log::info(json_encode($employee['id'],JSON_PRETTY_PRINT));
-
-                // Log::info("OVERTIME DATA-------------->");
-                // Log::info(json_encode($overtimeData,JSON_PRETTY_PRINT));
-
-
                 $filteredOvertimeData = collect(array_values($overtimeData))->filter(function ($value) {
                     return $value != 'A' && $value != 'VL' && $value != 'GE' && $value != 'SL';
                 })->toArray();
@@ -216,30 +209,30 @@ class OvertimeSheetController extends Controller
                 // Calculate total overtime hours properly handling minutes
                 $totalOvertimeMonthly = 0;
                 $totalHours = 0;
-                $totalMinutes = 0;
+                $totalThirtyMinutes = 0;
                 
                 foreach ($filteredOvertimeData as $overtimeValue) {
                     if (is_numeric($overtimeValue)) {
-                        // Split the value into hours and minutes
+                        // Split the value into hours and thirty-minute parts
                         $parts = explode('.', (string)$overtimeValue);
                         $hours = (int)$parts[0];
-                        $minutes = isset($parts[1]) ? (int)$parts[1] : 0;
+                        $thirtyMin = isset($parts[1]) && $parts[1] == '5' ? 1 : 0; // .5 means 30 minutes
                         
                         // Add to totals
                         $totalHours += $hours;
-                        $totalMinutes += $minutes;
+                        $totalThirtyMinutes += $thirtyMin;
                     }
                 }
                 
-                // Convert excess minutes to hours
-                $additionalHours = floor($totalMinutes / 60);
-                $remainingMinutes = $totalMinutes % 60;
+                // Convert excess 30-minute intervals to hours
+                $additionalHours = floor($totalThirtyMinutes / 2);
+                $remainingThirtyMin = $totalThirtyMinutes % 2;
                 
-                // Calculate final total with proper formatting for minutes
-                $totalOvertimeMonthly = $totalHours + $additionalHours + ($remainingMinutes / 100);
+                // Calculate final total
+                $totalOvertimeMonthly = $totalHours + $additionalHours + ($remainingThirtyMin * 0.5);
                 
-                // Format to ensure minutes always have two digits
-                $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 2, '.', '');
+                // Format to ensure consistent decimal format
+                $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 1, '.', '');
 
                 return [
                     'user_id' => $employee['id'],
@@ -410,7 +403,7 @@ class OvertimeSheetController extends Controller
             ]);
         }
     }
-
+// 
     /**
      * Calculate total overtime hours from array of time values
      * Handles format like "2.30" (2 hours 30 minutes)
@@ -420,40 +413,31 @@ class OvertimeSheetController extends Controller
      */
     private function calculateTotalOvertime($overtime_hours)
     {
-        $total_hours = 0;
-        $total_minutes = 0;
+        $totalHours = 0;
+        $totalThirtyMinutes = 0;
 
-        foreach ($overtime_hours as $time) {
-            // Convert to string and remove any quotes or special characters
-            $time = str_replace(['"', "'"], '', (string)$time);
-            
-            if (is_numeric($time)) {
-                // Split the time into hours and decimal part
-                $parts = explode('.', $time);
+        foreach ($overtime_hours as $overtimeValue) {
+            if (is_numeric($overtimeValue)) {
+                // Split the value into hours and thirty-minute parts
+                $parts = explode('.', (string)$overtimeValue);
+                $hours = (int)$parts[0];
+                $thirtyMin = isset($parts[1]) && $parts[1] == '5' ? 1 : 0; // .5 means 30 minutes
                 
-                // Add hours
-                $total_hours += intval($parts[0]);
-
-                // If there's a decimal part, convert it to minutes
-                if (isset($parts[1])) {
-                    // Convert decimal part to actual minutes (e.g., .30 → 30 minutes)
-                    $minutes = intval($parts[1]);
-                    if ($minutes < 10) {
-                        $minutes *= 10; // Handle single digit decimals (e.g., .3 → 30 minutes)
-                    }
-                    $total_minutes += $minutes;
-                }
+                // Add to totals
+                $totalHours += $hours;
+                $totalThirtyMinutes += $thirtyMin;
             }
         }
-
-        // Convert excess minutes to hours
-        $additional_hours = floor($total_minutes / 60);
-        $remaining_minutes = $total_minutes % 60;
-
-        // Calculate final total in decimal format
-        $total = $total_hours + $additional_hours + ($remaining_minutes / 60);
-
-        return round($total, 2);
+        
+        // Convert excess 30-minute intervals to hours
+        $additionalHours = floor($totalThirtyMinutes / 2);
+        $remainingThirtyMin = $totalThirtyMinutes % 2;
+        
+        // Calculate final total
+        $total = $totalHours + $additionalHours + ($remainingThirtyMin * 0.5);
+        
+        // Format to ensure consistent decimal format
+        return number_format($total, 1, '.', '');
     }
 
     public function exportPdf()
