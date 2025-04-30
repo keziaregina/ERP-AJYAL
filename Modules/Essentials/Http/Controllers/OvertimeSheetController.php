@@ -73,7 +73,8 @@ class OvertimeSheetController extends Controller
         try {
 
             $request->validate([
-                'user_id' => 'required|exists:users,id',
+                'user_id' => 'required|array',
+                'user_id.*' => 'required|exists:users,id|distinct',
                 'overtime_hours' => ['required', Rule::in(array_keys(EmployeeOvertime::OVERTIME_HOURS))],
                 'date' => 'nullable|date'
             ]);
@@ -85,15 +86,19 @@ class OvertimeSheetController extends Controller
                 $day = date('d');
             }
 
-            $overtimeHour = EmployeeOvertime::updateOrCreate([
-                'user_id' => $request->user_id,
-                'day' => $day,
-                'month' => date('m'),
-                'year' => date('Y'),
-            ], [
-                'total_hour' => $request->overtime_hours,
-                'created_by' => auth()->id()
-            ]);
+            $users = $request->user_id;
+            foreach ($users as $user) {
+                EmployeeOvertime::updateOrCreate([
+                    'user_id' => $user,
+                    'day' => $day,
+                    'month' => date('m'),
+                    'year' => date('Y'),
+                ], [
+                    'total_hour' => $request->overtime_hours,
+                    'created_by' => auth()->id()
+                ]);
+            }
+            
 
             return redirect()->back()->with('success', 'Created Successfully.');
         } catch (\Exception $e) {

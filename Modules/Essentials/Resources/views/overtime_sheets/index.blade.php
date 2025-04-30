@@ -175,12 +175,18 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="user_id">@lang('essentials::lang.employee_name')</label>
-                            <select name="user_id" id="user_id" class="form-control" required>
-                                <option value="">@lang('essentials::lang.select_employee')</option>
+                            <div class="mb-2">
+                                <button type="button" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-primary select-all">
+                                    @lang('lang_v1.select_all')
+                                </button>
+                                <button type="button" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-primary deselect-all">
+                                    @lang('lang_v1.deselect_all')
+                                </button>
+                            </div>
+                            <select name="user_id[]" id="user_id" class="form-control select2" required multiple style="width: 100%;">
                                 @foreach ($employees as $employee)
                                     <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
                                 @endforeach
-                            {{-- <option selected value="{{ auth()->user()->id}}">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</option> --}}                                        
                             </select>
                         </div>
                                                 
@@ -234,12 +240,18 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="user_id">@lang('essentials::lang.employee_name')</label>
-                            <select name="user_id" id="user_id" class="form-control" required>
-                                <option value="">@lang('essentials::lang.select_employee')</option>
+                            <div class="mb-2">
+                                <button type="button" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-primary select-all">
+                                    @lang('lang_v1.select_all')
+                                </button>
+                                <button type="button" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-primary deselect-all">
+                                    @lang('lang_v1.deselect_all')
+                                </button>
+                            </div>
+                            <select name="user_id[]" id="user_id" class="form-control select2" required multiple style="width: 100%;">
                                 @foreach ($employees as $employee)
                                     <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
                                 @endforeach
-                            {{-- <option selected value="{{ auth()->user()->id}}">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</option> --}}                                        
                             </select>
                         </div>
                                                 
@@ -327,6 +339,19 @@
 @section('javascript')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
+        $(document).ready(function(){
+            $('.select-all').click(function(){
+                $('#user_id option').prop('selected', true).trigger('change');
+            });
+
+            $('.deselect-all').click(function(){
+                $('#user_id option').prop('selected', false).trigger('change');
+            });
+
+            
+            $('#user_id').select2();
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date();
             const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
