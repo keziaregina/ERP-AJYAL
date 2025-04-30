@@ -471,6 +471,22 @@
               </label>
             </div>
           </div>
+          <div class="col-md-12">
+            <div class="checkbox">
+              <label>
+                {!! Form::checkbox('permissions[]', 'essentials.show_overtime_page', false,['class' => 'input-icheck']); !!}
+                {{ __('essentials::lang.show_overtime_page') }}
+              </label>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="checkbox">
+              <label>
+                {!! Form::checkbox('permissions[]', 'essentials.show_company_bank_page', false,['class' => 'input-icheck']); !!}
+                {{ __('essentials::lang.show_company_bank_page') }}
+              </label>
+            </div>
+          </div>
         </div>
         </div>
         <hr>
