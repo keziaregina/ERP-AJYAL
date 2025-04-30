@@ -421,40 +421,20 @@ class OvertimeSheetController extends Controller
     private function calculateTotalOvertime($overtime_hours)
     {
         $total_hours = 0;
-        $total_minutes = 0;
-
+    
         foreach ($overtime_hours as $time) {
-            // Convert to string and remove any quotes or special characters
+            // Bersihkan string dari petik
             $time = str_replace(['"', "'"], '', (string)$time);
-            
+        
+            // Pastikan cuma nilai numeric float aja yang dihitung
             if (is_numeric($time)) {
-                // Split the time into hours and decimal part
-                $parts = explode('.', $time);
-                
-                // Add hours
-                $total_hours += intval($parts[0]);
-
-                // If there's a decimal part, convert it to minutes
-                if (isset($parts[1])) {
-                    // Convert decimal part to actual minutes (e.g., .30 → 30 minutes)
-                    $minutes = intval($parts[1]);
-                    if ($minutes < 10) {
-                        $minutes *= 10; // Handle single digit decimals (e.g., .3 → 30 minutes)
-                    }
-                    $total_minutes += $minutes;
-                }
+                $total_hours += floatval($time);
             }
         }
-
-        // Convert excess minutes to hours
-        $additional_hours = floor($total_minutes / 60);
-        $remaining_minutes = $total_minutes % 60;
-
-        // Calculate final total in decimal format
-        $total = $total_hours + $additional_hours + ($remaining_minutes / 60);
-
-        return round($total, 2);
-    }
+    
+        // Bulatkan ke 2 desimal (kalau mau bisa ke 1 aja)
+        return round($total_hours, 2);
+    } 
 
     public function exportPdf()
     {
