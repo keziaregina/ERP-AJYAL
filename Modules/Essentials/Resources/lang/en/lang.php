@@ -195,7 +195,7 @@ return [
     'attendance_by_shift' => 'Attendance by shift',
     'attendance_by_date' => 'Attendance by date',
     'present' => 'Present',
-    'absent' => 'Absent',
+    'absent' => 'Absent - غائب',
     'shift' => 'Shift',
     'no_data_found' => 'No data found',
     'import_attendance' => 'Import Attendance',
@@ -327,10 +327,10 @@ return [
     'add_new_overtime' => 'Add Overtime Hour',
     'select_overtime_hours' => 'Select Overtime Hours',
     'overtime_hours' => 'Overtime Hours',
-    'legend' => 'Legend',
-    'vacation_leave' => 'Vacation Leave',
-    'glorious_employee_allowance' => 'Glorious Employee Allowance',
-    'sick_leave' => 'Sick Leave',
+    'legend' => 'Legend - الأسطورة',
+    'vacation_leave' => 'Vacation Leave - إجازة الإجازة',
+    'glorious_employee_allowance' => 'Glorious Employee Allowance - مخصصات الموظفين المجيدين',
+    'sick_leave' => 'Sick Leave - الإجازات المرضية',
     
     // Payroll calculation formulas
     'payroll_calculation_formulas' => 'Payroll Calculation Formulas',
@@ -364,4 +364,5 @@ return [
     'purchase_price' => 'Add Purchase Page Price',
     'show_overtime_page' => 'Show Overtime Page',
     'show_company_bank_page' => 'Show Company Bank Page',
+    'employee_of_the_month' => 'Employee of the month'
 ];

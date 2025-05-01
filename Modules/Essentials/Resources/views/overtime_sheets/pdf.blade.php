@@ -152,6 +152,14 @@
         </tbody>
     </table>
 
+    <!-- Ge Employee Section -->
+    <div style="margin-top: 20px; border: 1px solid #FFB22C; padding: 10px; width: 100%; background-color: #FEF3E2;">
+        <div style="align-items: center; font-size: 12px; justify-content: start; color: #FA812F;">
+            <h4>{{ __('essentials::lang.employee_of_the_month') }}</h4>          
+            <h3>{{ $GloriousName }}</h3>                
+        </div>
+    </div>
+
     <!-- Legend Section -->
     <div style="margin-top: 20px; border: 1px solid #ddd; padding: 10px; background-color: #f9f9f9;">
         <h3 style="font-size: 12px; margin-bottom: 10px; text-align: center;">{{ __('essentials::lang.legend') }}</h3>

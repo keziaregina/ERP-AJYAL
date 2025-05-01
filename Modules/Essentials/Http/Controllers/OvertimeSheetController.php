@@ -437,17 +437,24 @@ class OvertimeSheetController extends Controller
     } 
 
     public function exportPdf()
-    {
+    {        
         try {
             $logo = public_path('img/logo-small.png');
             $overtimeData = $this->getOvertimeDataForCurrentMonth();
             $data = $overtimeData['employees'];
             $totalAllOvertime = $overtimeData['total_all_overtime'];
+            $gloriousEmployee = GloriousEmployee::with('user')->where('month', date('m'))->first();
+            if ($gloriousEmployee && $gloriousEmployee->user) {
+                $nameEmployee = $gloriousEmployee->user->first_name . ' ' . $gloriousEmployee->user->last_name;
+            } else {
+                $nameEmployee = ' - ';
+            }
             
             $pdf = PDF::loadView('essentials::overtime_sheets.pdf', [
                 'data' => $data,
                 'totalAllOvertime' => $totalAllOvertime,
                 'logo' => $logo,
+                'GloriousName' => $nameEmployee,
                 'business' => request()->session()->get('business'),
                 'location' => request()->session()->get('user.location_id'),
                 'month' => now()->format('F'),
