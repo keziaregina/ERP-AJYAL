@@ -122,7 +122,6 @@
 <div class="form-group col-md-3">
     <label for="color-select">Select or Create Bic Code</label>
     {{-- <input id="user_bank_code" value="salkdhsa" autocomplete="off" placeholder=""> --}}
-    {{-- @dd($bicCode) --}}
     <select name="bic_code" id="user_bank_code" placeholder="" autocomplete="off">
         <option disabled selected>Select Bic Code</option>
         @foreach ($bicCode as $code)
@@ -137,20 +136,20 @@
   </div>
 
   {{-- Salary Frecuency --}}
-<div class="form-group col-md-3">
-    <label for="color-select">Select or Create Salary Frequency</label>
-    <select name="salary_code" id="user_salary_code" placeholder="" autocomplete="off">
-        <option disabled selected>Select Salary Frequency</option>
-        @foreach ($salaryCode as $Scode)
-        
-        @if ($Scode['id'] == $user->salary_id)
-        <option value="{{ $Scode['id'] }}" selected>{{ $Scode['name'] }}</option>
-        @else
-        <option value="{{ $Scode['id'] }}">{{ $Scode['name'] }}</option>
-        @endif
-        @endforeach
-    </select>
-  </div>
+    <div class="form-group col-md-3">
+        <label for="color-select">Select or Create Salary</label>
+        <select name="salary_code" id="user_salary_code" placeholder="" autocomplete="off">
+            <option disabled selected>Select Salary Frequency</option>
+            @foreach ($salaryCode as $Scode)
+
+            @if ($Scode['id'] == $user->salary_id)
+            <option value="{{ $Scode['id'] }}" selected>{{ $Scode['name'] }}</option>
+            @else
+            <option value="{{ $Scode['id'] }}">{{ $Scode['name'] }}</option>
+            @endif
+            @endforeach
+        </select>
+    </div>
 
 
 @section('extra_scripts')
