@@ -320,8 +320,13 @@ class DataController extends Controller
                 'default' => false,
             ],
             [
-                'value' => 'essentials.purchase_price',
-                'label' => __('essentials::lang.purchase_price'),
+                'value' => 'essentials.show_overtime_page',
+                'label' => __('essentials::lang.show_overtime_page'),
+                'default' => false,
+            ],
+            [
+                'value' => 'essentials.show_company_bank_page',
+                'label' => __('essentials::lang.show_company_bank_page'),
                 'default' => false,
             ],
         ];

@@ -1,5 +1,14 @@
 <script type="text/javascript">
 $(document).ready( function () {
+	// Function to get query parameters from URL
+	function getQueryParam(param) {
+		const urlParams = new URLSearchParams(window.location.search);
+		return urlParams.get(param);
+	}
+
+	// Get month from URL query parameter
+	// const monthFromUrl = getQueryParam('month');
+	// window.url = monthFromUrl || new Date().toISOString().slice(0, 7); // Default to current month if not provided
 
 	//add allowance row
 	$('.add_allowance').click( function() {
@@ -146,12 +155,14 @@ $(document).ready( function () {
                 method: "GET",
                 url: '/hrm/get-user-allow-deduct',
                 data: {
-                    'user_id': id
+                    'user_id': id,
+                    // 'month': $("input[name='transaction_date']").val()
+                    'month': getQueryParam('month_year')
                 },
                 success: function(result) {
-                    console.log("result");
-                    console.log(result);
-                    console.log("result------------>");
+                    // console.log("result");
+                    // console.log(result);
+                    // console.log("result------------>");
                     // allowance_deduction_data = result;
                     allowances = result.allowances;
                     deductions = result.deductions;

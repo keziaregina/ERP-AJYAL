@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Media;
 use App\User;
+use App\Media;
+use App\EmployeeBicCode;
+use App\SalaryFrequency;
 use App\Utils\ModuleUtil;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -42,15 +45,18 @@ class UserController extends Controller
      */
     public function getProfile()
     {
+        $businessId = Auth::user()->business_id;
+        $bicCode = EmployeeBicCode::where('business_id', $businessId)->get();
         $user_id = request()->session()->get('user.id');
         $user = User::where('id', $user_id)->with(['media'])->first();
         $config_languages = config('constants.langs');
         $languages = [];
+        $salaryCode = SalaryFrequency::where('business_id', $businessId)->get();
         foreach ($config_languages as $key => $value) {
             $languages[$key] = $value['full_name'];
         }
 
-        return view('user.profile', compact('user', 'languages'));
+        return view('user.profile', compact('user', 'languages', 'bicCode', 'salaryCode'));
     }
 
     /**
@@ -82,11 +88,34 @@ class UserController extends Controller
                 $input['bank_details'] = json_encode($request->input('bank_details'));
             }
 
+            $salary = SalaryFrequency::find($request->salary_code);
+            if ($salary) {
+                $input['salary_id'] = $request->salary_code;
+            } else {
+                $newSalary = SalaryFrequency::create([
+                    'name' => $request->salary_code,
+                    'business_id' => Auth::user()->business_id,
+                ]);
+                $input['salary_id'] = $newSalary->id;
+            }
+
+            $bic = EmployeeBicCode::find($request->bic_code);
+            if ($bic) {
+                $input['bic_id'] = $request->bic_code;
+            } else {
+                $newBic = EmployeeBicCode::create([
+                    'name' => $request->bic_code,
+                    'business_id' => Auth::user()->business_id,
+                ]);
+                $input['bic_id'] = $newBic->id;
+            }
+
+            
             $user = User::find($user_id);
             $user->update($input);
-
+            
             Media::uploadMedia($user->business_id, $user, request(), 'profile_photo', true);
-
+            
             //update session
             $input['id'] = $user_id;
             $business_id = request()->session()->get('user.business_id');

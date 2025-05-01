@@ -202,6 +202,7 @@ class OvertimeSheetController extends Controller
                     }
                 }
                 
+
                 $filteredOvertimeData = collect(array_values($overtimeData))->filter(function ($value) {
                     return $value != 'A' && $value != 'VL' && $value != 'GE' && $value != 'SL';
                 })->toArray();
@@ -242,8 +243,6 @@ class OvertimeSheetController extends Controller
                 ];
             });
 
-            Log::info(json_encode($result,JSON_PRETTY_PRINT));
-
             // Calculate total overtime across all employees
             $totalAllOvertime = 0;
             foreach ($result as $employeeData) {
@@ -253,15 +252,11 @@ class OvertimeSheetController extends Controller
             // Format the total to ensure minutes have two digits
             $totalAllOvertime = number_format($totalAllOvertime, 2, '.', '');
 
-            Log::info(json_encode($totalAllOvertime,JSON_PRETTY_PRINT));
-
             // Add the total to the result
             $resultWithTotal = [
                 'employees' => $result,
                 'total_all_overtime' => $totalAllOvertime
             ];
-
-            Log::info(json_encode($resultWithTotal,JSON_PRETTY_PRINT));
 
             return $resultWithTotal;
         } catch (\Exception $e) {
@@ -281,7 +276,8 @@ class OvertimeSheetController extends Controller
         try {
             $user_id = $request->input('user_id');
             $month = $request->input('month');
-            
+
+            // die;
             if (!$user_id || !$month) {
                 return response()->json([
                     'success' => false,
@@ -289,8 +285,8 @@ class OvertimeSheetController extends Controller
                 ]);
             }
 
-            // $start_date = Carbon::parse($month)->startOfMonth();
-            // $end_date = Carbon::parse($month)->endOfMonth();
+            // $start_date = Carbon::createFromFormat('m/Y', $month)->startOfMonth();
+            // $end_date = Carbon::createFromFormat('m/Y', $month)->endOfMonth();
 
             // Get overtime records for the month
             // $overtime_records = EmployeeOvertime::where('user_id', $user_id)
@@ -323,26 +319,20 @@ class OvertimeSheetController extends Controller
                 }
             }
 
-            $isGloriousEmployee = GloriousEmployee::where('month', date('m'))
-            ->where('year', date('Y'))
+            $isGloriousEmployee = GloriousEmployee::where('month', date('m', strtotime($month)))
+            ->where('year', date('Y', strtotime($month)))
             ->where('user_id', $user_id)
             ->first();
 
-            Log::info(date('m'));
-            Log::info(date('Y'));
-            Log::info($user_id);
-
-            Log::info(json_encode($isGloriousEmployee,JSON_PRETTY_PRINT));
-
             $overtime_records = EmployeeOvertime::where('user_id', $user_id)
-                ->where('month', date('m'))
-                ->where('year', date('Y'))
+                ->where('month', date('m', strtotime($month)))
+                ->where('year', date('Y', strtotime($month)))
                 // ->whereDate('created_at', '<=', $end_date)
                 ->get();
 
             $overtime_hours = EmployeeOvertime::where('user_id', $user_id)
-                ->where('month', date('m'))
-                ->where('year', date('Y'))
+                ->where('month', date('m', strtotime($month)))
+                ->where('year', date('Y', strtotime($month)))
                 ->whereNotIn('total_hour', ['A','VL','SL','GE'])
                 ->pluck('total_hour')
                 ->toArray();
@@ -441,17 +431,24 @@ class OvertimeSheetController extends Controller
     }
 
     public function exportPdf()
-    {
+    {        
         try {
             $logo = public_path('img/logo-small.png');
             $overtimeData = $this->getOvertimeDataForCurrentMonth();
             $data = $overtimeData['employees'];
             $totalAllOvertime = $overtimeData['total_all_overtime'];
+            $gloriousEmployee = GloriousEmployee::with('user')->where('month', date('m'))->first();
+            if ($gloriousEmployee && $gloriousEmployee->user) {
+                $nameEmployee = $gloriousEmployee->user->first_name . ' ' . $gloriousEmployee->user->last_name;
+            } else {
+                $nameEmployee = ' - ';
+            }
             
             $pdf = PDF::loadView('essentials::overtime_sheets.pdf', [
                 'data' => $data,
                 'totalAllOvertime' => $totalAllOvertime,
                 'logo' => $logo,
+                'GloriousName' => $nameEmployee,
                 'business' => request()->session()->get('business'),
                 'location' => request()->session()->get('user.location_id'),
                 'month' => now()->format('F'),
@@ -487,13 +484,15 @@ class OvertimeSheetController extends Controller
 
     public function getAllowDeduct(Request $request) {
         try {
-            Log::info("business id");
-            Log::info(Auth::user()->business_id);
+            $start_date = Carbon::createFromFormat('m/Y', $request->month)->startOfMonth();
+            $end_date = Carbon::createFromFormat('m/Y', $request->month)->endOfMonth();
+
+            // die;
             $employeeAllowDeduct = $this->essentialsUtil->getEmployeeAllowancesAndDeductions(
                 business_id: Auth::user()->business_id,
                 user_id: $request->user_id,
-                start_date: Carbon::now()->startOfMonth(),
-                end_date: Carbon::now()->endOfMonth()
+                start_date: $start_date,
+                end_date: $end_date
             );
 
             $payrolls = [];
@@ -502,9 +501,7 @@ class OvertimeSheetController extends Controller
             $deductions = [];
 
             foreach ($employeeAllowDeduct as $ad) {
-                Log::info("ad----------->");
-                Log::info(json_encode($ad,JSON_PRETTY_PRINT));
-
+            
                 if ($ad->type == 'allowance') {
                     $allowances[] = [
                         'name' => $ad->description,

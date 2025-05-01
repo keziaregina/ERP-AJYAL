@@ -363,4 +363,5 @@ return[
     'purchase_price' => 'إضافة سعر صفحة الشراء',
     'show_overtime_page' => 'إظهار صفحة العمل الإضافي',
     'show_company_bank_page' => 'إظهار صفحة بنك الشركة',
+    'employee_of_the_month' => 'موظف الشهر'
 ];
