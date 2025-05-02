@@ -41,17 +41,17 @@ class OvertimeSheetController extends Controller
         try {
             $businessId = request()->session()->get('user.business_id');
         
-            $employees = $this->getActiveEmployeesPerBusiness(businessId: $businessId);
+            $employees = self::getActiveEmployeesPerBusiness(businessId: $businessId);
 
             $daysInMonth = Carbon::now()->month(date('m'))->daysInMonth;
             $overtimeOptions = EmployeeOvertime::OVERTIME_HOURS;
             $findKey = array_search('Glorious Employee Allowance', $overtimeOptions);
-            unset($overtimeOptions[$findKey]);
+            unset($overtimeOptions[$findKey]);            
 
             // Get overtime data for the current month
             $overtimeData = $this->getOvertimeDataForCurrentMonth();
             $overtimeDatas = $overtimeData['employees'];
-            $totalAllOvertime = $overtimeData['total_all_overtime'];
+            $totalAllOvertime = $overtimeData['total_all_overtime'];            
 
             $gloriousEmployeeThisMonth = GloriousEmployee::where('month', date('m'))
             ->where('year', date('Y'))
@@ -134,7 +134,7 @@ class OvertimeSheetController extends Controller
         }
     }
 
-    private function getActiveEmployeesPerBusiness($businessId) {
+    public static function getActiveEmployeesPerBusiness($businessId) {
 
         $rawEmployees = User::forDropdownWithActive(business_id: $businessId);
             
@@ -175,7 +175,7 @@ class OvertimeSheetController extends Controller
             $businessId = request()->session()->get('user.business_id');
 
             // Get all active employees
-            $employees = $this->getActiveEmployeesPerBusiness(businessId: $businessId);
+            $employees = self::getActiveEmployeesPerBusiness(businessId: $businessId);
 
             // Get all overtime records for the current month
             $overtimeRecords = EmployeeOvertime::where('month', $currentMonth)
@@ -257,6 +257,112 @@ class OvertimeSheetController extends Controller
                 'employees' => $result,
                 'total_all_overtime' => $totalAllOvertime
             ];
+
+            return $resultWithTotal;
+        } catch (\Exception $e) {
+            Log::error("error getting overtime data: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    private function getOvertimeDataByMonth($month)
+    {
+        try {
+            $currentMonth = $month;
+
+            $currentYear = date('Y');
+
+            $businessId = request()->session()->get('user.business_id');
+
+            // Get all active employees
+            $employees = self::getActiveEmployeesPerBusiness(businessId: $businessId);
+
+            // Get all overtime records for the current month
+            $overtimeRecords = EmployeeOvertime::where('month', $currentMonth)
+                ->where('year', $currentYear)
+                ->whereIn('user_id', $employees->pluck('id'))
+                ->get();
+
+            // Group overtime records by user_id
+            $overtimeByUser = $overtimeRecords->groupBy('user_id');
+
+            // Process the data to create a structured format
+            $result = $employees->map(function ($employee) use ($overtimeByUser, $currentMonth) {
+                $overtimeData = [];
+
+                // Initialize all days with null values
+                for ($day = 1; $day <= now()->daysInMonth; $day++) {
+                    $overtimeData[str_pad($day, 2, '0', STR_PAD_LEFT)] = null;
+                }
+
+                // Fill in the actual overtime data if user has any records
+                if ($overtimeByUser->has($employee['id'])) {
+                    foreach ($overtimeByUser->get($employee['id']) as $overtime) {
+                        $overtimeData[$overtime->day] = $overtime->total_hour;
+                    }
+                }
+                
+
+                $filteredOvertimeData = collect(array_values($overtimeData))->filter(function ($value) {
+                    return $value != 'A' && $value != 'VL' && $value != 'GE' && $value != 'SL';
+                })->toArray();
+
+                // Calculate total overtime hours properly handling minutes
+                $totalOvertimeMonthly = 0;
+                $totalHours = 0;
+                $totalThirtyMinutes = 0;
+                
+                foreach ($filteredOvertimeData as $overtimeValue) {
+                    if (is_numeric($overtimeValue)) {
+                        // Split the value into hours and thirty-minute parts
+                        $parts = explode('.', (string)$overtimeValue);
+                        $hours = (int)$parts[0];
+                        $thirtyMin = isset($parts[1]) && $parts[1] == '5' ? 1 : 0; // .5 means 30 minutes
+                        
+                        // Add to totals
+                        $totalHours += $hours;
+                        $totalThirtyMinutes += $thirtyMin;
+                    }
+                }
+                
+                // Convert excess 30-minute intervals to hours
+                $additionalHours = floor($totalThirtyMinutes / 2);
+                $remainingThirtyMin = $totalThirtyMinutes % 2;
+                
+                // Calculate final total
+                $totalOvertimeMonthly = $totalHours + $additionalHours + ($remainingThirtyMin * 0.5);
+                
+                // Format to ensure consistent decimal format
+                $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 1, '.', '');
+    
+                return [
+                    'user_id' => $employee['id'],
+                    'full_name' => $employee['full_name'],
+                    'overtime_data' => $overtimeData,
+                    'total_overtime_by_month' => $totalOvertimeMonthly
+                ];
+            });
+
+            Log::info(json_encode($result,JSON_PRETTY_PRINT));
+
+            // Calculate total overtime across all employees
+            $totalAllOvertime = 0;
+            foreach ($result as $employeeData) {
+                $totalAllOvertime += (float)$employeeData['total_overtime_by_month'];
+            }
+            
+            // Format the total to ensure minutes have two digits
+            $totalAllOvertime = number_format($totalAllOvertime, 2, '.', '');
+
+            Log::info(json_encode($totalAllOvertime,JSON_PRETTY_PRINT));
+
+            // Add the total to the result
+            $resultWithTotal = [
+                'employees' => $result,
+                'total_all_overtime' => $totalAllOvertime
+            ];
+
+            Log::info(json_encode($resultWithTotal,JSON_PRETTY_PRINT));
 
             return $resultWithTotal;
         } catch (\Exception $e) {
@@ -430,14 +536,16 @@ class OvertimeSheetController extends Controller
         return number_format($total, 1, '.', '');
     }
 
-    public function exportPdf()
-    {        
+    public function exportPdf(Request $request)
+    {   
+        // dd($request->all());
         try {
+            $month = $request->month;
             $logo = public_path('img/logo-small.png');
-            $overtimeData = $this->getOvertimeDataForCurrentMonth();
+            $overtimeData = $this->getOvertimeDataByMonth($month);
             $data = $overtimeData['employees'];
             $totalAllOvertime = $overtimeData['total_all_overtime'];
-            $gloriousEmployee = GloriousEmployee::with('user')->where('month', date('m'))->first();
+            $gloriousEmployee = GloriousEmployee::with('user')->where('month', $month)->first();
             if ($gloriousEmployee && $gloriousEmployee->user) {
                 $nameEmployee = $gloriousEmployee->user->first_name . ' ' . $gloriousEmployee->user->last_name;
             } else {
@@ -451,14 +559,14 @@ class OvertimeSheetController extends Controller
                 'GloriousName' => $nameEmployee,
                 'business' => request()->session()->get('business'),
                 'location' => request()->session()->get('user.location_id'),
-                'month' => now()->format('F'),
+                'month' => \Carbon\Carbon::create()->month($month)->format('F'),
                 'year' => now()->format('Y'),
             ], [], [
                 'orientation' => 'L',
                 'format' => 'A4'
             ]);
 
-            return $pdf->download('overtime_report-' . now()->format('F_Y') . '.pdf');
+            return $pdf->download('overtime_report-' . \Carbon\Carbon::create()->month($month)->format('F_Y') . '.pdf');
             
         } catch (\Exception $e) {
             Log::error("Error generating overtime PDF: " . $e->getMessage());
@@ -466,19 +574,20 @@ class OvertimeSheetController extends Controller
         }
     }
 
-    public function exportExcel()
+    public function exportExcel(Request $request)
     {   
-        $overtimeData = $this->getOvertimeDataForCurrentMonth();
+        $month = $request->month;
+        $overtimeData = $this->getOvertimeDataByMonth($month);
         $data = $overtimeData['employees'];
         $totalAllOvertime = $overtimeData['total_all_overtime'];
         
         return Excel::download(new OvertimeSheetExport(
                 $data, 
-                now()->format('F'), 
+                \Carbon\Carbon::create()->month($month)->format('F'), 
                 now()->format('Y'), 
                 $totalAllOvertime
             ), 
-            'overtime_sheet-'.now()->format('F_Y').'.xlsx'
+            'overtime_sheet-'.\Carbon\Carbon::create()->month($month)->format('F_Y').'.xlsx'
         );        
     }
 

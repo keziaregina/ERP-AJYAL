@@ -4163,30 +4163,30 @@ class ReportController extends Controller
                 // Calculate total overtime hours properly handling minutes
                 $totalOvertimeMonthly = 0;
                 $totalHours = 0;
-                $totalMinutes = 0;
+                $totalThirtyMinutes = 0;
                 
                 foreach ($filteredOvertimeData as $overtimeValue) {
                     if (is_numeric($overtimeValue)) {
-                        // Split the value into hours and minutes
+                        // Split the value into hours and thirty-minute parts
                         $parts = explode('.', (string)$overtimeValue);
                         $hours = (int)$parts[0];
-                        $minutes = isset($parts[1]) ? (int)$parts[1] : 0;
+                        $thirtyMin = isset($parts[1]) && $parts[1] == '5' ? 1 : 0; // .5 means 30 minutes
                         
                         // Add to totals
                         $totalHours += $hours;
-                        $totalMinutes += $minutes;
+                        $totalThirtyMinutes += $thirtyMin;
                     }
                 }
                 
-                // Convert excess minutes to hours
-                $additionalHours = floor($totalMinutes / 60);
-                $remainingMinutes = $totalMinutes % 60;
+                // Convert excess 30-minute intervals to hours
+                $additionalHours = floor($totalThirtyMinutes / 2);
+                $remainingThirtyMin = $totalThirtyMinutes % 2;
                 
-                // Calculate final total with proper formatting for minutes
-                $totalOvertimeMonthly = $totalHours + $additionalHours + ($remainingMinutes / 100);
+                // Calculate final total
+                $totalOvertimeMonthly = $totalHours + $additionalHours + ($remainingThirtyMin * 0.5);
                 
-                // Format to ensure minutes always have two digits
-                $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 2, '.', '');
+                // Format to ensure consistent decimal format
+                $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 1, '.', '');
 
                 return [
                     'user_id' => $employee->id,

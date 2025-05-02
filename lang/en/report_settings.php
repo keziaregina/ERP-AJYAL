@@ -30,6 +30,7 @@ return [
     'register_report' => 'Register Report',
     'expense_report' => 'Expense Report',
     'activity_log' => 'Activity Log',
+    'overtime' => 'Overtime Report',
 
     'daily' => 'Daily',
     'weekly' => 'Weekly',
