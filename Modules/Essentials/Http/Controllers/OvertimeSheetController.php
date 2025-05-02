@@ -320,11 +320,9 @@ class OvertimeSheetController extends Controller
                 
                 foreach ($filteredOvertimeData as $overtimeValue) {
                     if (is_numeric($overtimeValue)) {
-                        // Split the value into hours and minutes
-                        $parts = explode('.', (string)$overtimeValue);
-                        $hours = (int)$parts[0];
-                        $minutes = isset($parts[1]) ? (int)$parts[1] : 0;
-                        
+                        $hours = floor($overtimeValue);
+                        $minutes = ($overtimeValue - $hours) * 60;
+                
                         // Add to totals
                         $totalHours += $hours;
                         $totalMinutes += $minutes;

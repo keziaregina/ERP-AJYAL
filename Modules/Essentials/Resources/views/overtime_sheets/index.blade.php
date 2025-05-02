@@ -329,7 +329,11 @@
                             </select>
                         </div>
                     
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" onclick="submitExport()" id="btnExport" class="btn btn-primary">Export</button>
+                        </div>
+                    </form>
                 
             </div>
         </div>
