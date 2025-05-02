@@ -364,5 +364,8 @@ return [
     'purchase_price' => 'Add Purchase Page Price',
     'show_overtime_page' => 'Show Overtime Page',
     'show_company_bank_page' => 'Show Company Bank Page',
-    'employee_of_the_month' => 'Employee of the month'
+    'employee_of_the_month' => 'Employee of the month',
+    'month' => 'Month',
+    'format' => 'Select Format',
+    'export_overtime' => 'Export',
 ];

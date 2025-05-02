@@ -30,26 +30,13 @@
         @component('components.widget', ['class' => 'box-primary', 'title' => __('essentials::lang.manage_your_overtime_sheets')])
                 <div class="tw-flex tw-gap-2 tw-mb-4">
                     @can('essentials.export_overtime_hour')
-                    <a href="{{ route('pdfovertime') }}" class="tw-dw-btn bg-black tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
-                        PDF
-                    </a>
-                    <a href="{{ route('excelovertime') }}" class="tw-dw-btn bg-black tw-font-bold tw-text-white tw-border-none tw-rounded-full tw-px-4 tw-py-2 tw-flex tw-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tw-mr-2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
-                        Excel
-                    </a> 
+                    
+                    <div class="box-tools">
+                        <!-- Button trigger modal -->
+                        <button type="button" class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right" data-toggle="modal" data-target="#exportModal">                        
+                        @lang('essentials::lang.export_overtime')
+                        </button>
+                    </div> 
                     @endcan              
                     @can('essentials.edit_overtime_hour')               
                         <div class="box-tools">
@@ -288,6 +275,70 @@
         </div>
     </div>
 
+    <!-- Modal Export File -->
+    <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Export Overtime</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form id="exportForm" method="GET">
+                    @csrf
+                    <div class="modal-body">
+                        @php
+                            $months = [
+                                '01' => 'Januari',
+                                '02' => 'Februari',
+                                '03' => 'Maret',
+                                '04' => 'April',
+                                '05' => 'Mei',
+                                '06' => 'Juni',
+                                '07' => 'Juli',
+                                '08' => 'Agustus',
+                                '09' => 'September',
+                                '10' => 'Oktober',
+                                '11' => 'November',
+                                '12' => 'Desember',
+                            ];
+                            $currentMont = \Carbon\Carbon::now()->month;
+                            str_pad($currentMont, 2, '0', STR_PAD_LEFT);                            
+                            $monthsAfterCurrent = array_slice($months, 0, $currentMont, true)
+
+                        @endphp
+
+                        <div class="form-group">
+                            <label for="month">{{ __('essentials::lang.month') }}:*</label>
+                            <select name="month" id="month" class="form-control" required>
+                                @foreach ($monthsAfterCurrent as $key => $value)
+                                    <option value="{{ $key }}" {{ $key == date('m') ? 'selected' : '' }} max="{{ date('Y-m-d') }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                                                
+                        <div class="form-group">
+                            <label for="file_type">{{ __('essentials::lang.format') }}:*</label>
+                            <select id="file_type" class="form-control" required>
+                                <option value="">-- Pilih Format --</option>
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
+                            </select>
+                        </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" onclick="submitExport()" id="btnExport" class="btn btn-primary">Export</button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+
     {{-- Select Employee Glorious --}}
     <div class="modal fade" id="selectGEModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -338,6 +389,34 @@
 
 @section('javascript')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        function submitExport() {
+            var form = document.getElementById('exportForm');
+            var fileType = document.getElementById('file_type').value;
+            var btn = document.getElementById('btnExport');
+
+            if (!fileType) {
+                alert("Pilih format file terlebih dahulu!");
+                return;
+            }
+
+            if (fileType === 'pdf') {
+                form.action = "{{ route('pdfovertime') }}";
+            } else if (fileType === 'excel') {
+                form.action = "{{ route('excelovertime') }}";
+            }
+
+            btn.disabled = true;
+            btn.innerText = "{{ __('essentials::lang.download') }}";
+
+            form.submit();
+
+                    setTimeout(function() {
+                btn.disabled = false;
+                btn.innerText = "Export";
+            }, 3000);
+        }
+    </script>
     <script>
         $(document).ready(function(){
             $('.select-all').click(function(){
