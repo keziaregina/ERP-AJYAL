@@ -292,29 +292,29 @@
                     <div class="modal-body">
                         @php
                             $months = [
-                                '01' => 'Januari',
-                                '02' => 'Februari',
-                                '03' => 'Maret',
+                                '01' => 'January',
+                                '02' => 'February',
+                                '03' => 'March',
                                 '04' => 'April',
-                                '05' => 'Mei',
-                                '06' => 'Juni',
-                                '07' => 'Juli',
-                                '08' => 'Agustus',
+                                '05' => 'May',
+                                '06' => 'June',
+                                '07' => 'July',
+                                '08' => 'August',
                                 '09' => 'September',
-                                '10' => 'Oktober',
+                                '10' => 'October',
                                 '11' => 'November',
-                                '12' => 'Desember',
+                                '12' => 'December',
                             ];
-                            $currentMont = \Carbon\Carbon::now()->month;
-                            str_pad($currentMont, 2, '0', STR_PAD_LEFT);                            
-                            $monthsAfterCurrent = array_slice($months, 0, $currentMont, true)
+                            // $currentMont = \Carbon\Carbon::now()->month;
+                            // str_pad($currentMont, 2, '0', STR_PAD_LEFT);                            
+                            // $monthsAfterCurrent = array_slice($months, 0, $currentMont, true)
 
                         @endphp
 
                         <div class="form-group">
                             <label for="month">{{ __('essentials::lang.month') }}:*</label>
                             <select name="month" id="month" class="form-control" required>
-                                @foreach ($monthsAfterCurrent as $key => $value)
+                                @foreach ($months as $key => $value)
                                     <option value="{{ $key }}" {{ $key == date('m') ? 'selected' : '' }} max="{{ date('Y-m-d') }}">{{ $value }}</option>
                                 @endforeach
                             </select>
