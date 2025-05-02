@@ -4,12 +4,11 @@ namespace App\Services;
 
 use App\User;
 use App\Contact;
-use App\EmployeeOvertime;
-use App\Jobs\SendReportEmailJob;
 use App\TaxRate;
 use App\Transaction;
 use App\PurchaseLine;
 use App\Mail\Reporting;
+use App\EmployeeOvertime;
 use App\Utils\ModuleUtil;
 use App\SellingPriceGroup;
 use App\Utils\ProductUtil;
@@ -18,15 +17,17 @@ use App\Utils\BusinessUtil;
 use App\TransactionSellLine;
 use App\Utils\TransactionUtil;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Jobs\SendReportEmailJob;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
 use App\TransactionSellLinesPurchaseLines;
-use Illuminate\Support\Facades\App;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as pdh; 
+use Modules\Essentials\Http\Controllers\OvertimeSheetController;
 
 class ReportEmailService
 {
@@ -237,7 +238,8 @@ class ReportEmailService
             $query = $query->where('business_id', $businessId)
                 ->where('status', 'active');
 
-            $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
+            // $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
+            $employees = OvertimeSheetController::getActiveEmployeesPerBusiness($businessId);
 
             // Get all overtime records for the current month
             $overtimeRecords = EmployeeOvertime::where('month', $currentMonth)
@@ -258,8 +260,8 @@ class ReportEmailService
                 }
 
                 // Fill in the actual overtime data if user has any records
-                if ($overtimeByUser->has($employee->id)) {
-                    foreach ($overtimeByUser->get($employee->id) as $overtime) {
+                if ($overtimeByUser->has($employee['id'])) {
+                    foreach ($overtimeByUser->get($employee['id']) as $overtime) {
                         $overtimeData[$overtime->day] = $overtime->total_hour;
                     }
                 }
@@ -271,34 +273,34 @@ class ReportEmailService
                 // Calculate total overtime hours properly handling minutes
                 $totalOvertimeMonthly = 0;
                 $totalHours = 0;
-                $totalMinutes = 0;
+                $totalThirtyMinutes = 0;
                 
                 foreach ($filteredOvertimeData as $overtimeValue) {
                     if (is_numeric($overtimeValue)) {
-                        // Split the value into hours and minutes
+                        // Split the value into hours and thirty-minute parts
                         $parts = explode('.', (string)$overtimeValue);
                         $hours = (int)$parts[0];
-                        $minutes = isset($parts[1]) ? (int)$parts[1] : 0;
+                        $thirtyMin = isset($parts[1]) && $parts[1] == '5' ? 1 : 0; // .5 means 30 minutes
                         
                         // Add to totals
                         $totalHours += $hours;
-                        $totalMinutes += $minutes;
+                        $totalThirtyMinutes += $thirtyMin;
                     }
                 }
                 
-                // Convert excess minutes to hours
-                $additionalHours = floor($totalMinutes / 60);
-                $remainingMinutes = $totalMinutes % 60;
+                // Convert excess 30-minute intervals to hours
+                $additionalHours = floor($totalThirtyMinutes / 2);
+                $remainingThirtyMin = $totalThirtyMinutes % 2;
                 
-                // Calculate final total with proper formatting for minutes
-                $totalOvertimeMonthly = $totalHours + $additionalHours + ($remainingMinutes / 100);
+                // Calculate final total
+                $totalOvertimeMonthly = $totalHours + $additionalHours + ($remainingThirtyMin * 0.5);
                 
-                // Format to ensure minutes always have two digits
-                $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 2, '.', '');
+                // Format to ensure consistent decimal format
+                $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 1, '.', '');
 
                 return [
-                    'user_id' => $employee->id,
-                    'full_name' => $employee->full_name,
+                    'user_id' => $employee['id'],
+                    'full_name' => $employee['full_name'],
                     'overtime_data' => $overtimeData,
                     'total_overtime_by_month' => $totalOvertimeMonthly
                 ];

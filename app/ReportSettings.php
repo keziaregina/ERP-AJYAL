@@ -52,6 +52,8 @@ class ReportSettings extends Model
                 return __('report_type.expense_report');
             case 'activity_log':
                 return __('report_type.activity_log');
+            case 'overtime':
+                return __('report_type.overtime');
         }
     }
 
