@@ -218,24 +218,26 @@ class ReportEmailService
 
     private function getOvertimeDataForCurrentMonth(User $user, $start_date = null, $end_date = null)
     {
+        // Log::info("++++++++++++++++++MASUK????=======================");
+        // Log::info(json_encode($user->all(), JSON_PRETTY_PRINT));
         try {
             $currentMonth = date('m');
 
             $currentYear = date('Y');
 
+            //kemungkinan ganti cara pemanggilan $businessId
             $businessId = $user->business_id;
 
             // Get all active employees
             $query = User::query();
 
-            if (! empty($locationId)) {
-                $query->where('location_id', $locationId);
-            } else {
-                $query->whereNull('location_id');
-            }
+            // if (! empty($locationId)) {
+            //     $query->where('location_id', $locationId);
+            // } else {
+            //     $query->whereNull('location_id');
+            // }
 
-            $query = $query->where('business_id', $businessId)
-                ->where('status', 'active');
+            $query = $query->where('business_id', $businessId);
 
             $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
 

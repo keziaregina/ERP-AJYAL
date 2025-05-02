@@ -518,16 +518,13 @@ class OvertimeSheetController extends Controller
         $total_hours = 0;
     
         foreach ($overtime_hours as $time) {
-            // Bersihkan string dari petik
             $time = str_replace(['"', "'"], '', (string)$time);
         
-            // Pastikan cuma nilai numeric float aja yang dihitung
             if (is_numeric($time)) {
                 $total_hours += floatval($time);
             }
         }
     
-        // Bulatkan ke 2 desimal (kalau mau bisa ke 1 aja)
         return round($total_hours, 2);
     } 
 
