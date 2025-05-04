@@ -117,7 +117,7 @@ class PayrollController extends Controller
             }
 
             // Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
-            Log::info(json_encode($payrolls->get(),JSON_PRETTY_PRINT));
+            // Log::info(json_encode($payrolls->get(),JSON_PRETTY_PRINT));
 
             return Datatables::of($payrolls)
                 ->addColumn(
