@@ -301,6 +301,7 @@ class EssentialsLeaveController extends Controller
      */
     public function destroy($id)
     {
+        // TODO: add condition to overtime sheets if approved
         $business_id = request()->session()->get('user.business_id');
 
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
@@ -387,7 +388,7 @@ class EssentialsLeaveController extends Controller
                     ], [
                         'created_by' => auth()->user()->id,
                         'total_hour' => $leave_status,
-                        'type' => EmployeeOvertime::TYPES['LR'],
+                        'type' => EmployeeOvertime::TYPES['Leave Request'],
                     ]);
                 }
             }

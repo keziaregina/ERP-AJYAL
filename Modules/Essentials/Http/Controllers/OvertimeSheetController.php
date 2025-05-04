@@ -96,7 +96,7 @@ class OvertimeSheetController extends Controller
                 ], [
                     'total_hour' => $request->overtime_hours,
                     'created_by' => auth()->id(),
-                    'type' => EmployeeOvertime::TYPES['M']
+                    'type' => EmployeeOvertime::TYPES['Manual Overtime']
                 ]);
             }
             

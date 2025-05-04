@@ -94,8 +94,11 @@ class EmployeeOvertime extends Model
 
 
     CONST TYPES = [
-        'M'  => 'Manual Overtime',
-        'LR' => 'Leave Request',
-        'A'  => 'Auto',
+        // 'M'  => 'Manual Overtime',
+        // 'LR' => 'Leave Request',
+        // 'A'  => 'Auto',
+        'Manual Overtime'  => 'M',
+        'Leave Request' => 'LR',
+        'Auto'  => 'A',
     ];
 }
