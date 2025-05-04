@@ -48,4 +48,20 @@ class EssentialsAllowanceAndDeduction extends Model
 
         return $pay_components;
     }
+
+    // public static function getAllAllowanceAndDeductionsPerEmployee($businessId, $userId, $startDate = null, $endDate = null) {
+    //     $query = self::where('business_id', $businessId)
+    //         ->whereHas('employees', function ($query) use ($userId) {
+    //             $query->where('user_id', $userId);
+    //         });
+    //         // ->whereHas('employees', function ($query) use ($userId) {
+    //         //     $query->where('user_id', $userId);
+    //         // });
+
+    //     if ($startDate && $endDate) {
+    //         $query->whereBetween('applicable_date', [$startDate, $endDate]);
+    //     }
+
+    //     return $query->get();
+    // }
 }

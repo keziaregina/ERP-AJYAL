@@ -92,7 +92,7 @@
         {{ __('overtime.title') }}
         <br>
         <br>
-        {{ strtoupper(__('overtime.month.' . strtolower($month))) }} {{ $year }}
+        {{ strtoupper(__('overtime.month.' . strtolower($month_name))) }} {{ $year }}
     </div>
 
     <table>
@@ -101,7 +101,7 @@
                 <th>{{ strtoupper(__('overtime.sl')) }}</th>
                 {{-- <th>{{ strtoupper(__('overtime.badge')) }}</th> --}}
                 <th>{{ strtoupper(__('overtime.name')) }}</th>
-                @for ($d = 1; $d <= now()->daysInMonth; $d++)
+                @for ($d = 1; $d <= now()->month($month)->daysInMonth; $d++)
                     <th>{{ $d }}</th>
                 @endfor
                 <th>{{ strtoupper(__('overtime.total_per_month')) }}</th>
@@ -110,7 +110,7 @@
         <tbody>
             @foreach ($data as $index => $employee)
                 <tr @if ($loop->even) style="background-color: #f9f9f9;" @endif>
-                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $loop->iteration }}</td>
                     {{-- <td>{{ $employee['user_id'] }}</td> --}}
                     <td class="name-cell">{{ $employee['full_name'] }}</td>
 
@@ -126,13 +126,6 @@
                             } elseif ($value == 'A') {
                                 $bgClass = 'highlight-red';
                             } 
-                            // elseif ($value == 3) {
-                            //     $bgClass = 'highlight-grey';
-                            // } elseif ($value == 1) {
-                            //     $bgClass = 'highlight-green';
-                            // } elseif ($value == 11) {
-                            //     $bgClass = 'highlight-red';
-                            // }
                         @endphp
 
                         <td class="{{ $bgClass }}">{{ $value ?? '' }}</td>
@@ -144,7 +137,7 @@
             <!-- Total row -->
             <tr style="background-color: #f0f0f0; font-weight: bold;">
                 <td style="border: none;" colspan="2">{{ strtoupper(__('overtime.total_all')) }}</td>
-                @for ($d = 1; $d <= now()->daysInMonth; $d++)
+                @for ($d = 1; $d <= now()->month($month)->daysInMonth; $d++)
                     <td style="border: none;"></td>
                 @endfor
                 <td style="border: none; background-color: yellow">{{ $totalAllOvertime }}</td>

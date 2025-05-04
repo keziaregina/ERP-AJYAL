@@ -323,7 +323,7 @@
                         <div class="form-group">
                             <label for="file_type">{{ __('essentials::lang.format') }}:*</label>
                             <select id="file_type" class="form-control" required>
-                                <option value="">-- Pilih Format --</option>
+                                <option value="">-- Choose Format --</option>
                                 <option value="pdf">PDF</option>
                                 <option value="excel">Excel</option>
                             </select>

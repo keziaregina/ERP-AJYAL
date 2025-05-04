@@ -95,7 +95,8 @@ class OvertimeSheetController extends Controller
                     'year' => date('Y'),
                 ], [
                     'total_hour' => $request->overtime_hours,
-                    'created_by' => auth()->id()
+                    'created_by' => auth()->id(),
+                    'type' => EmployeeOvertime::TYPES['Manual Overtime']
                 ]);
             }
             
@@ -291,7 +292,7 @@ class OvertimeSheetController extends Controller
                 $overtimeData = [];
 
                 // Initialize all days with null values
-                for ($day = 1; $day <= now()->daysInMonth; $day++) {
+                for ($day = 1; $day <= now()->month($currentMonth)->daysInMonth; $day++) {
                     $overtimeData[str_pad($day, 2, '0', STR_PAD_LEFT)] = null;
                 }
 
@@ -343,8 +344,6 @@ class OvertimeSheetController extends Controller
                 ];
             });
 
-            Log::info(json_encode($result,JSON_PRETTY_PRINT));
-
             // Calculate total overtime across all employees
             $totalAllOvertime = 0;
             foreach ($result as $employeeData) {
@@ -354,7 +353,7 @@ class OvertimeSheetController extends Controller
             // Format the total to ensure minutes have two digits
             $totalAllOvertime = number_format($totalAllOvertime, 2, '.', '');
 
-            Log::info(json_encode($totalAllOvertime,JSON_PRETTY_PRINT));
+            // Log::info(json_encode($totalAllOvertime,JSON_PRETTY_PRINT));
 
             // Add the total to the result
             $resultWithTotal = [
@@ -362,7 +361,8 @@ class OvertimeSheetController extends Controller
                 'total_all_overtime' => $totalAllOvertime
             ];
 
-            Log::info(json_encode($resultWithTotal,JSON_PRETTY_PRINT));
+            // Log::info(json_encode($resultWithTotal,JSON_PRETTY_PRINT));
+            // die;
 
             return $resultWithTotal;
         } catch (\Exception $e) {
@@ -383,7 +383,6 @@ class OvertimeSheetController extends Controller
             $user_id = $request->input('user_id');
             $month = $request->input('month');
 
-            // die;
             if (!$user_id || !$month) {
                 return response()->json([
                     'success' => false,
@@ -391,16 +390,7 @@ class OvertimeSheetController extends Controller
                 ]);
             }
 
-            // $start_date = Carbon::createFromFormat('m/Y', $month)->startOfMonth();
-            // $end_date = Carbon::createFromFormat('m/Y', $month)->endOfMonth();
-
-            // Get overtime records for the month
-            // $overtime_records = EmployeeOvertime::where('user_id', $user_id)
-            //     ->whereDate('created_at', '>=', $start_date)
-            //     ->whereDate('created_at', '<=', $end_date)
-            //     ->get();
             $decimalBreakPoint = Auth::user()->business->currency_precision;
-            // $overtimeBonusFee = Auth::user()->business->essentialsAllowanceAndDeductions()->where('description', 'ساعات عمل إضافية Overtime')->first()->amount;
             $allowancesDeducDatas = Auth::user()->business->essentialsAllowanceAndDeductions->pluck('amount', 'description');
 
             $finalAllowanceDeduct = [];
@@ -445,6 +435,7 @@ class OvertimeSheetController extends Controller
 
             // Calculate total overtime hours
             $total_overtime = $this->calculateTotalOvertime($overtime_hours);
+
 
             $absent_days = 0;
             $vacation_days = 0;
@@ -509,32 +500,56 @@ class OvertimeSheetController extends Controller
      */
     private function calculateTotalOvertime($overtime_hours)
     {
-        $totalHours = 0;
-        $totalThirtyMinutes = 0;
 
-        foreach ($overtime_hours as $overtimeValue) {
-            if (is_numeric($overtimeValue)) {
-                // Split the value into hours and thirty-minute parts
-                $parts = explode('.', (string)$overtimeValue);
-                $hours = (int)$parts[0];
-                $thirtyMin = isset($parts[1]) && $parts[1] == '5' ? 1 : 0; // .5 means 30 minutes
-                
-                // Add to totals
-                $totalHours += $hours;
-                $totalThirtyMinutes += $thirtyMin;
+        // $filteredOvertimeData = collect(array_values($overtime_hours))->filter(function ($value) {
+        //     return $value != 'A' && $value != 'VL' && $value != 'GE' && $value != 'SL';
+        // })->toArray();
+
+        // $total_hours = 0;
+        // $total_thirty_minutes = 0;
+        // $total_overtime_monthly = 0;
+
+        // foreach ($filteredOvertimeData as $hours) {
+        //     if (is_numeric($hours)) {
+        //         // Split the value into hours and thirty-minute parts
+        //         $parts = explode('.', (string)$hours);
+        //         $hours = (int)$parts[0];
+        //         $thirty_min = isset($parts[1]) && $parts[1] == '5' ? 1 : 0; // .5 means 30 minutes
+
+        //         // Add to totals
+        //         $total_hours += $hours;
+        //         $total_thirty_minutes += $thirty_min;
+
+        //     }
+        // }
+
+        // // Convert excess 30-minute intervals to hours
+        // $additional_hours = floor($total_thirty_minutes / 2);
+        // $remaining_thirty_min = $total_thirty_minutes % 2;
+        
+        // // Calculate final total
+        // $total_overtime_monthly = $total_hours + $additional_hours + ($remaining_thirty_min * 0.5);
+        
+        // // Format to ensure consistent decimal format
+        // $total_overtime_monthly = number_format($total_overtime_monthly, 1, '.', '');
+        // return $total_overtime_monthly;
+
+        $total_hours = 0;
+            
+        foreach ($overtime_hours as $time) {
+            // Bersihkan string dari petik
+            $time = str_replace(['"', "'"], '', (string)$time);
+        
+            // Pastikan cuma nilai numeric float aja yang dihitung
+            if (is_numeric($time)) {
+                $total_hours += floatval($time);
             }
         }
-        
-        // Convert excess 30-minute intervals to hours
-        $additionalHours = floor($totalThirtyMinutes / 2);
-        $remainingThirtyMin = $totalThirtyMinutes % 2;
-        
-        // Calculate final total
-        $total = $totalHours + $additionalHours + ($remainingThirtyMin * 0.5);
-        
-        // Format to ensure consistent decimal format
-        return number_format($total, 1, '.', '');
-    }
+    
+        // Bulatkan ke 2 desimal (kalau mau bisa ke 1 aja)
+        return round($total_hours, 2);
+
+    } 
 
     public function exportPdf(Request $request)
     {   
@@ -559,7 +574,8 @@ class OvertimeSheetController extends Controller
                 'GloriousName' => $nameEmployee,
                 'business' => request()->session()->get('business'),
                 'location' => request()->session()->get('user.location_id'),
-                'month' => \Carbon\Carbon::create()->month($month)->format('F'),
+                'month' => $month,
+                'month_name' => \Carbon\Carbon::create()->month($month)->format('F'),
                 'year' => now()->format('Y'),
             ], [], [
                 'orientation' => 'L',

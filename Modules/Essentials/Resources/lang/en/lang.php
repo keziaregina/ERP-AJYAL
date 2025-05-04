@@ -336,7 +336,7 @@ return [
     'payroll_calculation_formulas' => 'Payroll Calculation Formulas',
     'absent_calculation' => 'Absent Days Deduction',
     'vacation_calculation' => 'Vacation Leave Deduction',
-    'sick_leave_calculation' => 'Sick Leave Allowance',
+    'sick_leave_calculation' => 'Sick Leave Deduction',
     'formula' => 'Formula',
     'example' => 'Example',
     'add_overtime_hour' => 'Add overtime hour',
@@ -368,4 +368,8 @@ return [
     'month' => 'Month',
     'format' => 'Select Format',
     'export_overtime' => 'Export',
+
+    'total_absent' => 'Total Absent',
+    'total_leaves' => 'Total Leaves',
+    // 'ab' => 'Total Absent',
 ];

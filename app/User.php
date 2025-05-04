@@ -418,4 +418,7 @@ class User extends Authenticatable
     }
 
     // public function essentialsAllowanceAndDeductions()
+    // public static function getEssentialsAllowanceAndDeductions($businessId, $userId, $startDate = null, $endDate = null) {
+    //     return self::find($userId)->business->essentialsAllowanceAndDeductions;
+    // }
 }

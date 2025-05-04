@@ -367,4 +367,6 @@ return[
     'month' => 'الشهر',
     'format' => 'حدد التنسيق',
     'export_overtime' => 'التصدير',
+    'total_absent' => 'إجمالي الغياب',
+    'total_leaves' => 'إجمالي الإجازات',
 ];
