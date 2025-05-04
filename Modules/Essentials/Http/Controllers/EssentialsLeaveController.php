@@ -196,7 +196,8 @@ class EssentialsLeaveController extends Controller
      */
     public function store(Request $request)
     {
-        // Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
+        Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
+        // die;
         $business_id = request()->session()->get('user.business_id');
 
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
@@ -332,6 +333,7 @@ class EssentialsLeaveController extends Controller
     public function changeStatus(Request $request)
     {
         // Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
+        // die;
         $business_id = request()->session()->get('user.business_id');
 
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module')) || ! auth()->user()->can('essentials.approve_leave')) {
@@ -348,49 +350,45 @@ class EssentialsLeaveController extends Controller
             $leave->status_note = $input['status_note'];
             $leave->save();
             
-            
-
             $leave->status = $this->leave_statuses[$leave->status]['name'];
 
             $leave->changed_by = auth()->user()->id;
-
+            
             $leave->user->notify(new LeaveStatusNotification($leave));
 
-            // $type = EssentialsLeave::with('leave_type')->find($leave->essentials_leave_type_id);
-
-            Log::info("STATUS?????????????");
-            Log::info($leave->leave_type->leave_type);
+            $type = EssentialsLeaveType::find($leave->essentials_leave_type_id);
 
             $leave_status = null;
-                switch ($leave->leave_type->leave_type) {
-                    case 'Sick Leave':
-                        $leave_status = 'SL';
-                        break;
-                    case 'Vacation Leaves':
-                        $leave_status = 'VL';
-                        break;
-                }
+            switch ($type->leave_type) {
+                case 'Sick Leave':
+                    $leave_status = 'SL';
+                    break;
+                case 'Vacation Leaves':
+                    $leave_status = 'VL';
+                    break;
+            }
 
 
-                $startDate = $leave->start_date;
-                $endDate = $leave->end_date;
-                $range = CarbonPeriod::create($startDate, $endDate);
+            $startDate = $leave->start_date;
+            $endDate = $leave->end_date;
+            $range = CarbonPeriod::create($startDate, $endDate);
+            
             foreach ($range as $date) {
                 $days = date('d', strtotime($date));
                 $months = date('m', strtotime($date));
                 $years = date('Y', strtotime($date));
-                
 
-            if ($input['status'] == 'approved') {
-                $overTimeHour = EmployeeOvertime::updateOrCreate([
-                    'user_id' => $leave->user_id,
-                    'day' => $days,
-                    'month' => $months,
-                    'year' => $years,                    
-                ], [
-                    'created_by' => auth()->user()->id,
-                    'total_hour' => $leave_status,
-                ]);
+                if ($input['status'] == 'approved') {
+                    $overTimeHour = EmployeeOvertime::updateOrCreate([
+                        'user_id' => $leave->user_id,
+                        'day' => $days,
+                        'month' => $months,
+                        'year' => $years,                    
+                    ], [
+                        'created_by' => auth()->user()->id,
+                        'total_hour' => $leave_status,
+                        'type' => EmployeeOvertime::TYPES['LR'],
+                    ]);
                 }
             }
 

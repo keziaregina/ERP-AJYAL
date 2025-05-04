@@ -95,7 +95,8 @@ class OvertimeSheetController extends Controller
                     'year' => date('Y'),
                 ], [
                     'total_hour' => $request->overtime_hours,
-                    'created_by' => auth()->id()
+                    'created_by' => auth()->id(),
+                    'type' => EmployeeOvertime::TYPES['M']
                 ]);
             }
             
