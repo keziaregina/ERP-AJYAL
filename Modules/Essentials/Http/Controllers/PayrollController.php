@@ -4,10 +4,13 @@ namespace Modules\Essentials\Http\Controllers;
 
 use DB;
 use App\User;
+use Exception;
 use App\Category;
 use App\Utils\Util;
 use App\Transaction;
 use App\BusinessLocation;
+use App\EmployeeOvertime;
+use App\GloriousEmployee;
 use App\Utils\ModuleUtil;
 use App\AccountTransaction;
 use App\TransactionPayment;
@@ -19,7 +22,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use App\Events\TransactionPaymentAdded;
-use Exception;
 use Yajra\DataTables\Facades\DataTables;
 use Modules\Essentials\Utils\EssentialsUtil;
 use Modules\Essentials\Entities\PayrollGroup;
@@ -214,6 +216,7 @@ class PayrollController extends Controller
                             ->find($location_id);
 
             //initialize required data
+            // dd($transaction_date);
             $start_date = $transaction_date;
             $end_date = \Carbon::parse($start_date)->lastOfMonth();
             $month_name = $end_date->format('F');
@@ -225,14 +228,40 @@ class PayrollController extends Controller
             foreach ($employees as $employee) {
 
                 //get employee info
+                $amount_per_unit_duration = $employee->essentials_salary;
+                $total_work_duration = 1;
+                if ($employee->essentials_pay_period == 'week') {
+                    $total_work_duration = 4;
+                } elseif ($employee->essentials_pay_period == 'day') {
+                    $total_work_duration = now()->month($month)->daysInMonth;
+                }
+                
+                $total = $total_work_duration * $amount_per_unit_duration;
+
+
                 $payrolls[$employee->id]['name'] = $employee->user_full_name;
                 $payrolls[$employee->id]['essentials_salary'] = $employee->essentials_salary;
                 $payrolls[$employee->id]['essentials_pay_period'] = $employee->essentials_pay_period;
-                $payrolls[$employee->id]['total_leaves'] = $this->essentialsUtil->getTotalLeavesForGivenDateOfAnEmployee($business_id, $employee->id, $start_date, $end_date->format('Y-m-d'));
-                $payrolls[$employee->id]['total_days_worked'] = $this->essentialsUtil->getTotalDaysWorkedForGivenDateOfAnEmployee($business_id, $employee->id, $start_date, $end_date);
+                // $payrolls[$employee->id]['total_leaves'] = $this->essentialsUtil->getTotalLeavesForGivenDateOfAnEmployee($business_id, $employee->id, $start_date, $end_date->format('Y-m-d'));
+                $payrolls[$employee->id]['total_leaves'] = EmployeeOvertime::getEmployeeLeavesByMonth(business_id: $business_id, employee_id: $employee->id, month: $month);
+
+                $payrolls[$employee->id]['total_absent'] = EmployeeOvertime::countEmployeOvertimeByTypeAndMonth(
+                    businessId: $business_id,
+                    employeeId: $employee->id,
+                    month: $month,
+                    typeHour: 'A'
+                );
+
+                $payrolls[$employee->id]['total_days_worked'] = EmployeeOvertime::getEmployeeWorkDaysByMonth(business_id: $business_id, employee_id: $employee->id, month: $month);
+                // $payrolls[$employee->id]['total_days_worked'] = $this->essentialsUtil->getTotalDaysWorkedForGivenDateOfAnEmployee($business_id, $employee->id, $start_date, $end_date);
 
                 //get total work duration of employee(attendance)
-                $payrolls[$employee->id]['total_work_duration'] = $this->essentialsUtil->getTotalWorkDuration('hour', $employee->id, $business_id, $start_date, $end_date->format('Y-m-d'));
+
+                // $payrolls[$employee->id]['total_work_duration'] = $this->essentialsUtil->getTotalWorkDuration('hour', $employee->id, $business_id, $start_date, $end_date->format('Y-m-d'));
+
+                // $total_work_duration = $this->essentialsUtil->getTotalWorkDuration('hour', $employee->id, $business_id, $start_date, $end_date->format('Y-m-d'));
+                $dailyRate = $total / now()->month($month)->daysInMonth;
+                $payrolls[$employee->id]['total_work_duration'] = $total_work_duration;
 
                 //get total earned commission for employee
                 $business_details = $this->businessUtil->getDetails($business_id);
@@ -252,10 +281,14 @@ class PayrollController extends Controller
 
                 if ($total_commission > 0) {
                     $payrolls[$employee->id]['allowances']['allowance_names'][] = __('essentials::lang.sale_commission');
+                    $payrolls[$employee->id]['allowances']['allowance_short_names'][] = null;
                     $payrolls[$employee->id]['allowances']['allowance_amounts'][] = $total_commission;
+                    $payrolls[$employee->id]['allowances']['overtime_hours'][] = null;
                     $payrolls[$employee->id]['allowances']['allowance_types'][] = 'fixed';
+                    $payrolls[$employee->id]['allowances']['allowance_col_types'][] = null;
                     $payrolls[$employee->id]['allowances']['allowance_percents'][] = 0;
                 }
+
                 $settings = $this->essentialsUtil->getEssentialsSettings();
                 //get total sales added by the employee
                 $sale_totals = $this->transactionUtil->getUserTotalSales($business_id, $employee->id, $start_date, $end_date);
@@ -274,31 +307,154 @@ class PayrollController extends Controller
 
                 if ($total_sales_target_commission > 0) {
                     $payrolls[$employee->id]['allowances']['allowance_names'][] = __('essentials::lang.sales_target_commission');
+                    $payrolls[$employee->id]['allowances']['allowance_short_names'][] = null;
                     $payrolls[$employee->id]['allowances']['allowance_amounts'][] = $total_sales_target_commission;
                     $payrolls[$employee->id]['allowances']['allowance_types'][] = 'fixed';
+                    $payrolls[$employee->id]['allowances']['overtime_hours'][] = null;
+                    $payrolls[$employee->id]['allowances']['allowance_col_types'][] = null;
                     $payrolls[$employee->id]['allowances']['allowance_percents'][] = 0;
                 }
 
                 //get earnings & deductions of employee
+                $employee = User::find($employee->id);
+                // $allowances_and_deductions = $this->essentialsUtil->getEmployeeAllowancesAndDeductions($business_id, $employee->id, $start_date, $end_date)->toArray();
                 $allowances_and_deductions = $this->essentialsUtil->getEmployeeAllowancesAndDeductions($business_id, $employee->id, $start_date, $end_date);
+
+                $vacationDays = EmployeeOvertime::countEmployeOvertimeByTypeAndMonth(
+                    businessId: $business_id,
+                    employeeId: $employee->id,
+                    month: $month,
+                    typeHour: 'VL'
+                );
+
+                $sickLeaveDays = EmployeeOvertime::countEmployeOvertimeByTypeAndMonth(
+                    businessId: $business_id,
+                    employeeId: $employee->id,
+                    month: $month,
+                    typeHour: 'SL'
+                );
+
+                $isGloriousEmployee = GloriousEmployee::isGloriousEmployee($business_id, $month, $employee->id);
+                // dd($isGloriousEmployee);
+                // $allowances_and_deductions = $this->essentialsUtil->getEmployeeAllowancesAndDeductions($business_id, $employee->id, $start_date, $end_date);
+                // dd($allowances_and_deductions->toArray());
+                // dd($allowances_and_deductions->toArray());
+                
                 foreach ($allowances_and_deductions as $ad) {
                     if ($ad->type == 'allowance') {
-                        $payrolls[$employee->id]['allowances']['allowance_names'][] = $ad->description;
-                        $payrolls[$employee->id]['allowances']['allowance_amounts'][] = $ad->amount_type == 'fixed' ? $ad->amount : 0;
-                        $payrolls[$employee->id]['allowances']['allowance_types'][] = $ad->amount_type;
-                        $payrolls[$employee->id]['allowances']['allowance_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                        if (str_contains(strtolower($ad->description), 'overtime')) {
+                            Log::info('overtime');
+                            Log::info('is contain glor overtime: '. str_contains(strtolower($ad->description), 'glorious employee'));
+
+                            Log::info('desc: '.$ad->description);
+                            $total_overtime = EmployeeOvertime::getAndCalculateTotalOvertime($business_id, $employee->id, $month);
+                            $payrolls[$employee->id]['allowances']['allowance_names'][] = $ad->description;
+                            $payrolls[$employee->id]['allowances']['allowance_short_names'][] = 'overtime';
+                            $payrolls[$employee->id]['allowances']['allowance_amounts'][] = $this->transactionUtil->num_uf($ad->amount * $total_overtime);
+                            $payrolls[$employee->id]['allowances']['overtime_hours'][] =  $total_overtime;
+                            $payrolls[$employee->id]['allowances']['allowance_types'][] = $ad->amount_type;
+                            $payrolls[$employee->id]['allowances']['allowance_col_types'][] = 'auto';
+                            $payrolls[$employee->id]['allowances']['allowance_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                        } else if (str_contains(strtolower($ad->description), 'glorious employee')) {
+                            Log::info('is contain glor yes: '. str_contains(strtolower($ad->description), 'glorious employee'));
+                            if ($isGloriousEmployee) {
+                                Log::info('glorious employee');
+                                Log::info('desc: '.$ad->description);
+
+                                $payrolls[$employee->id]['allowances']['allowance_names'][] = $ad->description;
+                                $payrolls[$employee->id]['allowances']['allowance_short_names'][] = 'glorious_employee';
+                                $payrolls[$employee->id]['allowances']['allowance_amounts'][] = $ad->amount;
+                                $payrolls[$employee->id]['allowances']['allowance_types'][] = $ad->amount_type;
+                                $payrolls[$employee->id]['allowances']['overtime_hours'][] = null;
+                                $payrolls[$employee->id]['allowances']['allowance_col_types'][] = 'auto';
+                                $payrolls[$employee->id]['allowances']['allowance_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                            } else {
+                                Log::info('is contain glor no: '. str_contains(strtolower($ad->description), 'glorious employee'));
+                            }
+                        } else {
+                            Log::info('allowance else');
+                            Log::info('is contain glor else: '. str_contains(strtolower($ad->description), 'glorious employee'));
+
+                            Log::info('desc: '.$ad->description);
+                            $payrolls[$employee->id]['allowances']['allowance_names'][] = $ad->description;
+                            $payrolls[$employee->id]['allowances']['allowance_short_names'][] = $ad->description;
+                            $payrolls[$employee->id]['allowances']['allowance_amounts'][] = $ad->amount;
+                            $payrolls[$employee->id]['allowances']['overtime_hours'][] = null;
+                            $payrolls[$employee->id]['allowances']['allowance_types'][] = $ad->amount_type;
+                            $payrolls[$employee->id]['allowances']['allowance_col_types'][] = 'auto';
+                            $payrolls[$employee->id]['allowances']['allowance_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                        }
+
                     } else {
-                        $payrolls[$employee->id]['deductions']['deduction_names'][] = $ad->description;
-                        $payrolls[$employee->id]['deductions']['deduction_amounts'][] = $ad->amount_type == 'fixed' ? $ad->amount : 0;
-                        $payrolls[$employee->id]['deductions']['deduction_types'][] = $ad->amount_type;
-                        $payrolls[$employee->id]['deductions']['deduction_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                        
+
+                        if (str_contains(strtolower($ad->description), 'absant')) {
+                            Log::info('absent');
+                            Log::info('desc: '.$ad->description);
+                            $absent_days = EmployeeOvertime::countEmployeOvertimeByTypeAndMonth($business_id, $employee->id, $month, 'A');
+                            $payrolls[$employee->id]['deductions']['deduction_names'][] = $ad->description;
+                            $payrolls[$employee->id]['deductions']['deduction_short_names'][] = "absent";
+                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] = ($dailyRate) * $absent_days;
+                            $payrolls[$employee->id]['deductions']['deduction_types'][] = $ad->amount_type;
+                            $payrolls[$employee->id]['deductions']['deduction_col_types'][] = 'auto';
+                            $payrolls[$employee->id]['deductions']['deduction_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                        } else if (str_contains(strtolower($ad->description), 'social security')) {
+                            Log::info('social security');
+                            Log::info('desc: '.$ad->description);
+                            Log::info('amount: '.$ad->amount);
+                            Log::info('total work duration: '.$total_work_duration);
+                            Log::info('calculate : '. $total_work_duration * $ad->amount / 100 );
+
+                            $payrolls[$employee->id]['deductions']['deduction_names'][] = $ad->description;
+                            $payrolls[$employee->id]['deductions']['deduction_short_names'][] = "social_security";
+                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] = $ad->amount_type == 'percent' ? $total_work_duration * $ad->amount / 100 : $ad->amount;
+                            $payrolls[$employee->id]['deductions']['deduction_types'][] = $ad->amount_type;
+                            $payrolls[$employee->id]['deductions']['deduction_col_types'][] = 'auto';
+                            $payrolls[$employee->id]['deductions']['deduction_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                        } else {
+                            Log::info('default');
+                            Log::info('desc: '.$ad->description);
+                            $payrolls[$employee->id]['deductions']['deduction_names'][] = $ad->description;
+                            $payrolls[$employee->id]['deductions']['deduction_short_names'][] = $ad->description;
+                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] = $ad->amount_type == 'fixed' ? $ad->amount : 0;
+                            $payrolls[$employee->id]['deductions']['deduction_types'][] = $ad->amount_type;
+                            $payrolls[$employee->id]['deductions']['deduction_col_types'][] = $ad->amount_type == 'percent' ? 'percentage' : 'fixed';
+                            $payrolls[$employee->id]['deductions']['deduction_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                        }
                     }
+
                 }
+
+                // dd($vacationDays);
+                if ($vacationDays > 0) {
+                    Log::info('vacation days');
+                    foreach ($payrolls[$employee->id]['allowances']['allowance_names'] as $key => $value) {
+                        $food_allowance = 0;
+                        if (str_contains(strtolower($value), 'food')) {
+                            $food_allowance = $payrolls[$employee->id]['allowances']['allowance_amounts'][$key];
+                            $daily_food_allowance = $food_allowance / now()->month($month)->daysInMonth;
+    
+                            $payrolls[$employee->id]['deductions']['deduction_names'][] = 'Vacation Days';
+                            $payrolls[$employee->id]['deductions']['deduction_short_names'][] = 'vacation_days';
+                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] = ($daily_food_allowance + $dailyRate) * $vacationDays;
+                            $payrolls[$employee->id]['deductions']['deduction_types'][] = 'fixed';
+                            $payrolls[$employee->id]['deductions']['deduction_col_types'][] = 'auto';
+                            $payrolls[$employee->id]['deductions']['deduction_percents'][] = 0;
+                        }
+
+                    }
+
+                }
+                // dd($payrolls);
+
+                // dd($allowances_and_deductions->toArray());
             }
+
+            // dd($payrolls);
 
             $action = 'create';
 
-            return view('essentials::payroll.create')
+            return view('essentials::payroll.create2')
                     ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'action', 'location'));
         } else {
             return redirect()->action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'index'])
@@ -543,7 +699,7 @@ class PayrollController extends Controller
             $end_of_month->format('Y-m-d')
         );
 
-        $total_work_duration = $this->essentialsUtil->getTotalWorkDuration('hour',
+        $total_work_duration = $this->essentialsUtil->getTotalWorkDuration('hour', 
         $payroll->transaction_for->id, $business_id, $start_of_month->format('Y-m-d'),
         $end_of_month->format('Y-m-d'));
    
@@ -901,6 +1057,8 @@ class PayrollController extends Controller
             $payrolls[$transaction->expense_for]['essentials_duration'] = $transaction->essentials_duration;
             $payrolls[$transaction->expense_for]['essentials_duration_unit'] = $transaction->essentials_duration_unit;
             $payrolls[$transaction->expense_for]['total_leaves'] = $this->essentialsUtil->getTotalLeavesForGivenDateOfAnEmployee($business_id, $transaction->expense_for, $start_date->format('Y-m-d'), $end_date->format('Y-m-d'));
+            // $payrolls[$transaction->expense_for]['total_absent'] = $this->essentialsUtil->getTotalAbsentForGivenDateOfAnEmployee($business_id, $transaction->expense_for, $start_date->format('Y-m-d'), $end_date->format('Y-m-d'));
+           
             $payrolls[$transaction->expense_for]['total_days_worked'] = $this->essentialsUtil->getTotalDaysWorkedForGivenDateOfAnEmployee($business_id, $transaction->expense_for, $start_date, $end_date);
 
             //get total work duration of employee(attendance)

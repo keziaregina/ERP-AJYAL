@@ -368,4 +368,7 @@ return [
     'month' => 'Month',
     'format' => 'Select Format',
     'export_overtime' => 'Export',
+
+    'total_absent' => 'Total Absent',
+    // 'ab' => 'Total Absent',
 ];

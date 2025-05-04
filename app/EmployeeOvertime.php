@@ -101,4 +101,56 @@ class EmployeeOvertime extends Model
         'Leave Request' => 'LR',
         'Auto'  => 'A',
     ];
+
+    public static function getEmployeeLeavesByMonth($business_id, $employee_id, $month) {
+        return self::where('user_id', $employee_id)
+            ->where('month', $month)
+            ->where('year', date('Y'))
+            ->whereIn('total_hour', ['VL', 'SL'])
+            ->count();
+    }
+
+    public static function getEmployeeWorkDaysByMonth($business_id, $employee_id, $month) {
+        return self::where('user_id', $employee_id)
+            ->where('month', $month)
+            ->where('year', date('Y'))
+            ->whereNotIn('total_hour', ['A', 'VL', 'SL', 'GE'])
+            ->count();
+    }
+
+    public static function getEmployeeOvertimeByMonth($business_id, $employee_id, $month) {
+        return self::where('user_id', $employee_id)
+            ->where('month', $month)
+            ->where('year', date('Y'))
+            ->whereNotIn('total_hour', ['A', 'VL', 'SL', 'GE'])
+            ->pluck('total_hour')
+            ->toArray();
+    }
+
+    public static function getAndCalculateTotalOvertime($business_id, $employee_id, $month) {
+        $overtime_hours = self::getEmployeeOvertimeByMonth($business_id, $employee_id, $month);
+        $total_overtime = self::calculateTotalOvertime($overtime_hours);
+        return $total_overtime;
+    }
+
+    public static function calculateTotalOvertime($overtime_hours) {
+        $total_hours = 0;
+            
+        foreach ($overtime_hours as $time) {
+            $time = str_replace(['"', "'"], '', (string)$time);
+            if (is_numeric($time)) {
+                $total_hours += floatval($time);
+            }
+        }
+    
+        return round($total_hours, 2);
+    }
+
+    public static function countEmployeOvertimeByTypeAndMonth($businessId, $employeeId, $month, $typeHour) {
+        return self::where('user_id', $employeeId)
+            ->where('month', $month)
+            ->where('year', date('Y'))
+            ->where('total_hour', $typeHour)
+            ->count();
+    }
 }
