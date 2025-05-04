@@ -327,9 +327,9 @@ return [
     'add_new_overtime' => 'Add Overtime Hour',
     'select_overtime_hours' => 'Select Overtime Hours',
     'overtime_hours' => 'Overtime Hours',
-    'legend' => 'Legend - الأسطورة',
-    'vacation_leave' => 'Vacation Leave - إجازة الإجازة',
-    'glorious_employee_allowance' => 'Glorious Employee Allowance - مخصصات الموظفين المجيدين',
+    'legend' => 'Legend - مفاتيح رموز التقرير',
+    'vacation_leave' => 'Vacation Leave - إجازة',
+    'glorious_employee_allowance' => 'Glorious Employee Allowance - علاوة الموظفين المجيدين',
     'sick_leave' => 'Sick Leave - الإجازات المرضية',
     
     // Payroll calculation formulas
