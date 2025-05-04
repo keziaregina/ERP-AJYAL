@@ -292,7 +292,7 @@ class OvertimeSheetController extends Controller
                 $overtimeData = [];
 
                 // Initialize all days with null values
-                for ($day = 1; $day <= now()->daysInMonth; $day++) {
+                for ($day = 1; $day <= now()->month($currentMonth)->daysInMonth; $day++) {
                     $overtimeData[str_pad($day, 2, '0', STR_PAD_LEFT)] = null;
                 }
 
@@ -549,7 +549,8 @@ class OvertimeSheetController extends Controller
                 'GloriousName' => $nameEmployee,
                 'business' => request()->session()->get('business'),
                 'location' => request()->session()->get('user.location_id'),
-                'month' => \Carbon\Carbon::create()->month($month)->format('F'),
+                'month' => $month,
+                'month_name' => \Carbon\Carbon::create()->month($month)->format('F'),
                 'year' => now()->format('Y'),
             ], [], [
                 'orientation' => 'L',
