@@ -319,6 +319,18 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        <div class="form-group">
+                            <label for="year">Tahun *</label>
+                            <select name="year" id="year" class="form-control" required>
+                                @php
+                                    $currentYear = date('Y');
+                                @endphp
+                                @for ($year = $currentYear; $year >= ($currentYear - 5); $year--)
+                                    <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>{{ $year }}</option>
+                                @endfor
+                            </select>
+                        </div>
                                                 
                         <div class="form-group">
                             <label for="file_type">{{ __('essentials::lang.format') }}:*</label>

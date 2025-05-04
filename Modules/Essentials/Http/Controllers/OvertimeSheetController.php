@@ -265,12 +265,12 @@ class OvertimeSheetController extends Controller
         }
     }
 
-    private function getOvertimeDataByMonth($month)
+    private function getOvertimeDataByMonth($month, $year)
     {
         try {
             $currentMonth = $month;
 
-            $currentYear = date('Y');
+            $currentYear = $year;
 
             $businessId = request()->session()->get('user.business_id');
 
@@ -531,8 +531,9 @@ class OvertimeSheetController extends Controller
         // dd($request->all());
         try {
             $month = $request->month;
+            $year = $request->year;
             $logo = public_path('img/logo-small.png');
-            $overtimeData = $this->getOvertimeDataByMonth($month);
+            $overtimeData = $this->getOvertimeDataByMonth($month, $year);
             $data = $overtimeData['employees'];
             $totalAllOvertime = $overtimeData['total_all_overtime'];
             $gloriousEmployee = GloriousEmployee::with('user')->where('month', $month)->first();
@@ -550,13 +551,13 @@ class OvertimeSheetController extends Controller
                 'business' => request()->session()->get('business'),
                 'location' => request()->session()->get('user.location_id'),
                 'month' => \Carbon\Carbon::create()->month($month)->format('F'),
-                'year' => now()->format('Y'),
+                'year' => \Carbon\Carbon::create()->year($year)->format('Y'),
             ], [], [
                 'orientation' => 'L',
                 'format' => 'A4'
             ]);
 
-            return $pdf->download('overtime_report-' . \Carbon\Carbon::create()->month($month)->format('F_Y') . '.pdf');
+            return $pdf->download('overtime_report-' . \Carbon\Carbon::create($year, $month)->format('F_Y') . '.pdf');
             
         } catch (\Exception $e) {
             Log::error("Error generating overtime PDF: " . $e->getMessage());
