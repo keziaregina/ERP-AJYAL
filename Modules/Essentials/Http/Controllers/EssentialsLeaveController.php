@@ -388,11 +388,10 @@ class EssentialsLeaveController extends Controller
                     'month' => $months,
                     'year' => $years,                    
                 ], [
+                    'created_by' => auth()->user()->id,
                     'total_hour' => $leave_status,
                 ]);
                 }
-            // Log::info(json_encode($overTimeHour, JSON_PRETTY_PRINT));
-            // Log::info(json_encode($range, JSON_PRETTY_PRINT));    
             }
 
             
