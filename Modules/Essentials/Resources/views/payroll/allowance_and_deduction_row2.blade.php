@@ -15,6 +15,7 @@
 
     $amount_type = !empty($amount_type) ? $amount_type : 'fixed';
     $percent = $amount_type == 'percent' && !empty($percent) ?  $percent : 0;
+    $shortname = !empty($shortname) ? $shortname : '';
 
 @endphp
 <tr>

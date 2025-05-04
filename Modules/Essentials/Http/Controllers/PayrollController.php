@@ -407,7 +407,7 @@ class PayrollController extends Controller
 
                             $payrolls[$employee->id]['deductions']['deduction_names'][] = $ad->description;
                             $payrolls[$employee->id]['deductions']['deduction_short_names'][] = "social_security";
-                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] = $ad->amount_type == 'percent' ? $total_work_duration * $ad->amount / 100 : $ad->amount;
+                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] = $ad->amount_type == 'percent' ? $total * $ad->amount / 100 : $ad->amount;
                             $payrolls[$employee->id]['deductions']['deduction_types'][] = $ad->amount_type;
                             $payrolls[$employee->id]['deductions']['deduction_col_types'][] = 'auto';
                             $payrolls[$employee->id]['deductions']['deduction_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
@@ -481,7 +481,7 @@ class PayrollController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        // dd($request->all());
+        dd($request->all());
         Log::info("payroll in store");
         Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
         try {
@@ -848,15 +848,21 @@ class PayrollController extends Controller
 
     public function getAllowanceAndDeductionRow(Request $request)
     {
-        if ($request->ajax()) {
-            $employee = $request->input('employee_id');
-            $type = $request->input('type');
+        try {
+            if ($request->ajax()) {
+                $employee = $request->input('employee_id');
+                $type = $request->input('type');
 
-            $ad_row = view('essentials::payroll.allowance_and_deduction_row')
+            // $ad_row = view('essentials::payroll.allowance_and_deduction_row')
+            $ad_row = view('essentials::payroll.allowance_and_deduction_row2')
                         ->with(compact('type', 'employee'))
                         ->render();
 
             return $ad_row;
+            }
+        } catch (Exception $e) {
+            Log::error("Error get allowance deduct row " . $e->getMessage());
+            throw $e->getMessage();
         }
     }
 

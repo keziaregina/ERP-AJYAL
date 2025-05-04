@@ -233,8 +233,8 @@
                                                     @foreach($payroll['allowances']['allowance_names'] as $key => $value)
                                                         @include('essentials::payroll.allowance_and_deduction_row2',
                                                         [
-                                                            // 'add_button'  => $loop->index ==  0  ? true : false, 
-                                                            'add_button'  => false, 
+                                                            'add_button'  => $loop->index ==  0  ? true : false, 
+                                                            // 'add_button'  => false, 
                                                             'type'        => 'allowance', 'name' => $value,
                                                             'shortname'   => $payroll['allowances']['allowance_short_names'][$key],
                                                             'value'       => $payroll['allowances']['allowance_amounts'][$key], 
@@ -288,8 +288,8 @@
                                                     @foreach($payroll['deductions']['deduction_names'] as $key => $value)
                                                         @include('essentials::payroll.allowance_and_deduction_row2', 
                                                         [
-                                                            // 'add_button'  => $loop->index == 0 ? true : false, 
-                                                            'add_button'  => false, 
+                                                            'add_button'  => $loop->index == 0 ? true : false, 
+                                                            // 'add_button'  => false, 
                                                             'type'        => 'deduction',
                                                             'shortname'   => $payroll['deductions']['deduction_short_names'][$key],
                                                             'name'        => $value,
@@ -359,4 +359,5 @@
 @stop
 @section('javascript')
 {{-- @includeIf('essentials::payroll.form_script2') --}}
+@includeIf('essentials::payroll.form_script_init')
 @endsection
