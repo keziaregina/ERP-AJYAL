@@ -481,7 +481,7 @@ class PayrollController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        dd($request->all());
+        // dd($request->all());
         Log::info("payroll in store");
         Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
         try {
@@ -531,6 +531,10 @@ class PayrollController extends Controller
                 }
                 unset($payroll['allowance_names'], $payroll['allowance_types'], $payroll['allowance_percent'], $payroll['allowance_amounts'], $payroll['deduction_names'], $payroll['deduction_types'], $payroll['deduction_percent'], $payroll['deduction_amounts'], $payroll['total']);
 
+                // dd($payroll);
+                // $payroll['total_days_worked'] = $allowances_and_deductions['total_days_worked'];
+                // $payroll['total_work_duration'] = $allowances_and_deductions['total_work_duration'];
+
                 $transaction = Transaction::create($payroll);
                 $transaction_ids[] = $transaction->id;
 
@@ -551,6 +555,7 @@ class PayrollController extends Controller
             ];
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error store payroll ----> '.$e->getMessage());
             \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
 
             $output = ['success' => false,
@@ -566,50 +571,32 @@ class PayrollController extends Controller
     {
         Log::info("payroll in getallow");
         Log::info(json_encode($payroll,JSON_PRETTY_PRINT));
+        
         // dd($payroll);
 
-        // $allowance_names = $payroll['allowance_names'];
-        $allowance_names = $payroll['allowances']['description'];
-        
-        // $allowance_types = $payroll['allowance_types'];
-        $allowance_types = $payroll['allowances']['amount_type'];
-
-        // $allowance_percents = $payroll['allowance_percent'];
-        $allowance_percents = $payroll['allowances']['amount'];
-
+        $allowance_names = $payroll['allowance_names'];
+        $allowance_types = $payroll['allowance_types'];
+        $allowance_percents = $payroll['allowance_percent'];
         $allowance_names_array = [];
         $allowance_percent_array = [];
         $allowance_amounts = [];
 
-        // foreach ($payroll['allowance_amounts'] as $key => $value) {
-        foreach ($payroll['allowances']['amount'] as $key => $value) {
+        foreach ($payroll['allowance_amounts'] as $key => $value) {
             if (! empty($allowance_names[$key])) {
                 $allowance_amounts[] = $this->moduleUtil->num_uf($value);
                 $allowance_names_array[] = $allowance_names[$key];
-                $allowance_percent_array[] = 0;
-                // $allowance_percent_array[] = ! empty($allowance_percents[$key]) ? $this->moduleUtil->num_uf($allowance_percents[$key]) : 0;
-                // $allowance_percent_array[] = ! empty($allowance_percents[$key]) ? $this->moduleUtil->num_uf($allowance_percents[$key]) : 0;
+                $allowance_percent_array[] = ! empty($allowance_percents[$key]) ? $this->moduleUtil->num_uf($allowance_percents[$key]) : 0;
             }
         }
 
-        // $deduction_names = $payroll['deduction_names'];
-        $deduction_names = $payroll['deductions']['description'];
-
-        // $deduction_types = $payroll['deduction_types'];
-        $deduction_types = $payroll['deductions']['amount_type'];
-
-        // $deduction_percents = $payroll['deduction_percent'];
-        $deduction_percents = $payroll['deductions']['percentage'];
-
+        $deduction_names = $payroll['deduction_names'];
+        $deduction_types = $payroll['deduction_types'];
+        $deduction_percents = $payroll['deduction_percent'];
         $deduction_names_array = [];
         $deduction_percents_array = [];
         $deduction_amounts = [];
-
-        // foreach ($payroll['deduction_amounts'] as $key => $value) {
-        foreach ($payroll['deductions']['amount'] as $key => $value) {
+        foreach ($payroll['deduction_amounts'] as $key => $value) {
             if (! empty($deduction_names[$key])) {
-                // dd($value);
-                // dd($deduction_names[$value]);
                 $deduction_names_array[] = $deduction_names[$key];
                 $deduction_amounts[] = $this->moduleUtil->num_uf($value);
                 $deduction_percents_array[] = ! empty($deduction_percents[$key]) ? $this->moduleUtil->num_uf($deduction_percents[$key]) : 0;
@@ -629,8 +616,71 @@ class PayrollController extends Controller
             'deduction_percents' => $deduction_percents_array,
         ]);
 
-        // dd($output);
         return $output;
+
+        // // $allowance_names = $payroll['allowance_names'];
+        // $allowance_names = $payroll['allowances']['description'];
+        
+        // // $allowance_types = $payroll['allowance_types'];
+        // $allowance_types = $payroll['allowances']['amount_type'];
+
+        // // $allowance_percents = $payroll['allowance_percent'];
+        // $allowance_percents = $payroll['allowances']['amount'];
+
+        // $allowance_names_array = [];
+        // $allowance_percent_array = [];
+        // $allowance_amounts = [];
+
+        // // foreach ($payroll['allowance_amounts'] as $key => $value) {
+        // foreach ($payroll['allowances']['amount'] as $key => $value) {
+        //     if (! empty($allowance_names[$key])) {
+        //         $allowance_amounts[] = $this->moduleUtil->num_uf($value);
+        //         $allowance_names_array[] = $allowance_names[$key];
+        //         $allowance_percent_array[] = 0;
+        //         // $allowance_percent_array[] = ! empty($allowance_percents[$key]) ? $this->moduleUtil->num_uf($allowance_percents[$key]) : 0;
+        //         // $allowance_percent_array[] = ! empty($allowance_percents[$key]) ? $this->moduleUtil->num_uf($allowance_percents[$key]) : 0;
+        //     }
+        // }
+
+        // // $deduction_names = $payroll['deduction_names'];
+        // $deduction_names = $payroll['deductions']['description'];
+
+        // // $deduction_types = $payroll['deduction_types'];
+        // $deduction_types = $payroll['deductions']['amount_type'];
+
+        // // $deduction_percents = $payroll['deduction_percent'];
+        // $deduction_percents = $payroll['deductions']['percentage'];
+
+        // $deduction_names_array = [];
+        // $deduction_percents_array = [];
+        // $deduction_amounts = [];
+
+        // // foreach ($payroll['deduction_amounts'] as $key => $value) {
+        // foreach ($payroll['deductions']['amount'] as $key => $value) {
+        //     if (! empty($deduction_names[$key])) {
+        //         // dd($value);
+        //         // dd($deduction_names[$value]);
+        //         $deduction_names_array[] = $deduction_names[$key];
+        //         $deduction_amounts[] = $this->moduleUtil->num_uf($value);
+        //         $deduction_percents_array[] = ! empty($deduction_percents[$key]) ? $this->moduleUtil->num_uf($deduction_percents[$key]) : 0;
+        //     }
+        // }
+
+        // $output['essentials_allowances'] = json_encode([
+        //     'allowance_names' => $allowance_names_array,
+        //     'allowance_amounts' => $allowance_amounts,
+        //     'allowance_types' => $allowance_types,
+        //     'allowance_percents' => $allowance_percent_array,
+        // ]);
+        // $output['essentials_deductions'] = json_encode([
+        //     'deduction_names' => $deduction_names_array,
+        //     'deduction_amounts' => $deduction_amounts,
+        //     'deduction_types' => $deduction_types,
+        //     'deduction_percents' => $deduction_percents_array,
+        // ]);
+
+        // // dd($output);
+        // return $output;
     }
 
     /**
@@ -692,22 +742,22 @@ class PayrollController extends Controller
             $total_leaves += $diff;
         }
 
-        $total_days_present = $this->essentialsUtil->getTotalDaysWorkedForGivenDateOfAnEmployee(
-            $business_id,
-            $payroll->transaction_for->id,
-            $start_of_month->format('Y-m-d'),
-            $end_of_month->format('Y-m-d')
-        );
-
-        $total_work_duration = $this->essentialsUtil->getTotalWorkDuration('hour', 
-        $payroll->transaction_for->id, $business_id, $start_of_month->format('Y-m-d'),
-        $end_of_month->format('Y-m-d'));
+        // $total_days_present = $this->essentialsUtil->getTotalDaysWorkedForGivenDateOfAnEmployee(
+        //     $business_id,
+        //     $payroll->transaction_for->id,
+        //     $start_of_month->format('Y-m-d'),
+        //     $end_of_month->format('Y-m-d')
+        // );
+        $total_days_present = $payroll->total_days_worked;
+        $total_work_duration = $payroll->total_work_duration;
+        $total_absent = $payroll->total_absent;
+        $total_leaves = $payroll->total_leaves;
    
 
         return view('essentials::payroll.show')
         ->with(compact('payroll', 'month_name', 'allowances', 'deductions', 'year', 'payment_types',
         'bank_details', 'designation', 'department', 'final_total_in_words', 'total_leaves', 'days_in_a_month',
-        'total_work_duration', 'location', 'total_days_present'));
+        'total_work_duration', 'location', 'total_days_present', 'total_absent'));
     }
 
     /**

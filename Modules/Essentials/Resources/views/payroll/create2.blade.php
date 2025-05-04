@@ -164,17 +164,21 @@
                                     {{
                                         __('essentials::lang.total_leaves_days', ['total_leaves' => $payroll['total_leaves']])
                                     }}
+                                    <input type="hidden" name="payrolls[{{$employee}}][total_leaves]" value="{{$payroll['total_leaves']}}">
                                     <br><br>
                                     <Fb>{{__('essentials::lang.work_duration')}} :</Fb> 
                                     {{
                                         __('essentials::lang.work_duration_hour', ['duration' => $payroll['total_work_duration']])
                                     }}
+                                    <input type="hidden" name="payrolls[{{$employee}}][total_work_duration]" value="{{$payroll['total_work_duration']}}">
                                     <br><br>
                                     <b>{{__('essentials::lang.attendance')}}:</b>
                                     {{$payroll['total_days_worked']}} @lang('lang_v1.days')
+                                    <input type="hidden" name="payrolls[{{$employee}}][total_days_worked]" value="{{$payroll['total_days_worked']}}">
                                     <br><br>
                                     <b>{{__('essentials::lang.absent')}}:</b>
                                     {{$payroll['total_absent']}} @lang('lang_v1.days')
+                                    <input type="hidden" name="payrolls[{{$employee}}][total_absent]" value="{{$payroll['total_absent']}}">
                                 </td>
                                 <td>
                                     <label for="essentials_duration_{{$employee}}">@lang('essentials::lang.total_work_duration') <span class="text-danger">*</span></label>
