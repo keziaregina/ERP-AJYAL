@@ -170,7 +170,7 @@ class EssentialsLeaveController extends Controller
      * @return Response
      */
     public function create()
-    {
+    {        
         $business_id = request()->session()->get('user.business_id');
 
         $leave_types = EssentialsLeaveType::forDropdown($business_id);
@@ -310,12 +310,30 @@ class EssentialsLeaveController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        $EssentialsLeave = EssentialsLeave::where('id', $id)->first();
+        $status =$EssentialsLeave->status;
+
         if (request()->ajax()) {
             try {
-                EssentialsLeave::where('business_id', $business_id)->where('id', $id)->delete();
+                if ($status == 'cancelled' ) {
+                EssentialsLeave::where('business_id', $business_id)->where('id', $id)->delete();                
 
                 $output = ['success' => true,
                     'msg' => __('lang_v1.deleted_success'),
+                ];
+
+                return $output;
+                }
+
+                if ($status != 'cancelled') {
+                    return [
+                        'success' => false,
+                        'msg' => 'Data can only be deleted if the status is Cancelled.',
+                    ];
+                }
+
+                $output = ['success' => false,
+                    'msg' => __('messages.something_went_wrong'),
                 ];
             } catch (\Exception $e) {
                 \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
@@ -331,7 +349,7 @@ class EssentialsLeaveController extends Controller
 
     public function changeStatus(Request $request)
     {
-        // Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
+        Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
         $business_id = request()->session()->get('user.business_id');
 
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module')) || ! auth()->user()->can('essentials.approve_leave')) {
@@ -390,6 +408,14 @@ class EssentialsLeaveController extends Controller
                 ], [
                     'total_hour' => $leave_status,
                 ]);
+                }
+
+                if ($input['status'] == 'cancelled') {
+                    EmployeeOvertime::where('user_id', $leave->user_id)
+                        ->where('day', $days)
+                        ->where('month', $months)
+                        ->where('year', $years)
+                        ->delete();
                 }
             // Log::info(json_encode($overTimeHour, JSON_PRETTY_PRINT));
             // Log::info(json_encode($range, JSON_PRETTY_PRINT));    
