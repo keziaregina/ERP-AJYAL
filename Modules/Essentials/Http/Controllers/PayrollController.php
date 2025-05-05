@@ -210,6 +210,8 @@ class PayrollController extends Controller
                     ->get();
 
         $add_payroll_for = array_diff($employee_ids, $payrolls->pluck('expense_for')->toArray());
+        // dd( $payrolls->pluck('expense_for'));
+        // dd($add_payroll_for);
 
         if (! empty($add_payroll_for)) {
             $location = BusinessLocation::where('business_id', $business_id)
@@ -222,7 +224,16 @@ class PayrollController extends Controller
             $month_name = $end_date->format('F');
 
             $employees = User::where('business_id', $business_id)
+                            ->where(function($query) use ($transaction_date) {
+                                $query->whereNull('custom_field_1')
+                                      ->orWhere(function($q) use ($transaction_date) {
+                                          $q->whereNotNull('custom_field_1')
+                                            ->whereDate('custom_field_1', '<=', $transaction_date);
+                                      });
+                            })
                             ->find($add_payroll_for);
+
+            // dd($employees);
 
             $payrolls = [];
             foreach ($employees as $employee) {
@@ -254,6 +265,8 @@ class PayrollController extends Controller
                 $payrolls[$employee->id]['total_days_worked'] = EmployeeOvertime::getEmployeeWorkDaysByMonth(business_id: $business_id, employee_id: $employee->id, month: $month);
                 $dailyRate = $total / now()->month($month)->daysInMonth;
                 $payrolls[$employee->id]['total_work_duration'] = $total_work_duration;
+                $payrolls[$employee->id]['allowances'] = [];
+                $payrolls[$employee->id]['deductions'] = [];
 
                 //get total earned commission for employee
                 $business_details = $this->businessUtil->getDetails($business_id);
@@ -412,8 +425,10 @@ class PayrollController extends Controller
 
                 }
 
-                if ($vacationDays > 0) {
-                    Log::info('vacation days');
+                if ($vacationDays > 0 && $payrolls[$employee->id]['allowances'] != null) {
+                    // Log::info('vacation days');
+                    // Log::info("Payroll--------------------------->");
+                    Log::info($payrolls[$employee->id]);
                     foreach ($payrolls[$employee->id]['allowances']['allowance_names'] as $key => $value) {
                         $food_allowance = 0;
                         if (str_contains(strtolower($value), 'food')) {

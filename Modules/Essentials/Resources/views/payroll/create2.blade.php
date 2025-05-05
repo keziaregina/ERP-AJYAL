@@ -152,7 +152,7 @@
                                     $total = $total_work_duration * $amount_per_unit_duration;
                                 }
                             @endphp
-                            <tr data-id="{{$employee}}">
+                            <tr data-id="{{$employee}}" style="background-color: #f0f0f0;">
                                 <input type="hidden" name="payrolls[{{$employee}}][expense_for]" value="{{$employee}}">
                                 @if($action == 'edit')
                                     <input type="hidden" name="payrolls[{{$employee}}][transaction_id]" value="{{$payroll['transaction_id']}}">
