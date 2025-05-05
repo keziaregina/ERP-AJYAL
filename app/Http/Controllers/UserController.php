@@ -47,11 +47,11 @@ class UserController extends Controller
     {
         $businessId = Auth::user()->business_id;
         $bicCode = EmployeeBicCode::where('business_id', $businessId)->get();
+        $salaryCode = SalaryFrequency::where('business_id', $businessId)->get();
         $user_id = request()->session()->get('user.id');
         $user = User::where('id', $user_id)->with(['media'])->first();
         $config_languages = config('constants.langs');
         $languages = [];
-        $salaryCode = SalaryFrequency::where('business_id', $businessId)->get();
         foreach ($config_languages as $key => $value) {
             $languages[$key] = $value['full_name'];
         }
