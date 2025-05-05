@@ -224,6 +224,9 @@ class PayrollController extends Controller
             $payrolls = [];
             foreach ($employees as $employee) {
 
+                $Deducations = EssentialsAllowanceAndDeduction::where('description', 'like', '%Glorious employee%')->first() ;
+                $deductionAmountGE = $Deducations->amount;
+
                 //get employee info
                 $payrolls[$employee->id]['name'] = $employee->user_full_name;
                 $payrolls[$employee->id]['essentials_salary'] = $employee->essentials_salary;
@@ -299,7 +302,7 @@ class PayrollController extends Controller
             $action = 'create';
 
             return view('essentials::payroll.create')
-                    ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'action', 'location'));
+                    ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'action', 'location', 'deductionAmountGE'));
         } else {
             return redirect()->action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'index'])
                 ->with('status',
@@ -338,7 +341,7 @@ class PayrollController extends Controller
             // $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('total_gross_amount'));
             // $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('payrolls[0][final_total]'));
             $payroll_group['location_id'] = $request->input('location_id');
-            $payroll_group['created_by'] = auth()->user()->id;
+            $payroll_group['created_by'] = auth()->user()->id;            
 
             DB::beginTransaction();
 
@@ -957,7 +960,7 @@ class PayrollController extends Controller
             $payroll_group = PayrollGroup::where('business_id', $business_id)
                                     ->findOrFail($payroll_group_id);
 
-            $payroll_group->update($pg_input);
+            $payroll_group->update($pg_input);            
 
             foreach ($payrolls as $key => $payroll) {
                 $transaction_id = $payroll['transaction_id'];
