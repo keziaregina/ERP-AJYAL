@@ -372,4 +372,5 @@ return [
     'total_absent' => 'Total Absent',
     'total_leaves' => 'Total Leaves',
     // 'ab' => 'Total Absent',
+    'earnings' => 'Earnings',
 ];

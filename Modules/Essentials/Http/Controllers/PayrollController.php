@@ -242,7 +242,6 @@ class PayrollController extends Controller
                 $payrolls[$employee->id]['name'] = $employee->user_full_name;
                 $payrolls[$employee->id]['essentials_salary'] = $employee->essentials_salary;
                 $payrolls[$employee->id]['essentials_pay_period'] = $employee->essentials_pay_period;
-                // $payrolls[$employee->id]['total_leaves'] = $this->essentialsUtil->getTotalLeavesForGivenDateOfAnEmployee($business_id, $employee->id, $start_date, $end_date->format('Y-m-d'));
                 $payrolls[$employee->id]['total_leaves'] = EmployeeOvertime::getEmployeeLeavesByMonth(business_id: $business_id, employee_id: $employee->id, month: $month);
 
                 $payrolls[$employee->id]['total_absent'] = EmployeeOvertime::countEmployeOvertimeByTypeAndMonth(
@@ -253,13 +252,6 @@ class PayrollController extends Controller
                 );
 
                 $payrolls[$employee->id]['total_days_worked'] = EmployeeOvertime::getEmployeeWorkDaysByMonth(business_id: $business_id, employee_id: $employee->id, month: $month);
-                // $payrolls[$employee->id]['total_days_worked'] = $this->essentialsUtil->getTotalDaysWorkedForGivenDateOfAnEmployee($business_id, $employee->id, $start_date, $end_date);
-
-                //get total work duration of employee(attendance)
-
-                // $payrolls[$employee->id]['total_work_duration'] = $this->essentialsUtil->getTotalWorkDuration('hour', $employee->id, $business_id, $start_date, $end_date->format('Y-m-d'));
-
-                // $total_work_duration = $this->essentialsUtil->getTotalWorkDuration('hour', $employee->id, $business_id, $start_date, $end_date->format('Y-m-d'));
                 $dailyRate = $total / now()->month($month)->daysInMonth;
                 $payrolls[$employee->id]['total_work_duration'] = $total_work_duration;
 
@@ -317,7 +309,6 @@ class PayrollController extends Controller
 
                 //get earnings & deductions of employee
                 $employee = User::find($employee->id);
-                // $allowances_and_deductions = $this->essentialsUtil->getEmployeeAllowancesAndDeductions($business_id, $employee->id, $start_date, $end_date)->toArray();
                 $allowances_and_deductions = $this->essentialsUtil->getEmployeeAllowancesAndDeductions($business_id, $employee->id, $start_date, $end_date);
 
                 $vacationDays = EmployeeOvertime::countEmployeOvertimeByTypeAndMonth(
@@ -335,10 +326,6 @@ class PayrollController extends Controller
                 );
 
                 $isGloriousEmployee = GloriousEmployee::isGloriousEmployee($business_id, $month, $employee->id);
-                // dd($isGloriousEmployee);
-                // $allowances_and_deductions = $this->essentialsUtil->getEmployeeAllowancesAndDeductions($business_id, $employee->id, $start_date, $end_date);
-                // dd($allowances_and_deductions->toArray());
-                // dd($allowances_and_deductions->toArray());
                 
                 foreach ($allowances_and_deductions as $ad) {
                     if ($ad->type == 'allowance') {
@@ -425,7 +412,6 @@ class PayrollController extends Controller
 
                 }
 
-                // dd($vacationDays);
                 if ($vacationDays > 0) {
                     Log::info('vacation days');
                     foreach ($payrolls[$employee->id]['allowances']['allowance_names'] as $key => $value) {
@@ -445,12 +431,9 @@ class PayrollController extends Controller
                     }
 
                 }
-                // dd($payrolls);
 
-                // dd($allowances_and_deductions->toArray());
             }
 
-            // dd($payrolls);
 
             $action = 'create';
 
@@ -571,10 +554,12 @@ class PayrollController extends Controller
     {
         Log::info("payroll in getallow");
         Log::info(json_encode($payroll,JSON_PRETTY_PRINT));
-        
+        // die;
         // dd($payroll);
 
         $allowance_names = $payroll['allowance_names'];
+        $allowance_short_names = $payroll['allowance_short_names'];
+        $allowance_overtime_hours = $payroll['overtime_hours'];
         $allowance_types = $payroll['allowance_types'];
         $allowance_percents = $payroll['allowance_percent'];
         $allowance_names_array = [];
@@ -584,12 +569,16 @@ class PayrollController extends Controller
         foreach ($payroll['allowance_amounts'] as $key => $value) {
             if (! empty($allowance_names[$key])) {
                 $allowance_amounts[] = $this->moduleUtil->num_uf($value);
+                $allowance_short_names_array[] = $allowance_short_names[$key];
+                $allowance_overtime_hours_array[] = $allowance_overtime_hours[$key];
+                $allowance_types_array[] = $allowance_types[$key];
                 $allowance_names_array[] = $allowance_names[$key];
                 $allowance_percent_array[] = ! empty($allowance_percents[$key]) ? $this->moduleUtil->num_uf($allowance_percents[$key]) : 0;
             }
         }
 
         $deduction_names = $payroll['deduction_names'];
+        $deduction_short_names = $payroll['deduction_short_names'];
         $deduction_types = $payroll['deduction_types'];
         $deduction_percents = $payroll['deduction_percent'];
         $deduction_names_array = [];
@@ -598,6 +587,8 @@ class PayrollController extends Controller
         foreach ($payroll['deduction_amounts'] as $key => $value) {
             if (! empty($deduction_names[$key])) {
                 $deduction_names_array[] = $deduction_names[$key];
+                $deduction_short_names_array[] = $deduction_short_names[$key];
+                $deduction_types_array[] = $deduction_types[$key];
                 $deduction_amounts[] = $this->moduleUtil->num_uf($value);
                 $deduction_percents_array[] = ! empty($deduction_percents[$key]) ? $this->moduleUtil->num_uf($deduction_percents[$key]) : 0;
             }
@@ -608,14 +599,20 @@ class PayrollController extends Controller
             'allowance_amounts' => $allowance_amounts,
             'allowance_types' => $allowance_types,
             'allowance_percents' => $allowance_percent_array,
+            'overtime_hours' => $allowance_overtime_hours_array,
+            'allowance_short_names' => $allowance_short_names_array,
         ]);
         $output['essentials_deductions'] = json_encode([
             'deduction_names' => $deduction_names_array,
             'deduction_amounts' => $deduction_amounts,
             'deduction_types' => $deduction_types,
+            'deduction_short_names' => $deduction_short_names_array,
             'deduction_percents' => $deduction_percents_array,
         ]);
 
+        // Log::info("output ------------>");
+        // Log::info(json_encode($output,JSON_PRETTY_PRINT));
+        // die;
         return $output;
 
         // // $allowance_names = $payroll['allowance_names'];
@@ -767,6 +764,7 @@ class PayrollController extends Controller
      */
     public function edit($id)
     {
+        // dd("hello");
         $business_id = request()->session()->get('user.business_id');
 
         if (! (auth()->user()->can('superadmin') || ! $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module')) && ! auth()->user()->can('essentials.update_payroll')) {
@@ -782,7 +780,17 @@ class PayrollController extends Controller
         $month_name = $transaction_date->format('F');
         $year = $transaction_date->format('Y');
         $allowances = ! empty($payroll->essentials_allowances) ? json_decode($payroll->essentials_allowances, true) : [];
-        $deductions = ! empty($payroll->essentials_deductions) ? json_decode($payroll->essentials_deductions, true) : [];
+        // $deductions = ! empty($payroll->essentials_deductions) ? json_decode($payroll->essentials_deductions, true) : [];
+
+        // Log::info("allowances---------------->");
+        // // Log::info(json_encode($allowances,JSON_PRETTY_PRINT));
+        // Log::info($allowances);
+
+        // Log::info("deductions---------------->");
+        // // Log::info(json_encode($deductions,JSON_PRETTY_PRINT));
+        // Log::info($deductions);
+
+        // dd($allowances);
 
         return view('essentials::payroll.edit')->with(compact('payroll', 'month_name', 'allowances', 'deductions', 'year'));
     }
@@ -1086,6 +1094,12 @@ class PayrollController extends Controller
                             ->with(['payrollGroupTransactions', 'payrollGroupTransactions.transaction_for', 'businessLocation'])
                             ->findOrFail($id);
 
+        // Log::info("payroll group ------------>");
+        // Log::info(json_encode($payroll_group,JSON_PRETTY_PRINT));
+
+        // die;
+        // dd($payroll_group);
+
         //payroll location
         $location = $payroll_group->businessLocation;
 
@@ -1095,6 +1109,9 @@ class PayrollController extends Controller
         $year = null;
         foreach ($payroll_group->payrollGroupTransactions as $transaction) {
 
+            Log::info("transaction ------------>");
+            Log::info(json_encode($transaction,JSON_PRETTY_PRINT));
+            // die;
             //payroll info
             if (empty($transaction_date) && empty($month_name) && empty($year)) {
                 $transaction_date = \Carbon::parse($transaction->transaction_date);
@@ -1112,14 +1129,18 @@ class PayrollController extends Controller
             $payrolls[$transaction->expense_for]['essentials_amount_per_unit_duration'] = $transaction->essentials_amount_per_unit_duration;
             $payrolls[$transaction->expense_for]['essentials_duration'] = $transaction->essentials_duration;
             $payrolls[$transaction->expense_for]['essentials_duration_unit'] = $transaction->essentials_duration_unit;
-            $payrolls[$transaction->expense_for]['total_leaves'] = $this->essentialsUtil->getTotalLeavesForGivenDateOfAnEmployee($business_id, $transaction->expense_for, $start_date->format('Y-m-d'), $end_date->format('Y-m-d'));
+            // $payrolls[$transaction->expense_for]['total_leaves'] = $this->essentialsUtil->getTotalLeavesForGivenDateOfAnEmployee($business_id, $transaction->expense_for, $start_date->format('Y-m-d'), $end_date->format('Y-m-d'));
             // $payrolls[$transaction->expense_for]['total_absent'] = $this->essentialsUtil->getTotalAbsentForGivenDateOfAnEmployee($business_id, $transaction->expense_for, $start_date->format('Y-m-d'), $end_date->format('Y-m-d'));
+            $payrolls[$transaction->expense_for]['total_leaves'] = $transaction->total_leaves;
+            $payrolls[$transaction->expense_for]['total_absent'] = $transaction->total_absent;
+            $payrolls[$transaction->expense_for]['total_work_duration'] = $transaction->total_work_duration;
+            $payrolls[$transaction->expense_for]['total_days_worked'] = $transaction->total_days_worked;
            
-            $payrolls[$transaction->expense_for]['total_days_worked'] = $this->essentialsUtil->getTotalDaysWorkedForGivenDateOfAnEmployee($business_id, $transaction->expense_for, $start_date, $end_date);
+            // $payrolls[$transaction->expense_for]['total_days_worked'] = $this->essentialsUtil->getTotalDaysWorkedForGivenDateOfAnEmployee($business_id, $transaction->expense_for, $start_date, $end_date);
 
             //get total work duration of employee(attendance)
-            $payrolls[$transaction->expense_for]['total_work_duration'] = $this->essentialsUtil->getTotalWorkDuration('hour', $transaction->expense_for, $business_id, $start_date->format('Y-m-d'), $end_date->format('Y-m-d'));
-
+            // $payrolls[$transaction->expense_for]['total_work_duration'] = $this->essentialsUtil->getTotalWorkDuration('hour', $transaction->expense_for, $business_id, $start_date->format('Y-m-d'), $end_date->format('Y-m-d'));
+            
             //get earnings employee
             $allowances = ! empty($transaction->essentials_allowances) ? json_decode($transaction->essentials_allowances, true) : [];
 
@@ -1145,8 +1166,12 @@ class PayrollController extends Controller
         }
 
         $action = 'edit';
+        Log::info("payrolls ------------>");
+        Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
+        // die;
 
-        return view('essentials::payroll.create')
+        // return view('essentials::payroll.create')
+        return view('essentials::payroll.create2')
             ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'payroll_group', 'action', 'location'));
     }
 

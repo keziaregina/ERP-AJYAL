@@ -5,23 +5,28 @@
         $val_class = 'allowance';
         $type_col = 'payrolls['.$employee.'][allowance_types]';
         $percent_col = 'payrolls['.$employee.'][allowance_percent]';
+        $shortname_col = 'payrolls['.$employee.'][allowance_short_names]';
+        $overtime_col = 'payrolls['.$employee.'][overtime_hours]';
     } elseif($type == 'deduction') {
         $name_col = 'payrolls['.$employee.'][deduction_names]';
         $val_col = 'payrolls['.$employee.'][deduction_amounts]';
         $val_class = 'deduction';
         $type_col = 'payrolls['.$employee.'][deduction_types]';
         $percent_col = 'payrolls['.$employee.'][deduction_percent]';
+        $shortname_col = 'payrolls['.$employee.'][deduction_short_names]';
     }
 
     $amount_type = !empty($amount_type) ? $amount_type : 'fixed';
     $percent = $amount_type == 'percent' && !empty($percent) ?  $percent : 0;
     $shortname = !empty($shortname) ? $shortname : '';
+    $overtime_value = !empty($overtime_value) ? $overtime_value : 0;
 
 @endphp
 <tr>
     <td>
         <input type="text" name="{{ $name_col }}[]" value="{{ !empty($name) ? $name : '' }}" class="form-control input-sm">
     </td>
+
     <td>
         <select name="{{ $type_col }}[]" class="form-control input-sm amount_type">
             <option value="fixed" {{ $amount_type == 'fixed' ? 'selected' : '' }}>{{ __('lang_v1.fixed') }}</option>
@@ -41,7 +46,8 @@
         <input type="text" name="payrolls[{{ $employee }}][overtime_hours][]" value="{{ $overtime_value }}" class="form-control input-sm value_field input_number overtime_hours" {{ $readonly }}>
     </td>
     @elseif ($type == 'allowance' && $shortname != 'overtime')
-        <td></td>
+    <td></td>
+    <input type="hidden" name="payrolls[{{ $employee }}][overtime_hours][]" value="{{ $overtime_value }}" class="">
     @endif
 
     {{-- @if ($type == 'deduction' && $shortname == 'social_security')
@@ -62,6 +68,7 @@
         @endphp
         <input type="text" name="{{ $val_col }}[]" value="{{ !empty($value) ? @num_format((float) $value) : 0 }}" class="form-control input-sm value_field input_number {{ $val_class }}" {{ $readonly }}>
     </td>
+
     <td>
         @if(!empty($add_button))
             <button type="button" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-primary @if($type == 'allowance') add_allowance @elseif($type == 'deduction') add_deduction @endif">
@@ -72,5 +79,13 @@
                 <i class="fa fa-minus"></i>
             </button>
         @endif
+    </td>
+
+    {{-- Input hidden --}}
+    <td>
+        <input type="hidden" name="{{ $shortname_col }}[]" value="{{ $shortname }}">
+        {{-- @if($type == 'allowance')
+            <input type="hidden" name="{{ $overtime_col }}[]" value="{{ $overtime_value }}">
+        @endif --}}
     </td>
 </tr>
