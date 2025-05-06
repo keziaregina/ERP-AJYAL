@@ -29,6 +29,7 @@ use Modules\Essentials\Entities\EssentialsLeave;
 use Modules\Essentials\Notifications\PayrollNotification;
 use Modules\Essentials\Entities\EssentialsUserSalesTarget;
 use Modules\Essentials\Entities\EssentialsAllowanceAndDeduction;
+use Modules\Essentials\Entities\EssentialsUserAllowancesAndDeduction;
 
 class PayrollController extends Controller
 {
@@ -339,9 +340,17 @@ class PayrollController extends Controller
                 );
 
                 $isGloriousEmployee = GloriousEmployee::isGloriousEmployee($business_id, $month, $employee->id);
+                $gloriousEmployee = EssentialsAllowanceAndDeduction::where('description', 'like', '%glorious employee%')->first();
+
+                Log::info('gloriousEmployee --> : '. $gloriousEmployee);
+                Log::info('emplyoe name: '.$employee->user_full_name);
+                Log::info('isGloriousEmployee: '.$isGloriousEmployee);
                 
+                Log::info('allowances_and_deductions --> : '. json_encode($allowances_and_deductions, JSON_PRETTY_PRINT));
+
                 foreach ($allowances_and_deductions as $ad) {
                     if ($ad->type == 'allowance') {
+                        Log::info('ad --> : '. $ad->description);
                         if (str_contains(strtolower($ad->description), 'overtime')) {
                             Log::info('overtime');
                             Log::info('is contain glor overtime: '. str_contains(strtolower($ad->description), 'glorious employee'));
@@ -356,6 +365,8 @@ class PayrollController extends Controller
                             $payrolls[$employee->id]['allowances']['allowance_col_types'][] = 'auto';
                             $payrolls[$employee->id]['allowances']['allowance_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
                         } else if (str_contains(strtolower($ad->description), 'glorious employee')) {
+                            Log::info('desc --> : '. strtolower($ad->description));
+                            Log::info('isGloriousEmployee --> : '. $isGloriousEmployee);
                             Log::info('is contain glor yes: '. str_contains(strtolower($ad->description), 'glorious employee'));
                             if ($isGloriousEmployee) {
                                 Log::info('glorious employee');
@@ -423,6 +434,17 @@ class PayrollController extends Controller
                         }
                     }
 
+                }
+
+                if ($isGloriousEmployee) {
+                    // Log::info('glorious employee');
+                    $payrolls[$employee->id]['allowances']['allowance_names'][] = $gloriousEmployee->description;
+                    $payrolls[$employee->id]['allowances']['allowance_short_names'][] = 'glorious_employee';
+                    $payrolls[$employee->id]['allowances']['allowance_amounts'][] = $gloriousEmployee->amount;
+                    $payrolls[$employee->id]['allowances']['allowance_types'][] = $gloriousEmployee->amount_type;
+                    $payrolls[$employee->id]['allowances']['overtime_hours'][] = null;
+                    $payrolls[$employee->id]['allowances']['allowance_col_types'][] = 'auto';
+                    $payrolls[$employee->id]['allowances']['allowance_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
                 }
 
                 if ($vacationDays > 0 && $payrolls[$employee->id]['allowances'] != null) {
@@ -577,7 +599,11 @@ class PayrollController extends Controller
         $allowance_overtime_hours = $payroll['overtime_hours'];
         $allowance_types = $payroll['allowance_types'];
         $allowance_percents = $payroll['allowance_percent'];
+
         $allowance_names_array = [];
+        $allowance_short_names_array = [];
+        $allowance_overtime_hours_array = [];
+        $allowance_types_array = [];
         $allowance_percent_array = [];
         $allowance_amounts = [];
 
@@ -597,6 +623,8 @@ class PayrollController extends Controller
         $deduction_types = $payroll['deduction_types'];
         $deduction_percents = $payroll['deduction_percent'];
         $deduction_names_array = [];
+        $deduction_short_names_array = [];
+        $deduction_types_array = [];
         $deduction_percents_array = [];
         $deduction_amounts = [];
         foreach ($payroll['deduction_amounts'] as $key => $value) {
@@ -625,8 +653,8 @@ class PayrollController extends Controller
             'deduction_percents' => $deduction_percents_array,
         ]);
 
-        // Log::info("output ------------>");
-        // Log::info(json_encode($output,JSON_PRETTY_PRINT));
+        Log::info("output ------------>");
+        Log::info(json_encode($output,JSON_PRETTY_PRINT));
         // die;
         return $output;
 
