@@ -229,6 +229,7 @@ class PurchaseController extends Controller
      */
     public function create()
     {
+    // dd();
         if (! auth()->user()->can('purchase.create') && ! auth()->user()->can('purchase.create_only')) {
             abort(403, 'Unauthorized action.');
         }
@@ -293,6 +294,31 @@ class PurchaseController extends Controller
         if (! auth()->user()->can('purchase.create') && ! auth()->user()->can('purchase.create_only')) {
             abort(403, 'Unauthorized action.');
         }
+        $business_id = auth()->user()->business_id;
+        $currency_details = $this->transactionUtil->purchaseCurrencyDetails($business_id);
+        $orderStatuses = $this->productUtil->orderStatuses();
+
+        $default_purchase_status = null;
+        if (request()->session()->get('business.enable_purchase_status') != 1) {
+            $default_purchase_status = 'received';
+        }
+
+        $business_locations = BusinessLocation::forDropdown($business_id, false, true);
+        $bl_attributes = $business_locations['attributes'];
+        $business_locations = $business_locations['locations'];
+
+        $types = [];
+        if (auth()->user()->can('supplier.create')) {
+            $types['supplier'] = __('report.supplier');
+        }
+        if (auth()->user()->can('customer.create')) {
+            $types['customer'] = __('report.customer');
+        }
+        if (auth()->user()->can('supplier.create') && auth()->user()->can('customer.create')) {
+            $types['both'] = __('lang_v1.both_supplier_customer');
+        }
+
+        $customer_groups = CustomerGroup::forDropdown($business_id);
 
         try {
             
@@ -306,7 +332,7 @@ class PurchaseController extends Controller
             $transaction_data = $request->only(['ref_no', 'status', 'contact_id', 'transaction_date', 'total_before_tax', 'location_id', 'discount_type', 'discount_amount', 'tax_id', 'tax_amount', 'shipping_details', 'shipping_charges', 'final_total', 'additional_notes', 'exchange_rate', 'pay_term_number', 'pay_term_type', 'purchase_order_ids']);
 
             $exchange_rate = $transaction_data['exchange_rate'];
-
+            
             //Reverse exchange rate and save it.
             //$transaction_data['exchange_rate'] = $transaction_data['exchange_rate'];
 
@@ -424,6 +450,7 @@ class PurchaseController extends Controller
             $output = ['success' => 1,
                 'msg' => __('purchase.purchase_add_success'),
             ];
+
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
@@ -431,9 +458,12 @@ class PurchaseController extends Controller
             $output = ['success' => 0,
                 'msg' => __('messages.something_went_wrong'),
             ];
+        }     
+        if (! auth()->user()->can('purchase.view')) {
+            return view('purchase.create')->with(compact('currency_details', 'customer_groups', 'types', 'bl_attributes', 'business_locations', 'orderStatuses', 'default_purchase_status'));
         }
 
-        return redirect('purchases')->with('status', $output);
+        return view('home.index')->with('status', $output);
     }
 
     /**

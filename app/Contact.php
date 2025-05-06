@@ -46,20 +46,20 @@ class Contact extends Authenticatable
      */
     public function scopeOnlySuppliers($query)
     {
-        if (auth()->check() && ! auth()->user()->can('supplier.view') && ! auth()->user()->can('supplier.view_own')) {
-            abort(403, 'Unauthorized action.');
-        }
+        // if (auth()->check() && ! auth()->user()->can('supplier.view') && ! auth()->user()->can('supplier.view_own')) {
+        //     abort(403, 'Unauthorized action.');
+        // }
 
         $query->whereIn('contacts.type', ['supplier', 'both']);
 
-        if (auth()->check() && ! auth()->user()->can('supplier.view') && auth()->user()->can('supplier.view_own')) {
+        // if (auth()->check() && ! auth()->user()->can('supplier.view') && auth()->user()->can('supplier.view_own')) {
             $query->leftjoin('user_contact_access AS ucas', 'contacts.id', 'ucas.contact_id');
             $query->where(function ($q) {
                 $user_id = auth()->user()->id;
                 $q->where('contacts.created_by', $user_id)
                     ->orWhere('ucas.user_id', $user_id);
             });
-        }
+        // }
 
         return $query;
     }
