@@ -46,6 +46,7 @@ class SalesTargetController extends Controller
                         ->user()
                         ->where('allow_login', 1)
                         ->where('status', 'active')
+                        ->whereNot('first_name', 'like', 'NASSER')
                         ->select(['id',
                             DB::raw("CONCAT(COALESCE(surname, ''), ' ', COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as full_name"), ]);
             // $users = User::getActiveEmployeesPerBusiness(businessId: $business_id)->values()->toArray();

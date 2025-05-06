@@ -218,6 +218,7 @@ class User extends Authenticatable
     public static function forDropdownWithActive($business_id, $prepend_none = true, $include_commission_agents = false, $prepend_all = false, $check_location_permission = false, $location_id = null) {
         $query = User::where('business_id', $business_id)
                     ->where('status', 'active')
+                    ->whereNot('first_name', 'like','NASSER')
                     ->user();
 
         if (! $include_commission_agents) {

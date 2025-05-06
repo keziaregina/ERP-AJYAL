@@ -236,7 +236,7 @@
                                 </button>
                             </div>
                             <select name="user_id[]" id="user_id" class="form-control select2" required multiple style="width: 100%;">
-                                @foreach ($employees as $employee)
+                                @foreach ($employees as $employee)                                    
                                     <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>
                                 @endforeach
                             </select>

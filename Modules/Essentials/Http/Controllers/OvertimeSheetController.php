@@ -41,7 +41,7 @@ class OvertimeSheetController extends Controller
         try {
             $businessId = request()->session()->get('user.business_id');
         
-            $employees = self::getActiveEmployeesPerBusiness(businessId: $businessId);
+            $employees = self::getActiveEmployeesPerBusiness(businessId: $businessId);            
 
             $daysInMonth = Carbon::now()->month(date('m'))->daysInMonth;
             $overtimeOptions = EmployeeOvertime::OVERTIME_HOURS;
@@ -51,7 +51,7 @@ class OvertimeSheetController extends Controller
             // Get overtime data for the current month
             $overtimeData = $this->getOvertimeDataForCurrentMonth();
             $overtimeDatas = $overtimeData['employees'];
-            $totalAllOvertime = $overtimeData['total_all_overtime'];            
+            $totalAllOvertime = $overtimeData['total_all_overtime'];
 
             $gloriousEmployeeThisMonth = GloriousEmployee::where('month', date('m'))
             ->where('year', date('Y'))
