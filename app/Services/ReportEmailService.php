@@ -9,6 +9,7 @@ use App\Transaction;
 use App\PurchaseLine;
 use App\Mail\Reporting;
 use App\EmployeeOvertime;
+use App\GloriousEmployee;
 use App\Utils\ModuleUtil;
 use App\SellingPriceGroup;
 use App\Utils\ProductUtil;
@@ -226,7 +227,6 @@ class ReportEmailService
 
             $currentYear = date('Y');
 
-            //kemungkinan ganti cara pemanggilan $businessId
             $businessId = $user->business_id;
 
             // Get all active employees
@@ -249,11 +249,19 @@ class ReportEmailService
                 ->whereIn('user_id', $employees->pluck('id'))
                 ->get();
 
+            // Get Name GE Employee on this mounth
+            $gloriousEmployee = GloriousEmployee::with('user')->where('month', $currentMonth)->first();
+                if ($gloriousEmployee && $gloriousEmployee->user) {
+                    $nameEmployee = $gloriousEmployee->user->first_name . ' ' . $gloriousEmployee->user->last_name;
+                } else {
+                    $nameEmployee = ' - ';
+                }
+
             // Group overtime records by user_id
             $overtimeByUser = $overtimeRecords->groupBy('user_id');
 
             // Process the data to create a structured format
-            $result = $employees->map(function ($employee) use ($overtimeByUser, $currentMonth) {
+            $result = $employees->map(function ($employee) use ($overtimeByUser, $currentMonth, $nameEmployee) {
                 $overtimeData = [];
 
                 // Initialize all days with null values
@@ -304,7 +312,8 @@ class ReportEmailService
                     'user_id' => $employee['id'],
                     'full_name' => $employee['full_name'],
                     'overtime_data' => $overtimeData,
-                    'total_overtime_by_month' => $totalOvertimeMonthly
+                    'total_overtime_by_month' => $totalOvertimeMonthly,
+                    'GloriousName' => $nameEmployee,
                 ];
             });
 
