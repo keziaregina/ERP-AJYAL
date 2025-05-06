@@ -325,8 +325,8 @@ return[
     'select_overtime_hours' => 'حدد ساعات العمل الإضافي',
     'overtime_hours' => 'ساعات العمل الإضافي',
     'legend' => 'مفاتيح رموز التقرير',
-    'vacation_leave' => 'إجازة سنوية',
-    'glorious_employee_allowance' => 'بدل الموظف المتميز',
+    'vacation_leave' => 'إجازة',
+    'glorious_employee_allowance' => 'علاوة الموظفين المجيدين',
     'sick_leave' => 'إجازة مرضية',
 
     // Payroll calculation formulas

@@ -126,7 +126,7 @@
         <option disabled selected>Select Bic Code</option>
         @foreach ($bicCode as $code)
         
-        @if ($code['id'] == $user->bic_id)
+        @if ($user != null && $code['id'] == $user->bic_id)
         <option value="{{ $code['id'] }}" selected>{{ $code['name'] }}</option>
         @else
         <option value="{{ $code['id'] }}">{{ $code['name'] }}</option>
@@ -142,7 +142,7 @@
             <option disabled selected>Select Salary Frequency</option>
             @foreach ($salaryCode as $Scode)
 
-            @if ($Scode['id'] == $user->salary_id)
+            @if ($user != null && $Scode['id'] == $user->salary_id)
             <option value="{{ $Scode['id'] }}" selected>{{ $Scode['name'] }}</option>
             @else
             <option value="{{ $Scode['id'] }}">{{ $Scode['name'] }}</option>

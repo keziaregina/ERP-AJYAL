@@ -103,7 +103,11 @@ class ManageUserController extends Controller
             return $this->moduleUtil->expiredResponse();
         } elseif (! $this->moduleUtil->isQuotaAvailable('users', $business_id)) {
             return $this->moduleUtil->quotaExpiredResponse('users', $business_id, action([\App\Http\Controllers\ManageUserController::class, 'index']));
-        }
+        }        
+
+        $bicCode = EmployeeBicCode::where('business_id', $business_id)->get();
+        $salaryCode = SalaryFrequency::where('business_id', $business_id)->get();
+        $user = null;
 
         $roles = $this->getRolesArray($business_id);
         $username_ext = $this->moduleUtil->getUsernameExtension();
@@ -115,7 +119,7 @@ class ManageUserController extends Controller
         $form_partials = $this->moduleUtil->getModuleData('moduleViewPartials', ['view' => 'manage_user.create']);
 
         return view('manage_user.create')
-                ->with(compact('roles', 'username_ext', 'locations', 'form_partials'));
+                ->with(compact('roles', 'user', 'username_ext', 'locations', 'form_partials', 'bicCode', 'salaryCode'));
     }
 
     /**
@@ -125,7 +129,7 @@ class ManageUserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {        
         if (! auth()->user()->can('user.create')) {
             abort(403, 'Unauthorized action.');
         }
@@ -133,13 +137,47 @@ class ManageUserController extends Controller
         try {
             if (! empty($request->input('dob'))) {
                 $request['dob'] = $this->moduleUtil->uf_date($request->input('dob'));
-            }
+            }       
+            
+            $business_id = auth()->user()->business_id;
+
 
             $request['cmmsn_percent'] = ! empty($request->input('cmmsn_percent')) ? $this->moduleUtil->num_uf($request->input('cmmsn_percent')) : 0;
 
             $request['max_sales_discount_percent'] = ! is_null($request->input('max_sales_discount_percent')) ? $this->moduleUtil->num_uf($request->input('max_sales_discount_percent')) : null;
 
             $user = $this->moduleUtil->createUser($request);
+
+            $user_data = [];
+
+        if ($request->filled('bic_code')) {
+            $bicCode = EmployeeBicCode::where('name', $request->bic_code)->where('business_id', $business_id)->first();
+            if ($bicCode) {
+                $user_data['bic_id'] = $bicCode->id;
+            } else {
+                $newBic = EmployeeBicCode::create([
+                    'name' => $request->bic_code,
+                    'business_id' => $business_id,
+                ]);
+                $user_data['bic_id'] = $newBic->id;
+            }
+        }
+
+
+        if ($request->filled('salary_code')) {
+            $salaryCode = SalaryFrequency::where('name', $request->salary_code)->where('business_id', $business_id)->first();
+            if ($salaryCode) {
+                $user_data['salary_id'] = $salary->id;
+            } else {
+                $newSalary = SalaryFrequency::create([
+                    'name' => $request->salary_code,
+                    'business_id' => $business_id,
+                ]);
+                $user_data['salary_id'] = $newSalary->id;
+            }
+        }
+
+        
 
             event(new UserCreatedOrModified($user, 'added'));
 
@@ -185,7 +223,7 @@ class ManageUserController extends Controller
            ->latest()
            ->get();
 
-        return view('manage_user.show')->with(compact('user', 'view_partials', 'users', 'activities'));
+        return view('manage_user.show')->with(compact('user', 'view_partials', 'users', 'activities', 'bic', 'salary'));
     }
 
     /**

@@ -170,7 +170,7 @@ class EssentialsLeaveController extends Controller
      * @return Response
      */
     public function create()
-    {
+    {        
         $business_id = request()->session()->get('user.business_id');
 
         $leave_types = EssentialsLeaveType::forDropdown($business_id);
@@ -312,9 +312,38 @@ class EssentialsLeaveController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        $EssentialsLeave = EssentialsLeave::where('id', $id)->first();
+        $status =$EssentialsLeave->status;
+        $user = $EssentialsLeave->user_id;
+        $startDate = $EssentialsLeave->start_date;
+        $endDate = $EssentialsLeave->end_date;
+        $range = CarbonPeriod::create($startDate, $endDate);
+            foreach ($range as $date) {
+                $days = date('d', strtotime($date));
+                $months = date('m', strtotime($date));
+                $years = date('Y', strtotime($date));
+
+                if ($status == 'approved') {
+                    EmployeeOvertime::where('user_id', $user)
+                        ->where('day', $days)
+                        ->where('month', $months)
+                        ->where('year', $years)
+                        ->delete();
+                }
+            }
+        // Log::info(json_encode($EssentialsLeave, JSON_PRETTY_PRINT));
+
+
         if (request()->ajax()) {
             try {
                 EssentialsLeave::where('business_id', $business_id)->where('id', $id)->delete();
+
+                // if ($status != 'cancelled' ) {
+                //     return [
+                //         'success' => false,
+                //         'msg' => 'Data can only be deleted if the status is Cancelled.',
+                //     ];
+                // }
 
                 $output = ['success' => true,
                     'msg' => __('lang_v1.deleted_success'),
@@ -391,6 +420,16 @@ class EssentialsLeaveController extends Controller
                         'type' => EmployeeOvertime::TYPES['Leave Request'],
                     ]);
                 }
+
+                if ($input['status'] == 'cancelled') {
+                    EmployeeOvertime::where('user_id', $leave->user_id)
+                        ->where('day', $days)
+                        ->where('month', $months)
+                        ->where('year', $years)
+                        ->delete();
+                }
+            // Log::info(json_encode($overTimeHour, JSON_PRETTY_PRINT));
+            // Log::info(json_encode($range, JSON_PRETTY_PRINT));    
             }
 
             

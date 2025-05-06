@@ -266,12 +266,12 @@ class OvertimeSheetController extends Controller
         }
     }
 
-    private function getOvertimeDataByMonth($month)
+    private function getOvertimeDataByMonth($month, $year)
     {
         try {
             $currentMonth = $month;
 
-            $currentYear = date('Y');
+            $currentYear = $year;
 
             $businessId = request()->session()->get('user.business_id');
 
@@ -537,16 +537,13 @@ class OvertimeSheetController extends Controller
         $total_hours = 0;
             
         foreach ($overtime_hours as $time) {
-            // Bersihkan string dari petik
             $time = str_replace(['"', "'"], '', (string)$time);
         
-            // Pastikan cuma nilai numeric float aja yang dihitung
             if (is_numeric($time)) {
                 $total_hours += floatval($time);
             }
         }
     
-        // Bulatkan ke 2 desimal (kalau mau bisa ke 1 aja)
         return round($total_hours, 2);
 
     } 
@@ -556,8 +553,9 @@ class OvertimeSheetController extends Controller
         // dd($request->all());
         try {
             $month = $request->month;
+            $year = $request->year;
             $logo = public_path('img/logo-small.png');
-            $overtimeData = $this->getOvertimeDataByMonth($month);
+            $overtimeData = $this->getOvertimeDataByMonth($month, $year);
             $data = $overtimeData['employees'];
             $totalAllOvertime = $overtimeData['total_all_overtime'];
             $gloriousEmployee = GloriousEmployee::with('user')->where('month', $month)->first();
@@ -574,15 +572,16 @@ class OvertimeSheetController extends Controller
                 'GloriousName' => $nameEmployee,
                 'business' => request()->session()->get('business'),
                 'location' => request()->session()->get('user.location_id'),
+                // 'month' => \Carbon\Carbon::create()->month($month)->format('F'),
                 'month' => $month,
                 'month_name' => \Carbon\Carbon::create()->month($month)->format('F'),
-                'year' => now()->format('Y'),
+                'year' => \Carbon\Carbon::create()->year($year)->format('Y'),
             ], [], [
                 'orientation' => 'L',
                 'format' => 'A4'
             ]);
 
-            return $pdf->download('overtime_report-' . \Carbon\Carbon::create()->month($month)->format('F_Y') . '.pdf');
+            return $pdf->download('overtime_report-' . \Carbon\Carbon::create($year, $month)->format('F_Y') . '.pdf');
             
         } catch (\Exception $e) {
             Log::error("Error generating overtime PDF: " . $e->getMessage());
@@ -593,7 +592,8 @@ class OvertimeSheetController extends Controller
     public function exportExcel(Request $request)
     {   
         $month = $request->month;
-        $overtimeData = $this->getOvertimeDataByMonth($month);
+        $year = $request->year;
+        $overtimeData = $this->getOvertimeDataByMonth($month, $year);
         $data = $overtimeData['employees'];
         $totalAllOvertime = $overtimeData['total_all_overtime'];
         
@@ -603,7 +603,7 @@ class OvertimeSheetController extends Controller
                 now()->format('Y'), 
                 $totalAllOvertime
             ), 
-            'overtime_sheet-'.\Carbon\Carbon::create()->month($month)->format('F_Y').'.xlsx'
+            'overtime_sheet-'.\Carbon\Carbon::create($year, $month)->format('F_Y').'.xlsx'
         );        
     }
 
