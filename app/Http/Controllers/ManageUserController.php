@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use DB;
 use App\User;
 use App\EmployeeBicCode;
+use App\SalaryFrequency;
 use App\BusinessLocation;
 use App\Utils\ModuleUtil;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Events\UserCreatedOrModified;
-use App\SalaryFrequency;
 use Spatie\Activitylog\Models\Activity;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -296,27 +297,34 @@ class ManageUserController extends Controller
                 'guardian_name', 'custom_field_1', 'custom_field_2',
                 'custom_field_3', 'custom_field_4', 'id_proof_name', 'id_proof_number', 'cmmsn_percent', 'gender', 'max_sales_discount_percent', 'family_number', 'alt_number', 'is_enable_service_staff_pin']);
 
-            $bic = EmployeeBicCode::find($request->bic_code);
-            if ($bic) {
-                $user_data['bic_id'] = $request->bic_code;
-            } else {
-                $newBic = EmployeeBicCode::create([
-                    'name' => $request->bic_code,
-                    'business_id' => Auth::user()->business_id,
-                ]);
-                $user_data['bic_id'] = $newBic->id;
+            if ($request->filled('bic_code')) {
+                $bic = EmployeeBicCode::find($request->bic_code);
+                if ($bic) {
+                    $user_data['bic_id'] = $request->bic_code;
+                } else {
+                    $newBic = EmployeeBicCode::create([
+                        'name' => $request->bic_code,
+                        'business_id' => Auth::user()->business_id,
+                    ]);
+                    $user_data['bic_id'] = $newBic->id;
+                }
             }
 
-            $salary = SalaryFrequency::find($request->salary_code);
-            if ($salary) {
-                $user_data['salary_id'] = $request->salary_code;
-            } else {
-                $newSalary = SalaryFrequency::create([
-                    'name' => $request->salary_code,
-                    'business_id' => Auth::user()->business_id,
-                ]);
-                $user_data['salary_id'] = $newSalary->id;
+            if ($request->filled('salary_code')) {
+
+                $salary = SalaryFrequency::find($request->salary_code);
+                if ($salary) {
+                    $user_data['salary_id'] = $request->salary_code;
+                } else {
+                    $newSalary = SalaryFrequency::create([
+                        'name' => $request->salary_code,
+                        'business_id' => Auth::user()->business_id,
+                    ]);
+                    $user_data['salary_id'] = $newSalary->id;
+                }
+
             }
+
 
             $user_data['status'] = ! empty($request->input('is_active')) ? 'active' : 'inactive';
 

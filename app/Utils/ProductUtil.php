@@ -1239,12 +1239,34 @@ class ProductUtil extends Util
             }
 
             $purchase_line->quantity = $new_quantity;
-            $purchase_line->pp_without_discount = ($this->num_uf($data['pp_without_discount'], $currency_details) * $exchange_rate) / $multiplier;
-            $purchase_line->discount_percent = $this->num_uf($data['discount_percent'], $currency_details);
-            $purchase_line->purchase_price = ($this->num_uf($data['purchase_price'], $currency_details) * $exchange_rate) / $multiplier;
-            $purchase_line->purchase_price_inc_tax = ($this->num_uf($data['purchase_price_inc_tax'], $currency_details) * $exchange_rate) / $multiplier;
-            $purchase_line->item_tax = ($this->num_uf($data['item_tax'], $currency_details) * $exchange_rate) / $multiplier;
-            $purchase_line->tax_id = $data['purchase_line_tax_id'];
+            // $purchase_line->pp_without_discount = ($this->num_uf($data['pp_without_discount'], $currency_details) * $exchange_rate) / $multiplier;
+            if (array_key_exists('pp_without_discount', $data)) {
+                $purchase_line->pp_without_discount = $this->num_uf($data['pp_without_discount'], $currency_details);
+            }
+
+            if (array_key_exists('discount_percent', $data)) {
+                $purchase_line->discount_percent = $this->num_uf($data['discount_percent'], $currency_details);
+            }
+
+            if (array_key_exists('purchase_price', $data)) {
+                $purchase_line->purchase_price = $this->num_uf($data['purchase_price'], $currency_details);
+            }
+
+            if (array_key_exists('purchase_price_inc_tax', $data)) {
+                $purchase_line->purchase_price_inc_tax = $this->num_uf($data['purchase_price_inc_tax'], $currency_details);
+            }
+
+            if (array_key_exists('item_tax', $data)) {
+                $purchase_line->item_tax = $this->num_uf($data['item_tax'], $currency_details);
+            }
+
+            if (array_key_exists('purchase_line_tax_id', $data)) {
+                $purchase_line->tax_id = $data['purchase_line_tax_id'];
+            }
+
+            if (array_key_exists('lot_number', $data)) {
+                $purchase_line->lot_number = $data['lot_number'];
+            }
             $purchase_line->lot_number = ! empty($data['lot_number']) ? $data['lot_number'] : null;
             $purchase_line->mfg_date = ! empty($data['mfg_date']) ? $this->uf_date($data['mfg_date']) : null;
             $purchase_line->exp_date = ! empty($data['exp_date']) ? $this->uf_date($data['exp_date']) : null;
@@ -1263,7 +1285,12 @@ class ProductUtil extends Util
                 if (isset($data['default_sell_price'])) {
                     $variation_data['sell_price_inc_tax'] = ($this->num_uf($data['default_sell_price'], $currency_details)) / $multiplier;
                 }
-                $variation_data['pp_without_discount'] = ($this->num_uf($data['pp_without_discount'], $currency_details) * $exchange_rate) / $multiplier;
+
+                $variation_data['pp_without_discount'] = 0;
+                if (array_key_exists('pp_without_discount', $data)) {
+                    $variation_data['pp_without_discount'] = $this->num_uf($data['pp_without_discount'], $currency_details);
+                }
+
                 $variation_data['variation_id'] = $purchase_line->variation_id;
                 $variation_data['purchase_price'] = $purchase_line->purchase_price;
 
