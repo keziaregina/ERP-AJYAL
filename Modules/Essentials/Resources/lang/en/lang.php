@@ -361,7 +361,7 @@ return [
     'employee_type' => 'Employee Type',
     'select_employee_type' => 'Select Employee Type',
     'export_company_bank' => 'Export Company Bank Detail Button',
-    'purchase_price' => 'Add Purchase Page Price',
+    'purchase_price' => 'View Price on Add Purchase Page',
     'show_overtime_page' => 'Show Overtime Page',
     'show_company_bank_page' => 'Show Company Bank Page',
     'employee_of_the_month' => 'Employee of the month',

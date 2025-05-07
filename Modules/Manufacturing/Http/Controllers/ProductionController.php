@@ -2,22 +2,23 @@
 
 namespace Modules\Manufacturing\Http\Controllers;
 
-use App\BusinessLocation;
+use DB;
 use App\Media;
+use App\Variation;
 use App\Transaction;
-use App\Utils\BusinessUtil;
+use App\BusinessLocation;
 use App\Utils\ModuleUtil;
 use App\Utils\ProductUtil;
-use App\Utils\TransactionUtil;
-use App\Variation;
-use DB;
+use App\Utils\BusinessUtil;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Utils\TransactionUtil;
 use Illuminate\Routing\Controller;
-use Modules\Manufacturing\Entities\MfgIngredientGroup;
+use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\Facades\DataTables;
 use Modules\Manufacturing\Entities\MfgRecipe;
 use Modules\Manufacturing\Utils\ManufacturingUtil;
-use Yajra\DataTables\Facades\DataTables;
+use Modules\Manufacturing\Entities\MfgIngredientGroup;
 
 class ProductionController extends Controller
 {
@@ -175,24 +176,26 @@ class ProductionController extends Controller
      */
     public function store(Request $request)
     {
-        $business_id = $request->session()->get('user.business_id');
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'manufacturing_module')) || ! auth()->user()->can('manufacturing.access_production')) {
-            abort(403, 'Unauthorized action.');
-        }
-
         try {
+            $business_id = $request->session()->get('user.business_id');
+            if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'manufacturing_module')) || ! auth()->user()->can('manufacturing.access_production')) {
+                abort(403, 'Unauthorized action.');
+            }
+
             $request->validate([
                 'transaction_date' => 'required',
                 'location_id' => 'required',
-                'final_total' => 'required',
+                'final_total' => 'nullable',
             ]);
-
+            
+            // Log::info('HERE ========>');
+            // die;
             //Create Production purchase
             $manufacturing_settings = $this->mfgUtil->getSettings($business_id);
             $user_id = $request->session()->get('user.id');
 
             $transaction_data = $request->only(['ref_no', 'transaction_date', 'location_id', 'final_total']);
-
+       
             $is_final = ! empty($request->input('finalize')) ? 1 : 0;
             $transaction_data['business_id'] = $business_id;
             $transaction_data['created_by'] = $user_id;
@@ -200,7 +203,10 @@ class ProductionController extends Controller
             $transaction_data['status'] = $is_final ? 'received' : 'pending';
             $transaction_data['payment_status'] = 'due';
             $transaction_data['transaction_date'] = $this->productUtil->uf_date($transaction_data['transaction_date'], true);
-            $transaction_data['final_total'] = $this->productUtil->num_uf($transaction_data['final_total']);
+            $transaction_data['final_total'] = 0;
+            if (! empty($request->input('final_total'))) {
+                $transaction_data['final_total'] = $this->productUtil->num_uf($transaction_data['final_total']);
+            }
 
             //Update reference count
             $ref_count = $this->productUtil->setAndGetReferenceCount($transaction_data['type']);
@@ -360,8 +366,8 @@ class ProductionController extends Controller
                 'msg' => __('lang_v1.added_success'),
             ];
         } catch (Exception $e) {
+            Log::error('File: '.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
             DB::rollBack();
-            \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
 
             $output = ['success' => 0,
                 'msg' => __('messages.something_went_wrong'),
