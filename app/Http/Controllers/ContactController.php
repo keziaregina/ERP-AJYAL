@@ -2,26 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Business;
-use App\BusinessLocation;
-use App\Contact;
-use App\CustomerGroup;
-use App\Notifications\CustomerNotification;
-use App\PurchaseLine;
-use App\Transaction;
-use App\TransactionPayment;
-use App\User;
-use App\Utils\ContactUtil;
-use App\Utils\ModuleUtil;
-use App\Utils\NotificationUtil;
-use App\Utils\TransactionUtil;
-use App\Utils\Util;
 use DB;
 use Excel;
+use App\User;
+use App\Contact;
+use App\Business;
+use App\Utils\Util;
+use App\Transaction;
+use App\PurchaseLine;
+use App\CustomerGroup;
+use App\BusinessLocation;
+use App\Utils\ModuleUtil;
+use App\Utils\ContactUtil;
+use App\TransactionPayment;
 use Illuminate\Http\Request;
+use App\Utils\TransactionUtil;
+use App\Utils\NotificationUtil;
+use PhpParser\Node\Stmt\TryCatch;
+use Illuminate\Support\Facades\Log;
 use Spatie\Activitylog\Models\Activity;
-use Yajra\DataTables\Facades\DataTables;
 use App\Events\ContactCreatedOrModified;
+use Yajra\DataTables\Facades\DataTables;
+use App\Notifications\CustomerNotification;
 
 class ContactController extends Controller
 {
@@ -577,7 +579,8 @@ class ContactController extends Controller
      */
     public function store(Request $request)
     {
-        if (! auth()->user()->can('supplier.create') && ! auth()->user()->can('customer.create') && ! auth()->user()->can('customer.view_own') && ! auth()->user()->can('supplier.view_own')) {
+        Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
+        if (! auth()->user()->can('supplier.create') && ! auth()->user()->can('customer.create') && ! auth()->user()->can('customer.view_own') && ! auth()->user()->can('supplier.view_own') && ! auth()->user()->can('purchase.create_only')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -1657,6 +1660,8 @@ class ContactController extends Controller
 
     public function checkMobile(Request $request)
     {
+        // Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
+    Try {
         $business_id = $request->session()->get('user.business_id');
 
         $mobile_number = $request->input('mobile_number');
@@ -1670,9 +1675,15 @@ class ContactController extends Controller
 
         $contacts = $query->pluck('name')->toArray();
 
-        return [
+        return [            
             'is_mobile_exists' => ! empty($contacts),
             'msg' => __('lang_v1.mobile_already_registered', ['contacts' => implode(', ', $contacts), 'mobile' => $mobile_number]),
         ];
+    } catch (\Exception $e) {
+        Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
+        $output = ['success' => 0,
+                'msg' => __('messages.something_went_wrong'),
+            ];
+    }
     }
 }

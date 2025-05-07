@@ -290,37 +290,40 @@ class PurchaseController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {   
         if (! auth()->user()->can('purchase.create') && ! auth()->user()->can('purchase.create_only')) {
             abort(403, 'Unauthorized action.');
         }
-        $business_id = auth()->user()->business_id;
-        $currency_details = $this->transactionUtil->purchaseCurrencyDetails($business_id);
-        $orderStatuses = $this->productUtil->orderStatuses();
-
-        $default_purchase_status = null;
-        if (request()->session()->get('business.enable_purchase_status') != 1) {
-            $default_purchase_status = 'received';
-        }
-
-        $business_locations = BusinessLocation::forDropdown($business_id, false, true);
-        $bl_attributes = $business_locations['attributes'];
-        $business_locations = $business_locations['locations'];
-
-        $types = [];
-        if (auth()->user()->can('supplier.create')) {
-            $types['supplier'] = __('report.supplier');
-        }
-        if (auth()->user()->can('customer.create')) {
-            $types['customer'] = __('report.customer');
-        }
-        if (auth()->user()->can('supplier.create') && auth()->user()->can('customer.create')) {
-            $types['both'] = __('lang_v1.both_supplier_customer');
-        }
-
-        $customer_groups = CustomerGroup::forDropdown($business_id);
-
+        
         try {
+            $user = auth()->user()->business_id;
+            $currency_details = $this->transactionUtil->purchaseCurrencyDetails($user);
+            $orderStatuses = $this->productUtil->orderStatuses();
+    
+            $default_purchase_status = null;
+            if (request()->session()->get('business.enable_purchase_status') != 1) {
+                $default_purchase_status = 'received';
+            }
+    
+            $business_locations = BusinessLocation::forDropdown($user, false, true);
+            $bl_attributes = $business_locations['attributes'];
+            $business_locations = $business_locations['locations'];
+    
+            $types = [];
+            if (auth()->user()->can('supplier.create')) {
+                $types['supplier'] = __('report.supplier');
+            }
+            if (auth()->user()->can('customer.create')) {
+                $types['customer'] = __('report.customer');
+            }
+            if (auth()->user()->can('supplier.create') && auth()->user()->can('customer.create')) {
+                $types['both'] = __('lang_v1.both_supplier_customer');
+            }
+    
+            $customer_groups = CustomerGroup::forDropdown($user);
+    
+            $suppliers = Contact::suppliersDropdown($user, false);
+            $orderStatuses = $this->productUtil->orderStatuses();
             
             $business_id = $request->session()->get('user.business_id');
 
@@ -329,7 +332,56 @@ class PurchaseController extends Controller
                 return $this->moduleUtil->expiredResponse(action([\App\Http\Controllers\PurchaseController::class, 'index']));
             }
 
-            $transaction_data = $request->only(['ref_no', 'status', 'contact_id', 'transaction_date', 'total_before_tax', 'location_id', 'discount_type', 'discount_amount', 'tax_id', 'tax_amount', 'shipping_details', 'shipping_charges', 'final_total', 'additional_notes', 'exchange_rate', 'pay_term_number', 'pay_term_type', 'purchase_order_ids']);
+            $transaction_data = $request->only(['ref_no', 'status', 'contact_id', 'transaction_date', 'total_before_tax', 'location_id', 'discount_type', 'discount_amount', 'tax_id', 'tax_amount', 'shipping_details', 'shipping_charges', 'final_total', 'additional_notes', 'exchange_rate', 'pay_term_number', 'pay_term_type', 'purchase_order_ids', 'purchases']);
+
+            if (!array_key_exists('total_before_tax',$transaction_data)) {
+                $transaction_data['total_before_tax'] = null;
+            }
+
+            if (!array_key_exists('discount_type',$transaction_data)) {
+                $transaction_data['discount_type'] = null;
+            }
+
+            if (!array_key_exists('tax_amount',$transaction_data)) {
+                $transaction_data['tax_amount'] = null;
+            }
+
+            if (!array_key_exists('shipping_charges',$transaction_data)) {
+                $transaction_data['shipping_charges'] = null;
+            }
+
+            if (!array_key_exists('final_total',$transaction_data)) {
+                $transaction_data['final_total'] = null;
+            }
+
+            if (!array_key_exists('additional_notes',$transaction_data)) {
+                $transaction_data['additional_notes'] = null;
+            }
+
+            if (!array_key_exists('exchange_rate',$transaction_data)) {
+                $transaction_data['exchange_rate'] = null;
+            }
+
+            if (!array_key_exists('pay_term_number',$transaction_data)) {
+                $transaction_data['pay_term_number'] = null;
+            }
+
+            if (!array_key_exists('pay_term_type',$transaction_data)) {
+                $transaction_data['pay_term_type'] = null;
+            }
+
+            //pengondisian masih error
+            if (!empty($transaction_data['purchases'])) {
+                foreach ($transaction_data['purchases'] as &$purchase) {
+                    if (!empty($purchase[0])) {
+                        foreach ($purchase[0] as &$purchase2) {
+                            if (!array_key_exists('pp_without_discount', $purchase2)) {
+                                $purchase2['pp_without_discount'] = null;
+                            }
+                        }
+                    }
+                }
+            }
 
             $exchange_rate = $transaction_data['exchange_rate'];
             
@@ -342,9 +394,9 @@ class PurchaseController extends Controller
                 'status' => 'required',
                 'contact_id' => 'required',
                 'transaction_date' => 'required',
-                'total_before_tax' => 'required',
+                'total_before_tax' => 'nullable',
                 'location_id' => 'required',
-                'final_total' => 'required',
+                'final_total' => 'nullable',
                 'document' => 'file|max:'.(config('constants.document_size_limit') / 1000),
             ]);
 
@@ -357,13 +409,13 @@ class PurchaseController extends Controller
             $currency_details = $this->transactionUtil->purchaseCurrencyDetails($business_id);
 
             //unformat input values
-            $transaction_data['total_before_tax'] = $this->productUtil->num_uf($transaction_data['total_before_tax'], $currency_details) * $exchange_rate;
+            $transaction_data['total_before_tax'] = $this->productUtil->num_uf($transaction_data['total_before_tax'] ?? 0, $currency_details) * $exchange_rate;
 
             // If discount type is fixed them multiply by exchange rate, else don't
             if ($transaction_data['discount_type'] == 'fixed') {
-                $transaction_data['discount_amount'] = $this->productUtil->num_uf($transaction_data['discount_amount'], $currency_details) * $exchange_rate;
+                $transaction_data['discount_amount'] = $this->productUtil->num_uf($transaction_data['discount_amount'] ?? 0, $currency_details) * $exchange_rate;
             } elseif ($transaction_data['discount_type'] == 'percentage') {
-                $transaction_data['discount_amount'] = $this->productUtil->num_uf($transaction_data['discount_amount'], $currency_details);
+                $transaction_data['discount_amount'] = $this->productUtil->num_uf($transaction_data['discount_amount'] ?? 0, $currency_details);
             } else {
                 $transaction_data['discount_amount'] = 0;
             }
@@ -460,10 +512,10 @@ class PurchaseController extends Controller
             ];
         }     
         if (! auth()->user()->can('purchase.view')) {
-            return view('purchase.create')->with(compact('currency_details', 'customer_groups', 'types', 'bl_attributes', 'business_locations', 'orderStatuses', 'default_purchase_status'));
+            return view('purchase.create')->with(compact('currency_details', 'customer_groups', 'types', 'bl_attributes', 'business_locations', 'orderStatuses', 'default_purchase_status', 'transaction_data'));
         }
 
-        return view('home.index')->with('status', $output);
+        return view('purchase.index')->with(compact('business_locations', 'suppliers', 'orderStatuses', 'transaction_data'));
     }
 
     /**
