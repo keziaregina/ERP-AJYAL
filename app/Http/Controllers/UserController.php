@@ -88,26 +88,36 @@ class UserController extends Controller
                 $input['bank_details'] = json_encode($request->input('bank_details'));
             }
 
-            $salary = SalaryFrequency::find($request->salary_code);
-            if ($salary) {
-                $input['salary_id'] = $request->salary_code;
+            $salaryCode = $request->salary_code;
+            if (empty($salaryCode)) {
+                $input['salary_id'] = null;
             } else {
-                $newSalary = SalaryFrequency::create([
-                    'name' => $request->salary_code,
-                    'business_id' => Auth::user()->business_id,
-                ]);
-                $input['salary_id'] = $newSalary->id;
-            }
+                $salary = SalaryFrequency::find($request->salary_code);
+                if ($salary) {
+                    $input['salary_id'] = $request->salary_code;
+                } else {
+                    $newSalary = SalaryFrequency::create([
+                        'name' => $request->salary_code,
+                        'business_id' => Auth::user()->business_id,
+                    ]);
+                    $input['salary_id'] = $newSalary->id;
+                }
+            }            
 
-            $bic = EmployeeBicCode::find($request->bic_code);
-            if ($bic) {
-                $input['bic_id'] = $request->bic_code;
+            $bicCode = $request->bic_code;
+            if (empty($bicCode)) {
+                $input['bic_id'] = null;
             } else {
-                $newBic = EmployeeBicCode::create([
-                    'name' => $request->bic_code,
-                    'business_id' => Auth::user()->business_id,
-                ]);
-                $input['bic_id'] = $newBic->id;
+                $bic = EmployeeBicCode::find($request->bic_code);
+                if ($bic) {
+                    $input['bic_id'] = $request->bic_code;
+                } else {
+                    $newBic = EmployeeBicCode::create([
+                        'name' => $request->bic_code,
+                        'business_id' => Auth::user()->business_id,
+                    ]);
+                    $input['bic_id'] = $newBic->id;
+                }
             }
 
             
