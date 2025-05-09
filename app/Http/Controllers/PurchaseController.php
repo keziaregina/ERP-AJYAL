@@ -295,11 +295,6 @@ class PurchaseController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-<<<<<<< Updated upstream
-=======
-        Log::info('HERE -------------->');
-        Log::info($request->all());
->>>>>>> Stashed changes
         try {
             
             $business_id = $request->session()->get('user.business_id');
