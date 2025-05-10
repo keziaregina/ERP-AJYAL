@@ -565,7 +565,7 @@ class OvertimeSheetController extends Controller
                 $nameEmployee = $gloriousEmployee->user->first_name . ' ' . $gloriousEmployee->user->last_name;
             } else {
                 $nameEmployee = ' - ';
-            }
+            }      
             
             $pdf = PDF::loadView('essentials::overtime_sheets.pdf', [
                 'data' => $data,

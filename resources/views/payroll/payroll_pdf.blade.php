@@ -40,6 +40,20 @@
             background-color: #f8f9fa;
         }
 
+        .header {
+            text-align: center; 
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 12px;
+            margin: 5px 10px 0px;
+        }
+
+        .logo {
+            width: 70px; 
+        }
+
         /* Main Table Styles */
         .main-table {
             width: 100%;
@@ -152,6 +166,10 @@
     </style>
 </head>
 <body>
+    <div class="header">
+        <img class="logo" src="{{ $logo }}" alt="logo">
+        <h1>Ajyal Al - Madina Al - Asria</h1>        
+    </div>
     <div class="header-section">
         <table class="header-table">
             <tr>
@@ -167,7 +185,12 @@
                 <td><span class="strong">PAYER BANK SHORT NAME:</span> {{ $companyBankDetail->payer_bank_short_name ?? 'BMCE' }}</td>
             </tr>
             <tr>
-                <td colspan="2"><span class="strong">PAYMENT TYPE:</span> {{ 'Salary' }}</td>
+                <td><span class="strong">PAYMENT TYPE:</span> {{ 'Salary' }}</td>
+                <td><span class="strong">MONTH:</span> {{  $monthName }} {{ $year }}</td>
+            </tr>
+            <tr>
+                <td><span class="strong">PRINT DATE:</span> {{ $createPdfDate }}</td>
+                <td><span class="strong">PRINT BY:</span> {{ $user }}</td>
             </tr>
         </table>
     </div>

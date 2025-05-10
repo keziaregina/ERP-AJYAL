@@ -40,7 +40,7 @@ class PayrollController extends Controller
             $socialSecurityAmount = $essentials_deductions->deduction_amounts[$key];
             break;
             }
-            }
+            }            
 
             $employeeOvertime = EmployeeOvertime::where('user_id', $data->transaction_for->id)
             ->where('month', date('m'))
@@ -59,8 +59,13 @@ class PayrollController extends Controller
 
             $totalSalary = $transactionPayrolls->sum('final_total');
             $numberOfRecords = $transactionPayrolls->count();
-
+            $logo = public_path('img/logo-small.png');
             $companyBankDetail = CompanyBankDetail::where('business_id', auth()->user()->business_id)->get()->first();
+            $createPdfDate = date('d-m-Y');
+            $user = auth()->user()->first_name;
+            $month = $transactionPayrolls->first()->payroll_month ?? '01';
+            $monthName = date('F', mktime(0, 0, 0, $month, 10));
+            $year = date('Y');
 
 
             // Prepare data for PDF
@@ -68,23 +73,36 @@ class PayrollController extends Controller
                 'companyBankDetail' => $companyBankDetail,
                 'totalSalary' => $totalSalary,
                 'numberOfRecords' => $numberOfRecords,
-                'payrollData' => $transactionPayrolls
+                'payrollData' => $transactionPayrolls,
+                'logo' => $logo,
+                'createPdfDate' => $createPdfDate,
+                'user' => $user,
+                'monthName' => $monthName,
+                'year' => $year,
             ];
 
             // dd($data);
+    
+            // return view ('payroll.payroll_pdf', $data);
+            
             // Generate PDF with specific options
-            $pdf = PDF::loadView('payroll.payroll_pdf', $data)
-                ->setPaper('a4', 'landscape')
-                ->setOptions([
-                    'defaultFont' => 'DejaVu Sans',
-                    'isRemoteEnabled' => true,
-                    'isHtml5ParserEnabled' => true,
-                    'isPhpEnabled' => true,
-                    'margin_left' => 10,
-                    'margin_right' => 10,
-                    'margin_top' => 10,
-                    'margin_bottom' => 10
-                ]);
+            $pdf = PDF::loadView('payroll.payroll_pdf', $data, [
+                'orientation' => 'L',
+                'format' => 'A4'                
+            ]);
+
+            // $pdf = PDF::loadView('payroll.payroll_pdf', $data)
+            //     ->setPaper('a4', 'landscape')
+            //     ->setOptions([
+            //         'defaultFont' => 'DejaVu Sans',
+            //         'isRemoteEnabled' => true,
+            //         'isHtml5ParserEnabled' => true,
+            //         'isPhpEnabled' => true,
+            //         'margin_left' => 10,
+            //         'margin_right' => 10,
+            //         'margin_top' => 10,
+            //         'margin_bottom' => 10
+            //     ]);
             
             // Generate filename
             $filename = 'Payroll_Report_' . date('Ymd') . '.pdf';
