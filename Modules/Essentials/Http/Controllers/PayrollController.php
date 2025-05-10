@@ -1007,14 +1007,14 @@ class PayrollController extends Controller
                                     <ul class="dropdown-menu dropdown-menu-right" role="menu">';
 
                         $html .= '<li>
-                                    <a href="'.action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'viewPayrollGroup'], [$row->id]).'" target="_blank">
+                                    <a href="'.action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'viewPayrollGroup'], [$row->id]).'" target="">
                                             <i class="fa fa-eye" aria-hidden="true"></i> '
                                             .__('messages.view').
                                     '</a>
                                 </li>';
                         if (auth()->user()->can('essentials.update_payroll')) {
                             $html .= '<li>
-                                        <a href="'.action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'getEditPayrollGroup'], [$row->id]).'" target="_blank">
+                                        <a href="'.action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'getEditPayrollGroup'], [$row->id]).'" target="">
                                                 <i class="fas fa-edit" aria-hidden="true"></i> '
                                                 .__('messages.edit').
                                         '</a>
@@ -1027,7 +1027,7 @@ class PayrollController extends Controller
 
                         if ($row->status == 'final' && $row->payment_status != 'paid') {
                             $html .= '<li>
-                                    <a href="'.action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'addPayment'], [$row->id]).'" target="_blank">
+                                    <a href="'.action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'addPayment'], [$row->id]).'" target="">
                                             <i class="fas fa-money-check" aria-hidden="true"></i> '
                                             .__('purchase.add_payment').
                                     '</a>
@@ -1036,13 +1036,13 @@ class PayrollController extends Controller
                         
                         if ( $row->status == 'final' && $row->payment_status != 'paid' && auth()->user()->can('essentials.export_company_bank')) {                            
                             $html .= '<li>
-                            <a href="' .route('sif-export-excel', ['id' => $row->id]). '" target="_blank">
+                            <a href="' .route('sif-export-excel', ['id' => $row->id]). '" target="">
                                 <i class="fa fa-regular fa-file" aria-hpayroll_group_idden="true"></i> '.__('messages.generate_as_sif').'
                             </a>
                             </li>';
                             
                             $html .= '<li>
-                            <a href="' .route('payroll.pdf', ['id' => $row->id]). '" target="_blank">
+                            <a href="' .route('payroll.pdf', ['id' => $row->id]). '" target="">
                                 <i class="fa fa-regular fa-file" aria-hidden="true"></i> '.__('messages.generate_as_pdf').'
                             </a>
                             </li>';
