@@ -502,8 +502,8 @@ class PayrollController extends Controller
         }
 
         // dd($request->all());
-        // Log::info("payroll in store");
-        // Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+        Log::info("payroll in store------------>");
+        Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
         // die;
         try {
             $transaction_date                     = $request->input('transaction_date');
@@ -559,6 +559,9 @@ class PayrollController extends Controller
                 // dd($payroll);
                 // $payroll['total_days_worked'] = $allowances_and_deductions['total_days_worked'];
                 // $payroll['total_work_duration'] = $allowances_and_deductions['total_work_duration'];
+
+                Log::info('payroll before create / update------------------>');
+                Log::info(json_encode($payroll,JSON_PRETTY_PRINT));
 
                 $transaction = Transaction::create($payroll);
                 $transaction_ids[] = $transaction->id;
@@ -853,6 +856,9 @@ class PayrollController extends Controller
     {
         $business_id = request()->session()->get('user.business_id');
 
+        Log::info("update in payroll-->");
+        Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+        // die;
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module')) && ! auth()->user()->can('essentials.update_payroll')) {
             abort(403, 'Unauthorized action.');
         }
@@ -1225,6 +1231,9 @@ class PayrollController extends Controller
 
     public function getUpdatePayrollGroup(Request $request)
     {
+        Log::info('in getupdatepay --------->');
+        Log::info(json_encode($request->all()));
+
         $business_id = request()->session()->get('user.business_id');
         if (! (auth()->user()->can('superadmin') || auth()->user()->can('essentials.update_payroll') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
             abort(403, 'Unauthorized action.');
@@ -1249,7 +1258,7 @@ class PayrollController extends Controller
             foreach ($payrolls as $key => $payroll) {
                 $transaction_id = $payroll['transaction_id'];
 
-                $payroll['total_before_tax'] = $payroll['final_total'];
+                $payroll['total_before_tax'] = $payroll['total'];
                 $payroll['essentials_amount_per_unit_duration'] = $this->moduleUtil->num_uf($payroll['essentials_amount_per_unit_duration']);
 
                 $allowances_and_deductions = $this->getAllowanceAndDeductionJson($payroll);
@@ -1261,6 +1270,9 @@ class PayrollController extends Controller
                 $payroll_trans = Transaction::where('business_id', $business_id)
                                         ->where('type', 'payroll')
                                         ->find($transaction_id);
+                                        
+                Log::info('isi payroll---------->');
+                Log::info(json_encode($payroll,JSON_PRETTY_PRINT));
 
                 if (! empty($payroll_trans)) {
                     $payroll_trans->update($payroll);
