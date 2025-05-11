@@ -856,7 +856,7 @@ class PayrollController extends Controller
             $input = $request->only(['essentials_duration', 'essentials_amount_per_unit_duration', 'final_total', 'essentials_duration_unit']);
 
             $input['essentials_amount_per_unit_duration'] = $this->moduleUtil->num_uf($input['essentials_amount_per_unit_duration']);
-            $input['total_before_tax'] = $input['final_total'];
+            $input['total_before_tax'] = $input['total'];
 
             //get pay componentes
             $payroll['allowance_names'] = $request->input('allowance_names');
