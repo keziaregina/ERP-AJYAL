@@ -2,6 +2,11 @@
 /public/hot
 /public/storage
 /storage/*
+# /public/hot
+# /public/storage
+/storage/
+# /storage/framework
+/storage/logs
 /storage/*.key
 /vendor
 /.idea

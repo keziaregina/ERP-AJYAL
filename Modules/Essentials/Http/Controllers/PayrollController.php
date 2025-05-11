@@ -502,19 +502,22 @@ class PayrollController extends Controller
         }
 
         // dd($request->all());
-        Log::info("payroll in store");
+        Log::info("payroll in store------------>");
         Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+        // die;
         try {
-            $transaction_date = $request->input('transaction_date');
-            $payrolls = $request->input('payrolls');
-            $notify_employee = ! empty($request->input('notify_employee')) ? 1 : 0;
-            $payroll_group['business_id'] = $business_id;
-            $payroll_group['name'] = $request->input('payroll_group_name');
-            $payroll_group['status'] = $request->input('payroll_group_status');
-            // $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('total_gross_amount'));
-            // $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('payrolls[0][final_total]'));
-            $payroll_group['location_id'] = $request->input('location_id');
-            $payroll_group['created_by'] = auth()->user()->id;
+            $transaction_date                     = $request->input('transaction_date');
+            $payrolls                             = $request->input('payrolls');
+            $notify_employee                      = ! empty($request->input('notify_employee')) ? 1: 0;
+            $payroll_group['business_id']         = $business_id;
+            $payroll_group['name']                = $request->input('payroll_group_name');
+            $payroll_group['status']              = $request->input('payroll_group_status');
+            // $payroll_group['gross_total']      = $this->transactionUtil->num_uf($request->input('total_gross_amount'));
+            // $payroll_group['gross_total']      = $this->transactionUtil->num_uf($request->input('payrolls[0][final_total]'));
+            $payroll_group['location_id']         = $request->input('location_id');
+            $payroll_group['created_by']          = auth()->user()->id;
+            $payroll_group['payroll_group_month'] = date('m', strtotime($transaction_date));
+            $payroll_group['payroll_group_year']  = date('Y', strtotime($transaction_date));
 
             DB::beginTransaction();
 
@@ -529,7 +532,9 @@ class PayrollController extends Controller
                 $payroll['type'] = 'payroll';
                 $payroll['payment_status'] = 'due';
                 $payroll['status'] = 'final';
-                $payroll['payroll_month'] = date('m');
+                // $payroll['payroll_month'] = date('m');
+                $payroll['payroll_month'] = date('m', strtotime($transaction_date));
+                $payroll['payroll_year'] = date('Y', strtotime($transaction_date));
                 // $payroll_group->gross_total = $payroll['total'];
                 // $payroll['total_before_tax'] = $payroll['final_total'];
                 $payroll['total_before_tax'] = $payroll['total'];
@@ -554,6 +559,9 @@ class PayrollController extends Controller
                 // dd($payroll);
                 // $payroll['total_days_worked'] = $allowances_and_deductions['total_days_worked'];
                 // $payroll['total_work_duration'] = $allowances_and_deductions['total_work_duration'];
+
+                Log::info('payroll before create / update------------------>');
+                Log::info(json_encode($payroll,JSON_PRETTY_PRINT));
 
                 $transaction = Transaction::create($payroll);
                 $transaction_ids[] = $transaction->id;
@@ -848,6 +856,9 @@ class PayrollController extends Controller
     {
         $business_id = request()->session()->get('user.business_id');
 
+        Log::info("update in payroll-->");
+        Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+        // die;
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module')) && ! auth()->user()->can('essentials.update_payroll')) {
             abort(403, 'Unauthorized action.');
         }
@@ -856,7 +867,7 @@ class PayrollController extends Controller
             $input = $request->only(['essentials_duration', 'essentials_amount_per_unit_duration', 'final_total', 'essentials_duration_unit']);
 
             $input['essentials_amount_per_unit_duration'] = $this->moduleUtil->num_uf($input['essentials_amount_per_unit_duration']);
-            $input['total_before_tax'] = $input['final_total'];
+            $input['total_before_tax'] = $input['total'];
 
             //get pay componentes
             $payroll['allowance_names'] = $request->input('allowance_names');
@@ -1220,6 +1231,9 @@ class PayrollController extends Controller
 
     public function getUpdatePayrollGroup(Request $request)
     {
+        Log::info('in getupdatepay --------->');
+        Log::info(json_encode($request->all()));
+
         $business_id = request()->session()->get('user.business_id');
         if (! (auth()->user()->can('superadmin') || auth()->user()->can('essentials.update_payroll') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
             abort(403, 'Unauthorized action.');
@@ -1244,7 +1258,7 @@ class PayrollController extends Controller
             foreach ($payrolls as $key => $payroll) {
                 $transaction_id = $payroll['transaction_id'];
 
-                $payroll['total_before_tax'] = $payroll['final_total'];
+                $payroll['total_before_tax'] = $payroll['total'];
                 $payroll['essentials_amount_per_unit_duration'] = $this->moduleUtil->num_uf($payroll['essentials_amount_per_unit_duration']);
 
                 $allowances_and_deductions = $this->getAllowanceAndDeductionJson($payroll);
@@ -1256,6 +1270,9 @@ class PayrollController extends Controller
                 $payroll_trans = Transaction::where('business_id', $business_id)
                                         ->where('type', 'payroll')
                                         ->find($transaction_id);
+                                        
+                Log::info('isi payroll---------->');
+                Log::info(json_encode($payroll,JSON_PRETTY_PRINT));
 
                 if (! empty($payroll_trans)) {
                     $payroll_trans->update($payroll);

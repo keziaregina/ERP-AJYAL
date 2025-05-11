@@ -15,8 +15,8 @@
         <td>{{ $companyBankDetail->payer_cr_no }}</td>
         <td>{{ $companyBankDetail->payer_bank_short_name }}</td>
         <td>{{ $companyBankDetail->payer_account_number }}</td>
-        <td>{{ date('Y') }}</td>
-        <td>{{ date('m') }}</td>
+        <td>{{ $salaryYear }}</td>
+        <td>{{ $salaryMonth }}</td>
         <td>{{ number_format($totalSalary, 3, '.', ',') }}</td>
         <td>{{ $numberOfRecords }}</td>
         <td>Salary</td>

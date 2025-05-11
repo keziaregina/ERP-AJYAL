@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use Modules\Essentials\Entities\PayrollGroup;
 
 class CompanyBankDetailController extends Controller {
     function index() {
@@ -62,15 +63,18 @@ class CompanyBankDetailController extends Controller {
     // Using transaction table
     function exportExcel($id) {
         try {
+            $payrollGroup = PayrollGroup::find($id);
+
             $datas = Transaction::leftJoin('essentials_payroll_group_transactions', 'transactions.id', '=', 'essentials_payroll_group_transactions.transaction_id')
             ->where('essentials_payroll_group_transactions.payroll_group_id', $id)
             ->where('business_id', auth()->user()->business_id)
             ->where('type', 'payroll')
-            ->where('payroll_month', date('m'))
+            // ->where('payroll_month', date('m'))
             ->with(['transaction_for'])
             ->get();
 
-            $transactionPayrolls = $datas->map(function ($data) {
+
+            $transactionPayrolls = $datas->map(function ($data) use ($payrollGroup) {
                 $essentials_allowances = json_decode($data->essentials_allowances);
                 $data->essentials_allowances = array_sum($essentials_allowances->{'allowance_amounts'});
                 $essentials_deductions = json_decode($data->essentials_deductions);
@@ -86,15 +90,38 @@ class CompanyBankDetailController extends Controller {
                 }
 
                 $employeeOvertime = EmployeeOvertime::where('user_id', $data->transaction_for->id)
-                ->where('month', date('m'))
-                ->where('year', date('Y'))
+                ->where('month', $payrollGroup->payroll_group_month)
+                ->where('year', $payrollGroup->payroll_group_year)
                 ->whereNotIn('total_hour', ['A','SL','VL','GE'])
                 ->get();
 
+                $slRecords = EmployeeOvertime::where('user_id', $data->transaction_for->id)
+                ->where('month', $payrollGroup->payroll_group_month)
+                ->where('year', $payrollGroup->payroll_group_year)
+                ->where('total_hour', 'SL')
+                ->count();
+
+                $vlRecords = EmployeeOvertime::where('user_id', $data->transaction_for->id)
+                ->where('month', $payrollGroup->payroll_group_month)
+                ->where('year', $payrollGroup->payroll_group_year)
+                ->where('total_hour', 'VL')
+                ->count();
+
+                $aRecords = EmployeeOvertime::where('user_id', $data->transaction_for->id)
+                ->where('month', $payrollGroup->payroll_group_month)
+                ->where('year', $payrollGroup->payroll_group_year)
+                ->where('total_hour', 'A')
+                ->count();
+
+                // $employeeOvertime = EmployeeOvertime::where('user_id', $data->transaction_for->id)
+                // ->where('month', date('m'))
+                // ->where('year', date('Y'))
+                // ->whereNotIn('total_hour', ['A','SL','VL','GE'])
+                // ->get();
+
                 $data->social_security_deductions = $socialSecurityAmount;
                 $data->extra_hours = array_sum($employeeOvertime->pluck('total_hour')->toArray());
-                // $data->working_days = array_sum($employeeOvertime->pluck('total_hour')->toArray());
-                $data->working_days = $employeeOvertime->count();
+                $data->working_days = now()->month($payrollGroup->payroll_group_month)->daysInMonth - $slRecords - $aRecords - $vlRecords;
 
                 return $data;
 
@@ -108,8 +135,16 @@ class CompanyBankDetailController extends Controller {
             $sifExportCounter = $this->addSifExportCounter();
             $fileFormat = 'SIF_'. $companyBankDetail->employer_cr_no .'_'. $companyBankDetail->payer_bank_short_name . '_' . date('Ymd') . '_' . $sifExportCounter . '.xls';
 
-            return Excel::download(new SifExcelExport($transactionPayrolls, $companyBankDetail, $totalSalary, $numberOfRecords), $fileFormat, \Maatwebsite\Excel\Excel::XLS);
-        } catch (\Exception $e) {
+            return Excel::download(new SifExcelExport(
+                transactionPayrolls: $transactionPayrolls,
+                companyBankDetail: $companyBankDetail,
+                totalSalary: $totalSalary,
+                numberOfRecords: $numberOfRecords,
+                salaryMonth: $payrollGroup->payroll_group_month,
+                salaryYear: $payrollGroup->payroll_group_year
+            ), $fileFormat, \Maatwebsite\Excel\Excel::XLS);
+        } catch (\Exception $e) {/* The `sif-export-excel` route is used to export data related to company bank details to an Excel file. When this route is accessed, it triggers the `exportExcel` method within the `CompanyBankDetailController` class, which is responsible for generating and downloading the Excel file containing the company bank details data. */
+        
             //throw $th;
             Log::error('ERROR on exportExcel : '. $e->getMessage());
             throw $e;
