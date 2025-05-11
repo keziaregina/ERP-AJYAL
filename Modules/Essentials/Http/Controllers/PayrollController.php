@@ -502,19 +502,22 @@ class PayrollController extends Controller
         }
 
         // dd($request->all());
-        Log::info("payroll in store");
-        Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+        // Log::info("payroll in store");
+        // Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+        // die;
         try {
-            $transaction_date = $request->input('transaction_date');
-            $payrolls = $request->input('payrolls');
-            $notify_employee = ! empty($request->input('notify_employee')) ? 1 : 0;
-            $payroll_group['business_id'] = $business_id;
-            $payroll_group['name'] = $request->input('payroll_group_name');
-            $payroll_group['status'] = $request->input('payroll_group_status');
-            // $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('total_gross_amount'));
-            // $payroll_group['gross_total'] = $this->transactionUtil->num_uf($request->input('payrolls[0][final_total]'));
-            $payroll_group['location_id'] = $request->input('location_id');
-            $payroll_group['created_by'] = auth()->user()->id;
+            $transaction_date                     = $request->input('transaction_date');
+            $payrolls                             = $request->input('payrolls');
+            $notify_employee                      = ! empty($request->input('notify_employee')) ? 1: 0;
+            $payroll_group['business_id']         = $business_id;
+            $payroll_group['name']                = $request->input('payroll_group_name');
+            $payroll_group['status']              = $request->input('payroll_group_status');
+            // $payroll_group['gross_total']      = $this->transactionUtil->num_uf($request->input('total_gross_amount'));
+            // $payroll_group['gross_total']      = $this->transactionUtil->num_uf($request->input('payrolls[0][final_total]'));
+            $payroll_group['location_id']         = $request->input('location_id');
+            $payroll_group['created_by']          = auth()->user()->id;
+            $payroll_group['payroll_group_month'] = date('m', strtotime($transaction_date));
+            $payroll_group['payroll_group_year']  = date('Y', strtotime($transaction_date));
 
             DB::beginTransaction();
 
@@ -529,7 +532,9 @@ class PayrollController extends Controller
                 $payroll['type'] = 'payroll';
                 $payroll['payment_status'] = 'due';
                 $payroll['status'] = 'final';
-                $payroll['payroll_month'] = date('m');
+                // $payroll['payroll_month'] = date('m');
+                $payroll['payroll_month'] = date('m', strtotime($transaction_date));
+                $payroll['payroll_year'] = date('Y', strtotime($transaction_date));
                 // $payroll_group->gross_total = $payroll['total'];
                 // $payroll['total_before_tax'] = $payroll['final_total'];
                 $payroll['total_before_tax'] = $payroll['total'];

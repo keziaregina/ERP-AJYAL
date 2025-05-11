@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Modules\Essentials\Entities\PayrollGroup;
 
 class PayrollController extends Controller
 {
@@ -19,15 +20,17 @@ class PayrollController extends Controller
     public function generatePayrollPdf($id)
     {
         try {
+            $payrollGroup = PayrollGroup::find($id);
+
             $datas = Transaction::leftJoin('essentials_payroll_group_transactions', 'transactions.id', '=', 'essentials_payroll_group_transactions.transaction_id')
             ->where('essentials_payroll_group_transactions.payroll_group_id', $id)
             ->where('business_id', auth()->user()->business_id)
             ->where('type', 'payroll')
-            ->where('payroll_month', date('m'))
+            // ->where('payroll_month', date('m'))
             ->with(['transaction_for'])
             ->get();
 
-            $transactionPayrolls = $datas->map(function ($data) {
+            $transactionPayrolls = $datas->map(function ($data) use ($payrollGroup){
             $essentials_allowances = json_decode($data->essentials_allowances);
             $data->essentials_allowances = array_sum($essentials_allowances->{'allowance_amounts'});
             $essentials_deductions = json_decode($data->essentials_deductions);
@@ -42,16 +45,36 @@ class PayrollController extends Controller
             }
             }
 
+
             $employeeOvertime = EmployeeOvertime::where('user_id', $data->transaction_for->id)
-            ->where('month', date('m'))
-            ->where('year', date('Y'))
+            // ->where('month', date('m'))
+            // ->where('year', date('Y'))
+            ->where('month', $payrollGroup->payroll_group_month)
+            ->where('year', $payrollGroup->payroll_group_year)
             ->whereNotIn('total_hour', ['A','SL','VL','GE'])
             ->get();
 
+            $slRecords = EmployeeOvertime::where('user_id', $data->transaction_for->id)
+            ->where('month', $payrollGroup->payroll_group_month)
+            ->where('year', $payrollGroup->payroll_group_year)
+            ->where('total_hour', 'SL')
+            ->count();
+
+            $vlRecords = EmployeeOvertime::where('user_id', $data->transaction_for->id)
+            ->where('month', $payrollGroup->payroll_group_month)
+            ->where('year', $payrollGroup->payroll_group_year)
+            ->where('total_hour', 'VL')
+            ->count();
+
+            $aRecords = EmployeeOvertime::where('user_id', $data->transaction_for->id)
+            ->where('month', $payrollGroup->payroll_group_month)
+            ->where('year', $payrollGroup->payroll_group_year)
+            ->where('total_hour', 'A')
+            ->count();
+
             $data->social_security_deductions = $socialSecurityAmount;
             $data->extra_hours = array_sum($employeeOvertime->pluck('total_hour')->toArray());
-            // $data->working_days = array_sum($employeeOvertime->pluck('total_hour')->toArray());
-            $data->working_days = $employeeOvertime->count();
+            $data->working_days = now()->month($payrollGroup->payroll_group_month)->daysInMonth - $slRecords - $aRecords - $vlRecords;
 
             return $data;
 
