@@ -59,7 +59,11 @@ class PayrollController extends Controller
 
             $totalSalary = $transactionPayrolls->sum('final_total');
             $numberOfRecords = $transactionPayrolls->count();
+            // $logo = (string) Image::make(public_path($path))
+            //     ->fit(80, 80)
+            //         ->encode('data-url');
             $logo = public_path('img/logo-small.png');
+            // imageUrl = (string) Image::make(public_path($path))                 ->fit(80, 80)                 ->encode('data-url');
             $companyBankDetail = CompanyBankDetail::where('business_id', auth()->user()->business_id)->get()->first();
             $createPdfDate = date('d-m-Y');
             $user = auth()->user()->first_name;
@@ -81,28 +85,28 @@ class PayrollController extends Controller
                 'year' => $year,
             ];
 
-            // dd($data);
+
     
             // return view ('payroll.payroll_pdf', $data);
             
             // Generate PDF with specific options
-            $pdf = PDF::loadView('payroll.payroll_pdf', $data, [
-                'orientation' => 'L',
-                'format' => 'A4'                
-            ]);
+            // $pdf = PDF::loadView('payroll.payroll_pdf', $data, [
+            //     'orientation' => 'L',
+            //     'format' => 'A4'                
+            // ]);
 
-            // $pdf = PDF::loadView('payroll.payroll_pdf', $data)
-            //     ->setPaper('a4', 'landscape')
-            //     ->setOptions([
-            //         'defaultFont' => 'DejaVu Sans',
-            //         'isRemoteEnabled' => true,
-            //         'isHtml5ParserEnabled' => true,
-            //         'isPhpEnabled' => true,
-            //         'margin_left' => 10,
-            //         'margin_right' => 10,
-            //         'margin_top' => 10,
-            //         'margin_bottom' => 10
-            //     ]);
+            $pdf = PDF::loadView('payroll.payroll_pdf', $data)
+                ->setPaper('a4', 'landscape')
+                ->setOptions([
+                    'defaultFont' => 'DejaVu Sans',
+                    'isRemoteEnabled' => true,
+                    'isHtml5ParserEnabled' => true,
+                    'isPhpEnabled' => true,
+                    'margin_left' => 10,
+                    'margin_right' => 10,
+                    'margin_top' => 10,
+                    'margin_bottom' => 10
+                ]);
             
             // Generate filename
             $filename = 'Payroll_Report_' . date('Ymd') . '.pdf';

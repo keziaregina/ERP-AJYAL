@@ -166,8 +166,9 @@
     </style>
 </head>
 <body>
+    {{-- @dd($logo) --}}
     <div class="header">
-        <img class="logo" src="{{ $logo }}" alt="logo">
+        <img class="logo" src="{{ 'data:image/png;base64,' . base64_encode(file_get_contents($logo)) }}">
         <h1>Ajyal Al - Madina Al - Asria</h1>        
     </div>
     <div class="header-section">
