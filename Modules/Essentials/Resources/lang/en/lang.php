@@ -98,6 +98,7 @@ return [
     'status_changed_to' => 'Status changed to :status',
     'leaves_summary_for_user' => 'Leaves Summary for :user',
     'total_work_hours' => 'Total work hours',
+    'total_overtime_hours' => 'Total overtime hours ', 
     'leave_count_interval' => 'Leave count interval',
     'current_month' => 'Current month',
     'current_fy' => 'Current financial year',
