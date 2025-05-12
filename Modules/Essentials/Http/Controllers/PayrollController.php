@@ -22,6 +22,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use App\Events\TransactionPaymentAdded;
+use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 use Modules\Essentials\Utils\EssentialsUtil;
 use Modules\Essentials\Entities\PayrollGroup;
@@ -750,6 +751,8 @@ class PayrollController extends Controller
             $query->where('expense_for', auth()->user()->id);
         }
         $payroll = $query->findOrFail($id);
+        Log::info('ISI DARI PAYROLL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        Log::info(json_encode($payroll, JSON_PRETTY_PRINT));
 
         $transaction_date = \Carbon::parse($payroll->transaction_date);
 
@@ -796,8 +799,14 @@ class PayrollController extends Controller
         //     $start_of_month->format('Y-m-d'),
         //     $end_of_month->format('Y-m-d')
         // );
+        // $year = date('Y');
         $total_days_present = $payroll->total_days_worked;
-        $total_work_duration = $payroll->total_work_duration;
+        $month = $payroll->payroll_month;
+        $employee_id = $payroll->transaction_for->id; 
+        // $total_work_duration = $payroll->total_work_duration;
+        $total_overtime = EmployeeOvertime::getAndCalculateTotalOvertime($business_id, $employee_id, $month);
+        // Log::info('TOTAL OVERTIME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        // Log::info($total_overtime);
         $total_absent = $payroll->total_absent;
         $total_leaves = $payroll->total_leaves;
    
@@ -805,7 +814,7 @@ class PayrollController extends Controller
         return view('essentials::payroll.show')
         ->with(compact('payroll', 'month_name', 'allowances', 'deductions', 'year', 'payment_types',
         'bank_details', 'designation', 'department', 'final_total_in_words', 'total_leaves', 'days_in_a_month',
-        'total_work_duration', 'location', 'total_days_present', 'total_absent'));
+        'total_overtime', 'location', 'total_days_present', 'total_absent'));
     }
 
     /**
