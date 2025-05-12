@@ -50,7 +50,7 @@
 		      			</td>
 		      		</tr>
 		      		<tr>
-		      			<td><strong>@lang('essentials::lang.total_work_duration'):</strong> {{(int)$total_work_duration}}</td>
+		      			<td><strong>@lang('essentials::lang.total_overtime_hours'):</strong> {{(int)$total_overtime}}</td>
 		      			<td><strong>@lang('essentials::lang.days_present'):</strong> {{$total_days_present}}</td>
 		      			<td><strong>@lang('essentials::lang.days_absent'):</strong> {{$total_absent}}</td>
 		      			<td><strong>@lang('essentials::lang.total_leaves'):</strong> {{$total_leaves}}</td>

@@ -138,6 +138,7 @@ return[
     'edit_payroll' => 'تحرير كشوف المرتبات',
     'payroll_of_employee' => 'كشوف المرتبات من <strong>:employee </strong> عن <strong>:date </strong>',
     'total_work_duration' => 'مجموع مدة العمل',
+    'total_overtime_hours' => 'إجمالي ساعات العمل الإضافي',
     'amount_per_unit_duartion' => 'المبلغ لكل وحدة مدة',
     'allowances' => 'الأرباح',
     'allowance' => 'كسب',
