@@ -751,9 +751,7 @@ class PayrollController extends Controller
             $query->where('expense_for', auth()->user()->id);
         }
         $payroll = $query->findOrFail($id);
-        Log::info('ISI DARI PAYROLL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        Log::info(json_encode($payroll, JSON_PRETTY_PRINT));
-
+       
         $transaction_date = \Carbon::parse($payroll->transaction_date);
 
         $department = Category::where('category_type', 'hrm_department')
