@@ -468,14 +468,18 @@ class PayrollController extends Controller
                     }
 
                 }
-
             }
+            $grorious_employee = number_format(EssentialsAllowanceAndDeduction::where('description','like' ,'%glorious employee allowance%' )->get()->first()->amount, 3, '.');
+            
+            
+            // Log::info('test');
+            // Log::info($grorious_employee);
 
 
             $action = 'create';
 
             return view('essentials::payroll.create2')
-                    ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'action', 'location'));
+                    ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'action', 'location' , 'grorious_employee'));
         } else {
             return redirect()->action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'index'])
                 ->with('status',
