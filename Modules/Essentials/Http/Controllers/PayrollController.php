@@ -31,6 +31,7 @@ use Modules\Essentials\Notifications\PayrollNotification;
 use Modules\Essentials\Entities\EssentialsUserSalesTarget;
 use Modules\Essentials\Entities\EssentialsAllowanceAndDeduction;
 use Modules\Essentials\Entities\EssentialsUserAllowancesAndDeduction;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
 class PayrollController extends Controller
 {
@@ -813,6 +814,110 @@ class PayrollController extends Controller
         ->with(compact('payroll', 'month_name', 'allowances', 'deductions', 'year', 'payment_types',
         'bank_details', 'designation', 'department', 'final_total_in_words', 'total_leaves', 'days_in_a_month',
         'total_overtime', 'location', 'total_days_present', 'total_absent'));
+    }
+
+    public function printAll () 
+    {
+        $business_id = request()->session()->get('user.business_id');
+        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        $query = Transaction::where('business_id', $business_id)                        
+                        ->with(['transaction_for', 'payment_lines']);
+
+        if (! auth()->user()->can('essentials.view_all_payroll')) {
+            $query->where('expense_for', auth()->user()->id);
+        }
+        $payrolls = $query->get();  
+        // dd($payrolls->toArray());      
+
+        $payrollData = [];
+
+        foreach ($payrolls as $payroll) {
+        $transaction_date = \Carbon::parse($payroll->transaction_date);
+
+        $department = Category::where('category_type', 'hrm_department')
+                        ->find($payroll?->transaction_for?->essentials_department_id);
+
+        $designation = Category::where('category_type', 'hrm_designation')
+                        ->find($payroll?->transaction_for?->essentials_designation_id);
+
+        $location = BusinessLocation::where('business_id', $business_id)
+                        ->find($payroll?->transaction_for?->location_id);
+
+        $month_name = $transaction_date->format('F');
+        $year = $transaction_date->format('Y');
+        $allowances = ! empty($payroll->essentials_allowances) ? json_decode($payroll->essentials_allowances, true) : [];
+        $deductions = ! empty($payroll->essentials_deductions) ? json_decode($payroll->essentials_deductions, true) : [];
+        $bank_details = json_decode($payroll?->transaction_for?->bank_details, true);
+        $payment_types = $this->moduleUtil->payment_types();
+        $final_total_in_words = $this->commonUtil->numToIndianFormat($payroll->final_total);
+
+        $start_of_month = \Carbon::parse($payroll->transaction_date);
+        $end_of_month = \Carbon::parse($payroll->transaction_date)->endOfMonth();
+
+        $leaves = EssentialsLeave::where('business_id', $business_id)
+                        ->where('user_id', $payroll?->transaction_for?->id)
+                        ->whereDate('start_date', '>=', $start_of_month)
+                        ->whereDate('end_date', '<=', $end_of_month)
+                        ->get();
+
+        $total_leaves = 0;
+        $days_in_a_month = \Carbon::parse($start_of_month)->daysInMonth;
+        foreach ($leaves as $key => $leave) {
+            $start_date = \Carbon::parse($leave->start_date);
+            $end_date = \Carbon::parse($leave->end_date);
+
+            $diff = $start_date->diffInDays($end_date);
+            $diff += 1;
+            $total_leaves += $diff;
+        }
+
+        $total_days_present = $payroll->total_days_worked;
+        $month = $payroll->payroll_month;
+        $employee_id = $payroll?->transaction_for?->id;
+        $total_overtime = EmployeeOvertime::getAndCalculateTotalOvertime($business_id, $employee_id, $month);
+        $total_absent = $payroll->total_absent;
+        $total_leaves = $payroll->total_leaves;
+                
+        $payrollData[] = [
+            'transaction_date' => $transaction_date,
+            'department' => $department,
+            'designation' => $designation,
+            'location' => $location,
+            'month_name' => $month_name,
+            'year' => $year,
+            'allowances' => $allowances,
+            'deductions' => $deductions,
+            'bank_details' => $bank_details,
+            'payment_types' => $payment_types,
+            'final_total_in_words' => $final_total_in_words,
+            'start_of_month' => $start_of_month,
+            'end_of_month' => $end_of_month,
+            'leaves' => $leaves,
+            'total_leaves' =>$total_leaves,
+            'days_in_a_month' => $days_in_a_month,
+            'total_days_present' => $total_days_present,
+            'month' => $month,
+            'employee_id' => $employee_id,
+            'total_overtime' => $total_overtime,
+            'total_absent' => $total_absent,
+            'payroll' => $payroll
+        ];
+        }
+
+        // Log::info('FOREACH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        // Log::info(json_encode($payrollData, JSON_PRETTY_PRINT));
+        // $payrollData = (object)$payrollData;
+        // $pdf = PDF::loadView('essentials::payroll.showAll',
+        //  [
+        // 'payrollData' => $payrollData
+        // ]);
+        // Log::info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        return view('essentials::payroll.showAll', [
+            'payrollData' => $payrollData
+        ]);
     }
 
     /**
