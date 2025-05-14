@@ -823,7 +823,8 @@ class PayrollController extends Controller
             abort(403, 'Unauthorized action.');
         }
         
-        $query = Transaction::where('business_id', $business_id)                        
+        $query = Transaction::where('business_id', $business_id)
+                        ->where('type', 'payroll')                        
                         ->with(['transaction_for', 'payment_lines']);
 
         if (! auth()->user()->can('essentials.view_all_payroll')) {
@@ -919,8 +920,7 @@ class PayrollController extends Controller
          [
         'payrollData' => $payrollData
         ]);
-        // dd($pdf);
-        return $pdf->stream('Document.pdf'); 
+        return $pdf->download('Document.pdf'); 
     }
 
     /**
