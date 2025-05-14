@@ -1,18 +1,18 @@
 {{-- @dd($payrollData); --}}
-@foreach ($payrollData as $item)
-@php
-	$item = (object)$item;
-@endphp
 <div class="modal-dialog modal-lg" role="document">
   	<div class="modal-content">
-  		<div class="modal-header no-print">
-	      	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+  		{{-- <div class="modal-header no-print"> --}}
+	      	{{-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 	      		<span aria-hidden="true">&times;</span>
-	      	</button>
-	      	<h4 class="modal-title no-print">
+	      	</button> --}}
+	@foreach ($payrollData as $item)
+	@php
+		$item = (object)$item;
+	@endphp
+	      	{{-- <h4 class="modal-title no-print">
 	      		{!! __('essentials::lang.payroll_of_employee', ['employee' => $item?->payroll?->transaction_for?->user_full_name, 'date' => $item->month_name . ' ' . $item->year]) !!}
-	      	</h4>
-	    </div>
+	      	</h4> --}}
+	    {{-- </div> --}}
 	    <div class="modal-body">
 	    	<div class="table-responsive">
 		      	<table class="table table-bordered" id="payroll-view">
@@ -174,12 +174,13 @@
 		      	</table>
 	      	</div>
 	    </div>
-	    <div class="modal-footer no-print">
+		@endforeach
+	    {{-- <div class="modal-footer no-print">
 	      	<button type="button" class="tw-dw-btn tw-dw-btn-primary tw-text-white" aria-label="Print" onclick="$(this).closest('div.modal-content').find('.modal-body').printThis();">
 	      		<i class="fa fa-print"></i> @lang( 'messages.print' )
       		</button>
 	      	<button type="button" class="tw-dw-btn tw-dw-btn-neutral tw-text-white" data-dismiss="modal">@lang( 'messages.close' )</button>
-	    </div>
+	    </div> --}}
   	</div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
 <style type="text/css">
@@ -201,4 +202,3 @@
 		background: #d4edda !important;
 	}
 </style>
-@endforeach

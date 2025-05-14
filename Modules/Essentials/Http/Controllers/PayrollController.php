@@ -906,18 +906,21 @@ class PayrollController extends Controller
             'payroll' => $payroll
         ];
         }
-
-        // Log::info('FOREACH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        // Log::info(json_encode($payrollData, JSON_PRETTY_PRINT));
-        // $payrollData = (object)$payrollData;
+        
+        Log::info('FOREACH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        Log::info(json_encode($payrollData, JSON_PRETTY_PRINT));
+        $payrollData = (object)$payrollData;
         // $pdf = PDF::loadView('essentials::payroll.showAll',
         //  [
         // 'payrollData' => $payrollData
         // ]);
         // Log::info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        return view('essentials::payroll.showAll', [
-            'payrollData' => $payrollData
+        $pdf = PDF::loadView('essentials::payroll.showAll',
+         [
+        'payrollData' => $payrollData
         ]);
+        // dd($pdf);
+        return $pdf->stream('Document.pdf'); 
     }
 
     /**
