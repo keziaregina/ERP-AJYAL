@@ -1,6 +1,6 @@
+@foreach ($payrollData as $item)
 <div class="modal-dialog modal-lg" role="document">
 	<div class="modal-content">		
-			@foreach ($payrollData as $item)
 			@php
 			$item = (object)$item;
 			@endphp	      				
@@ -9,9 +9,9 @@
 						<table class="table table-bordered" id="payroll-view">
 							<tr>
 								<td colspan="4">
-									{{-- @if(!empty(Session::get('business.logo')))
-									<img src="{{ asset( 'uploads/business_logos/' . Session::get('business.logo', '1737635769_logo ajyal.jpg') ) }}" alt="Logo" style="width: auto; max-height: 50px; margin: auto;">
-									@endif --}}
+									@if(!empty(Session::get('business.logo')))
+										<img src="{{ $item->base64Image }}" alt="Logo" style="width: auto; max-height: 50px; margin: auto;">
+									@endif
 									<div class="pull-right text-center">
 										<strong class="font-23">
 											{{Session::get('business.name') ?? ''}}
@@ -170,7 +170,6 @@
 		      	</table>
 	      	</div>
 	    </div>
-		@endforeach
 	</div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
 <style type="text/css">
@@ -191,4 +190,5 @@
 	#payroll-view .bg-success {
 		background: #d4edda !important;
 	}
-</style>
+	</style>
+	@endforeach
