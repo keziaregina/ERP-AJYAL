@@ -469,14 +469,18 @@ class PayrollController extends Controller
                     }
 
                 }
-
             }
+            $grorious_employee = number_format(EssentialsAllowanceAndDeduction::where('description','like' ,'%glorious employee allowance%' )->get()->first()->amount, 3, '.');
+            
+            
+            // Log::info('test');
+            // Log::info($grorious_employee);
 
 
             $action = 'create';
 
             return view('essentials::payroll.create2')
-                    ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'action', 'location'));
+                    ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'action', 'location' , 'grorious_employee'));
         } else {
             return redirect()->action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'index'])
                 ->with('status',
@@ -822,6 +826,7 @@ class PayrollController extends Controller
      */
     public function edit($id)
     {
+        // Log::info('test');
         // dd("hello");
         $business_id = request()->session()->get('user.business_id');
 
@@ -1146,6 +1151,9 @@ class PayrollController extends Controller
 
     public function getEditPayrollGroup($id)
     {
+
+        // Log::info('test');
+        // dd('4234');
         $business_id = request()->session()->get('user.business_id');
         if (! (auth()->user()->can('superadmin') || auth()->user()->can('essentials.update_payroll') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
             abort(403, 'Unauthorized action.');
@@ -1227,13 +1235,16 @@ class PayrollController extends Controller
         }
 
         $action = 'edit';
-        Log::info("payrolls ------------>");
-        Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
+        // Log::info("payrolls ------------>");
+        // Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
         // die;
 
+        $grorious_employee = number_format(EssentialsAllowanceAndDeduction::where('description','like' ,'%glorious employee allowance%' )->get()->first()->amount, 3, '.');
+            
+            
         // return view('essentials::payroll.create')
         return view('essentials::payroll.create2')
-            ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'payroll_group', 'action', 'location'));
+            ->with(compact('month_name','grorious_employee', 'transaction_date', 'year', 'payrolls', 'payroll_group', 'action', 'location'));
     }
 
     public function getUpdatePayrollGroup(Request $request)
@@ -1414,7 +1425,7 @@ class PayrollController extends Controller
                     $input['transaction_type'] = $transaction->type;
                     event(new TransactionPaymentAdded($tp, $input));
 
-                    //update payment status
+                       //update payment status
                     $payment_status = $this->transactionUtil->updatePaymentStatus($input['transaction_id']);
                     $transaction->payment_status = $payment_status;
                     $this->transactionUtil->activityLog($transaction, 'payment_edited', $transaction_before);

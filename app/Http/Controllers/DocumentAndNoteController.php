@@ -48,7 +48,7 @@ class DocumentAndNoteController extends Controller
                     $query->where('is_private', 0)
                         ->orWhere(function ($q) use ($user_id) {
                             $q->where('is_private', 1)
-                              ->where('created_by', $user_id);
+                            ->where('created_by', $user_id);
                         });
                 })
                 ->where('notable_type', $notable_type)
@@ -68,7 +68,7 @@ class DocumentAndNoteController extends Controller
                                             '.__('messages.action').'
                                         </span>
                                     </button>
-                                      <ul class="dropdown-menu dropdown-menu-left" role="menu">
+                                    <ul class="dropdown-menu dropdown-menu-left" role="menu">
                                         ';
 
                         if (in_array('view', $permissions)) {
