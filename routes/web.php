@@ -61,6 +61,7 @@ use App\Http\Controllers\VariationTemplateController;
 use App\Http\Controllers\WarrantyController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportSettingsController;
+use Modules\Essentials\Http\Controllers\PayrollController;
 
 /*
 |--------------------------------------------------------------------------
