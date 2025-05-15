@@ -84,7 +84,7 @@
             let total_duration = __read_number($("input#essentials_duration_"+id));
             let amount_per_unit_duration = __read_number($("input#essentials_amount_per_unit_duration_"+id));
             let total = total_duration * amount_per_unit_duration;
-            __write_number($("input#total_"+id), total, false, 2);
+            __write_number($("input#total_"+id), total, false, 3);
     
             //calculate total allownace
             let total_allowance = 0;
