@@ -31,6 +31,7 @@ use Modules\Essentials\Notifications\PayrollNotification;
 use Modules\Essentials\Entities\EssentialsUserSalesTarget;
 use Modules\Essentials\Entities\EssentialsAllowanceAndDeduction;
 use Modules\Essentials\Entities\EssentialsUserAllowancesAndDeduction;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
 class PayrollController extends Controller
 {
@@ -469,14 +470,18 @@ class PayrollController extends Controller
                     }
 
                 }
-
             }
+            $grorious_employee = number_format(EssentialsAllowanceAndDeduction::where('description','like' ,'%glorious employee allowance%' )->get()->first()->amount, 3, '.');
+            
+            
+            // Log::info('test');
+            // Log::info($grorious_employee);
 
 
             $action = 'create';
 
             return view('essentials::payroll.create2')
-                    ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'action', 'location'));
+                    ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'action', 'location' , 'grorious_employee'));
         } else {
             return redirect()->action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'index'])
                 ->with('status',
@@ -815,6 +820,119 @@ class PayrollController extends Controller
         'total_overtime', 'location', 'total_days_present', 'total_absent'));
     }
 
+    public function printAll () 
+    {
+        $business_id = request()->session()->get('user.business_id');
+        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        $query = Transaction::where('business_id', $business_id)
+                        ->where('type', 'payroll')                        
+                        ->with(['transaction_for', 'payment_lines']);
+
+        if (! auth()->user()->can('essentials.view_all_payroll')) {
+            $query->where('expense_for', auth()->user()->id);
+        }
+        $payrolls = $query->get();  
+        // dd($payrolls->toArray());      
+
+        $payrollData = [];
+
+        foreach ($payrolls as $payroll) {
+        $transaction_date = \Carbon::parse($payroll->transaction_date);
+
+        $department = Category::where('category_type', 'hrm_department')
+                        ->find($payroll?->transaction_for?->essentials_department_id);
+
+        $designation = Category::where('category_type', 'hrm_designation')
+                        ->find($payroll?->transaction_for?->essentials_designation_id);
+
+        $location = BusinessLocation::where('business_id', $business_id)
+                        ->find($payroll?->transaction_for?->location_id);
+
+        $month_name = $transaction_date->format('F');
+        $year = $transaction_date->format('Y');
+        $allowances = ! empty($payroll->essentials_allowances) ? json_decode($payroll->essentials_allowances, true) : [];
+        $deductions = ! empty($payroll->essentials_deductions) ? json_decode($payroll->essentials_deductions, true) : [];
+        $bank_details = json_decode($payroll?->transaction_for?->bank_details, true);
+        $payment_types = $this->moduleUtil->payment_types();
+        $final_total_in_words = $this->commonUtil->numToIndianFormat($payroll->final_total);
+
+        $start_of_month = \Carbon::parse($payroll->transaction_date);
+        $end_of_month = \Carbon::parse($payroll->transaction_date)->endOfMonth();
+
+        $leaves = EssentialsLeave::where('business_id', $business_id)
+                        ->where('user_id', $payroll?->transaction_for?->id)
+                        ->whereDate('start_date', '>=', $start_of_month)
+                        ->whereDate('end_date', '<=', $end_of_month)
+                        ->get();
+
+        $total_leaves = 0;
+        $days_in_a_month = \Carbon::parse($start_of_month)->daysInMonth;
+        foreach ($leaves as $key => $leave) {
+            $start_date = \Carbon::parse($leave->start_date);
+            $end_date = \Carbon::parse($leave->end_date);
+
+            $diff = $start_date->diffInDays($end_date);
+            $diff += 1;
+            $total_leaves += $diff;
+        }
+
+        $total_days_present = $payroll->total_days_worked;
+        $month = $payroll->payroll_month;
+        $employee_id = $payroll?->transaction_for?->id;
+        $total_overtime = EmployeeOvertime::getAndCalculateTotalOvertime($business_id, $employee_id, $month);
+        $total_absent = $payroll->total_absent;
+        $total_leaves = $payroll->total_leaves;
+        $path = public_path('uploads/business_logos/1737635769_logo ajyal.jpg');
+        $imageData = base64_encode(file_get_contents($path));
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $base64Image = 'data:image/' . $type . ';base64,' . $imageData;
+                
+        $payrollData[] = [
+            'transaction_date' => $transaction_date,
+            'base64Image' => $base64Image,
+            'department' => $department,
+            'designation' => $designation,
+            'location' => $location,
+            'month_name' => $month_name,
+            'year' => $year,
+            'allowances' => $allowances,
+            'deductions' => $deductions,
+            'bank_details' => $bank_details,
+            'payment_types' => $payment_types,
+            'final_total_in_words' => $final_total_in_words,
+            'start_of_month' => $start_of_month,
+            'end_of_month' => $end_of_month,
+            'leaves' => $leaves,
+            'total_leaves' =>$total_leaves,
+            'days_in_a_month' => $days_in_a_month,
+            'total_days_present' => $total_days_present,
+            'month' => $month,
+            'employee_id' => $employee_id,
+            'total_overtime' => $total_overtime,
+            'total_absent' => $total_absent,
+            'payroll' => $payroll
+        ];
+        }
+        
+        Log::info('FOREACH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        Log::info(json_encode($payrollData, JSON_PRETTY_PRINT));
+        $payrollData = (object)$payrollData;
+        // $pdf = PDF::loadView('essentials::payroll.showAll',
+        //  [
+        // 'payrollData' => $payrollData
+        // ]);
+        // Log::info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        ini_set("pcre.backtrack_limit", "10000000");
+        $pdf = PDF::loadView('essentials::payroll.showAll',
+         [
+        'payrollData' => $payrollData
+        ]);
+        return $pdf->stream('Document.pdf'); 
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -822,6 +940,7 @@ class PayrollController extends Controller
      */
     public function edit($id)
     {
+        // Log::info('test');
         // dd("hello");
         $business_id = request()->session()->get('user.business_id');
 
@@ -1146,6 +1265,9 @@ class PayrollController extends Controller
 
     public function getEditPayrollGroup($id)
     {
+
+        // Log::info('test');
+        // dd('4234');
         $business_id = request()->session()->get('user.business_id');
         if (! (auth()->user()->can('superadmin') || auth()->user()->can('essentials.update_payroll') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
             abort(403, 'Unauthorized action.');
@@ -1227,13 +1349,16 @@ class PayrollController extends Controller
         }
 
         $action = 'edit';
-        Log::info("payrolls ------------>");
-        Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
+        // Log::info("payrolls ------------>");
+        // Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
         // die;
 
+        $grorious_employee = number_format(EssentialsAllowanceAndDeduction::where('description','like' ,'%glorious employee allowance%' )->get()->first()->amount, 3, '.');
+            
+            
         // return view('essentials::payroll.create')
         return view('essentials::payroll.create2')
-            ->with(compact('month_name', 'transaction_date', 'year', 'payrolls', 'payroll_group', 'action', 'location'));
+            ->with(compact('month_name','grorious_employee', 'transaction_date', 'year', 'payrolls', 'payroll_group', 'action', 'location'));
     }
 
     public function getUpdatePayrollGroup(Request $request)
@@ -1414,7 +1539,7 @@ class PayrollController extends Controller
                     $input['transaction_type'] = $transaction->type;
                     event(new TransactionPaymentAdded($tp, $input));
 
-                    //update payment status
+                       //update payment status
                     $payment_status = $this->transactionUtil->updatePaymentStatus($input['transaction_id']);
                     $transaction->payment_status = $payment_status;
                     $this->transactionUtil->activityLog($transaction, 'payment_edited', $transaction_before);

@@ -46,4 +46,5 @@ return [
     'price' => 'Price',
     'activate' => 'Activate',
     'deactivate' => 'Deactivate',
+    'print_all' => 'Print All',
 ];

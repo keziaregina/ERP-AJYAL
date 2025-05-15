@@ -93,6 +93,9 @@
                                             <path d="M5 12l14 0" />
                                         </svg> @lang( 'messages.add' )
                                     </button>
+                                    <a href="{{action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'printAll'])}}" class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right" target="_blank">
+                                        @lang( 'messages.print_all' )
+                                    </a>
                                 </div>
                                 <br><br><br>
                             @endcan

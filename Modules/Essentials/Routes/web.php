@@ -115,5 +115,7 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
 
         // Route for Employee Bic Code
         Route::resource('/bic-code', EmployeeBicCodeController::class);
+
+        Route::get('/printAll', [Modules\Essentials\Http\Controllers\PayrollController::class, 'printAll'])->name('printAll');
     });
 });

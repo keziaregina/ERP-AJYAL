@@ -103,7 +103,7 @@
                                             <div class="form-group">
                                                 <label>@lang('essentials::lang.glorious_employee_allowance')</label>
                                                 <div class="well well-sm">
-                                                    <p><strong>@lang('essentials::lang.formula')</strong>: Basic salary × 10%</p>
+                                                    <p><strong>@lang('essentials::lang.formula')</strong>: Basic salary + {{$grorious_employee}} ر.ع</p>
                                                     <p><strong>@lang('essentials::lang.example')</strong>: <span id="glorious_employee_example">0</span></p>
                                                 </div>
                                             </div>

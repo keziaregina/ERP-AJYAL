@@ -57,7 +57,7 @@ class CompanyBankDetailController extends Controller {
         
         $sifCount->count++;
         $sifCount->save();
-        $formattedCount = str_pad($sifCount->count, 3, '0', STR_PAD_LEFT);
+        $formattedCount = number_format($sifCount->count, 3, '0', STR_PAD_LEFT);
         return $formattedCount;
     }
     // Using transaction table
@@ -73,21 +73,26 @@ class CompanyBankDetailController extends Controller {
             ->with(['transaction_for'])
             ->get();
 
-
             $transactionPayrolls = $datas->map(function ($data) use ($payrollGroup) {
                 $essentials_allowances = json_decode($data->essentials_allowances);
                 $data->essentials_allowances = array_sum($essentials_allowances->{'allowance_amounts'});
                 $essentials_deductions = json_decode($data->essentials_deductions);
-                $data->essentials_deductions = array_sum($essentials_deductions->{'deduction_amounts'});
 
                 $socialSecurityAmount = null;
-
+                
                 foreach ($essentials_deductions->deduction_names as $key => $deduction_name) {
                     if (strpos($deduction_name, 'Social Security Deductions') !== false) {
                         $socialSecurityAmount = $essentials_deductions->deduction_amounts[$key];
+                        unset($essentials_deductions->deduction_names[$key]);
+                        unset($essentials_deductions->deduction_amounts[$key]);
+                        unset($essentials_deductions->deduction_types[$key]);
+                        unset($essentials_deductions->deduction_short_names[$key]);
+                        unset($essentials_deductions->deduction_percents[$key]);
                         break;
                     }
                 }
+
+                $data->essentials_deductions = array_sum($essentials_deductions->{'deduction_amounts'});
 
                 $employeeOvertime = EmployeeOvertime::where('user_id', $data->transaction_for->id)
                 ->where('month', $payrollGroup->payroll_group_month)
