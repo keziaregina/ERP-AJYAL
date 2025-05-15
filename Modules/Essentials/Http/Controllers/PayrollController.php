@@ -926,7 +926,7 @@ class PayrollController extends Controller
          [
         'payrollData' => $payrollData
         ]);
-        return $pdf->download('Document.pdf'); 
+        return $pdf->stream('Document.pdf'); 
     }
 
     /**
