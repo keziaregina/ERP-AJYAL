@@ -57,7 +57,7 @@ class CompanyBankDetailController extends Controller {
         
         $sifCount->count++;
         $sifCount->save();
-        $formattedCount = str_pad($sifCount->count, 3, '0', STR_PAD_LEFT);
+        $formattedCount = number_format($sifCount->count, 3, '0', STR_PAD_LEFT);
         return $formattedCount;
     }
     // Using transaction table

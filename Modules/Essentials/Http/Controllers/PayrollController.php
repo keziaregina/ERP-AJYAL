@@ -885,9 +885,14 @@ class PayrollController extends Controller
         $total_overtime = EmployeeOvertime::getAndCalculateTotalOvertime($business_id, $employee_id, $month);
         $total_absent = $payroll->total_absent;
         $total_leaves = $payroll->total_leaves;
+        $path = public_path('uploads/business_logos/1737635769_logo ajyal.jpg');
+        $imageData = base64_encode(file_get_contents($path));
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $base64Image = 'data:image/' . $type . ';base64,' . $imageData;
                 
         $payrollData[] = [
             'transaction_date' => $transaction_date,
+            'base64Image' => $base64Image,
             'department' => $department,
             'designation' => $designation,
             'location' => $location,
@@ -920,11 +925,12 @@ class PayrollController extends Controller
         // 'payrollData' => $payrollData
         // ]);
         // Log::info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        ini_set("pcre.backtrack_limit", "10000000");
         $pdf = PDF::loadView('essentials::payroll.showAll',
          [
         'payrollData' => $payrollData
         ]);
-        return $pdf->download('Document.pdf'); 
+        return $pdf->stream('Document.pdf'); 
     }
 
     /**
