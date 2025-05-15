@@ -55,12 +55,12 @@
             <td>{{ $bankDetails->{'account_number'} }}</td>
             <td>{{ $transactionPayroll->transaction_for?->employeeSalaryFrequency?->name ?? '-' }}</td>
             <td>{{ $transactionPayroll->working_days }}</td>
-            <td>{{ number_format($transactionPayroll->final_total, 3, '.', ',') }}</td>
-            <td>{{ number_format($transactionPayroll->total_before_tax, 3, '.', ',') }}</td>
+            <td>{{ number_format($transactionPayroll->final_total, 3, '.', '') }}</td>
+            <td>{{ number_format($transactionPayroll->total_before_tax, 3, '.', '') }}</td>
             <td>{{ $transactionPayroll->extra_hours }}</td>
-            <td>{{ number_format($transactionPayroll->essentials_allowances, 3, '.', ',') }}</td>
-            <td>{{ number_format($transactionPayroll->essentials_deductions, 3, '.', ',') }}</td>
-            <td>{{ number_format($transactionPayroll->social_security_deductions, 3, '.', ',') }}</td>
+            <td>{{ number_format($transactionPayroll->essentials_allowances, 3, '.', '') }}</td>
+            <td>{{ number_format($transactionPayroll->essentials_deductions, 3, '.', '') }}</td>
+            <td>{{ number_format($transactionPayroll->social_security_deductions, 3, '.', '') }}</td>
             <td></td>
         </tr>
     @endforeach
