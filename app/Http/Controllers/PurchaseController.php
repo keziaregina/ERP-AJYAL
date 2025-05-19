@@ -230,6 +230,9 @@ class PurchaseController extends Controller
      */
     public function create()
     {
+        
+        // Log::info('test----------->');
+        // die;
         if (! auth()->user()->can('purchase.create') && ! auth()->user()->can('purchase.create_only')) {
             abort(403, 'Unauthorized action.');
         }
@@ -425,16 +428,29 @@ class PurchaseController extends Controller
             $output = ['success' => 1,
                 'msg' => __('purchase.purchase_add_success'),
             ];
+
+            
+            if (auth()->user()->can('purchase.create')) {
+                // abort(403, 'Unauthorized action.');
+                Log::info("here1");
+                return redirect('purchases')->with('status', $output);
+            } else if (auth()->user()->can('purchase.create_only')) {
+                Log::info("here2");
+                return redirect()->route('purchase.show', $transaction->id)->with('status', $output);
+            }
+            
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
-
+            
             $output = ['success' => 0,
-                'msg' => __('messages.something_went_wrong'),
-            ];
+            'msg' => __('messages.something_went_wrong'),
+        ];
+        Log::info("here3");
+
+            return redirect()->back()->with('status', $output);
         }
 
-        return redirect('purchases')->with('status', $output);
     }
 
     /**
