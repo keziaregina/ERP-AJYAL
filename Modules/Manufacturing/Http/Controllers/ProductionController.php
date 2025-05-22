@@ -204,7 +204,9 @@ class ProductionController extends Controller
             $transaction_data['payment_status'] = 'due';
             $transaction_data['transaction_date'] = $this->productUtil->uf_date($transaction_data['transaction_date'], true);
             $transaction_data['final_total'] = 0;
-            if (! empty($request->input('final_total'))) {
+            if (empty($request->input('final_total'))){
+                $transaction_data['final_total'] = 0;
+            } elseif (!empty($request->input('final_total'))) {
                 $transaction_data['final_total'] = $this->productUtil->num_uf($transaction_data['final_total']);
             }
 

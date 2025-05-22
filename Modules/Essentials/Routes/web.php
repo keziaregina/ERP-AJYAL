@@ -4,10 +4,10 @@
 // use Illuminate\Support\Facades\Route;
 
 use App\EmployeeBicCode;
-use App\Http\Controllers\EmployeeBicCodeController;
-use Modules\Essentials\Http\Controllers\CompanyBankDetailController;
 use Modules\Essentials\Http\Controllers\OvertimeSheetController;
+use Modules\Essentials\Http\Controllers\EmployeeBicCodeController;
 use Modules\Essentials\Http\Controllers\GloriousEmployeeController;
+use Modules\Essentials\Http\Controllers\CompanyBankDetailController;
 
 Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezone', 'AdminSidebarMenu')->group(function () {
     Route::prefix('essentials')->group(function () {
