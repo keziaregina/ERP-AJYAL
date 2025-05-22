@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\AccountTransaction;
-use App\Business;
-use App\BusinessLocation;
-use App\Contact;
-use App\CustomerGroup;
-use App\Product;
-use App\PurchaseLine;
-use App\TaxRate;
-use App\Transaction;
+use Excel;
 use App\User;
-use App\Utils\BusinessUtil;
+use App\Contact;
+use App\Product;
+use App\TaxRate;
+use App\Business;
+use App\Variation;
+use App\Transaction;
+use App\PurchaseLine;
+use App\CustomerGroup;
+use App\BusinessLocation;
 use App\Utils\ModuleUtil;
 use App\Utils\ProductUtil;
-use App\Utils\TransactionUtil;
-use App\Variation;
-use Excel;
+use App\AccountTransaction;
+use App\Utils\BusinessUtil;
 use Illuminate\Http\Request;
+use App\Utils\TransactionUtil;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Spatie\Activitylog\Models\Activity;
 use Yajra\DataTables\Facades\DataTables;
 use App\Events\PurchaseCreatedOrModified;
@@ -229,6 +230,9 @@ class PurchaseController extends Controller
      */
     public function create()
     {
+        // Log::info('test----------->');
+        // die;
+        
         if (! auth()->user()->can('purchase.create')) {
             abort(403, 'Unauthorized action.');
         }

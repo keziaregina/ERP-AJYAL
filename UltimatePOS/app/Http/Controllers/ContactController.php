@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Business;
-use App\BusinessLocation;
-use App\Contact;
-use App\CustomerGroup;
-use App\Notifications\CustomerNotification;
-use App\PurchaseLine;
-use App\Transaction;
-use App\TransactionPayment;
-use App\User;
-use App\Utils\ContactUtil;
-use App\Utils\ModuleUtil;
-use App\Utils\NotificationUtil;
-use App\Utils\TransactionUtil;
-use App\Utils\Util;
 use DB;
 use Excel;
+use App\User;
+use App\Contact;
+use App\Business;
+use App\Utils\Util;
+use App\Transaction;
+use App\PurchaseLine;
+use App\CustomerGroup;
+use App\BusinessLocation;
+use App\Utils\ModuleUtil;
+use App\Utils\ContactUtil;
+use App\TransactionPayment;
 use Illuminate\Http\Request;
+use App\Utils\TransactionUtil;
+use App\Utils\NotificationUtil;
+use Illuminate\Support\Facades\Log;
 use Spatie\Activitylog\Models\Activity;
-use Yajra\DataTables\Facades\DataTables;
 use App\Events\ContactCreatedOrModified;
+use Yajra\DataTables\Facades\DataTables;
+use App\Notifications\CustomerNotification;
 
 class ContactController extends Controller
 {
@@ -102,6 +103,7 @@ class ContactController extends Controller
      */
     private function indexSupplier()
     {
+        // LOg::info('here');
         if (! auth()->user()->can('supplier.view') && ! auth()->user()->can('supplier.view_own')) {
             abort(403, 'Unauthorized action.');
         }
@@ -577,7 +579,9 @@ class ContactController extends Controller
      */
     public function store(Request $request)
     {
-        if (! auth()->user()->can('supplier.create') && ! auth()->user()->can('customer.create') && ! auth()->user()->can('customer.view_own') && ! auth()->user()->can('supplier.view_own')) {
+
+        Log::info('here customer');
+        if (! auth()->user()->can('supplier.create') && ! auth()->user()->can('customer.create') && ! auth()->user()->can('customer.view_own') && ! auth()->user()->can('supplier.view_own') && ! auth()->user()->can('purchase.create_only')) {
             abort(403, 'Unauthorized action.');
         }
 
