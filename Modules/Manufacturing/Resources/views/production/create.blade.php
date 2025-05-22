@@ -134,10 +134,10 @@
 			</div>
 			@endcan
 		</div>
+		{!! Form::hidden('final_total', 0, ['id' => 'final_total']); !!}
 		@can('manufacturing.access_price')
 		<div class="row">
 			<div class="col-md-3 col-md-offset-9">
-				{!! Form::hidden('final_total', 0, ['id' => 'final_total']); !!}
 				<strong>
 					{{__('manufacturing::lang.total_cost')}}:
 				</strong>
