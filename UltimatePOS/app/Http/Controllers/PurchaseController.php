@@ -313,6 +313,8 @@ class PurchaseController extends Controller
             //Reverse exchange rate and save it.
             //$transaction_data['exchange_rate'] = $transaction_data['exchange_rate'];
 
+            Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+            dd($request->all());
             //TODO: Check for "Undefined index: total_before_tax" issue
             //Adding temporary fix by validating
             $request->validate([

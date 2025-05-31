@@ -315,6 +315,8 @@ class PurchaseController extends Controller
             //$transaction_data['exchange_rate'] = $transaction_data['exchange_rate'];
 
             //TODO: Check for "Undefined index: total_before_tax" issue
+            // Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+            // dd($request->all());
             //Adding temporary fix by validating
             $request->validate([
                 'status' => 'required',
@@ -406,8 +408,10 @@ class PurchaseController extends Controller
 
             $this->productUtil->createOrUpdatePurchaseLines($transaction, $purchases, $currency_details, $enable_product_editing);
 
-            //Add Purchase payments
-            $this->transactionUtil->createOrUpdatePaymentLines($transaction, $request->input('payment'));
+            if (isset($request->payment)) {
+                //Add Purchase payments
+                $this->transactionUtil->createOrUpdatePaymentLines($transaction, $request->input('payment'));
+            }
 
             //update payment status
             $this->transactionUtil->updatePaymentStatus($transaction->id, $transaction->final_total);
@@ -436,12 +440,15 @@ class PurchaseController extends Controller
                 return redirect('purchases')->with('status', $output);
             } else if (auth()->user()->can('purchase.create_only')) {
                 Log::info("here2");
-                return redirect()->route('purchase.show', $transaction->id)->with('status', $output);
+                return redirect()->back()->with('status', $output);
+                // return redirect()->route('purchases.show', $transaction->id)->with('status', $output);
             }
             
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
+
+            \Log::error('ERROR on store purchase : ' . $e->getMessage());
             
             $output = ['success' => 0,
             'msg' => __('messages.something_went_wrong'),
