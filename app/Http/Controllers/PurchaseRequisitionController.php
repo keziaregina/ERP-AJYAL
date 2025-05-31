@@ -198,6 +198,8 @@ class PurchaseRequisitionController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
+
         if (! auth()->user()->can('purchase_requisition.create')) {
             abort(403, 'Unauthorized action.');
         }
