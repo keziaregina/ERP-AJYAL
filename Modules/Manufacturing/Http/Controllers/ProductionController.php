@@ -182,10 +182,15 @@ class ProductionController extends Controller
                 abort(403, 'Unauthorized action.');
             }
 
+            Log::info("STORE METHOD------------------->");
+            Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+
+            // die;
+
             $request->validate([
                 'transaction_date' => 'required',
                 'location_id' => 'required',
-                'final_total' => 'nullable',
+                'final_total' => 'required',
             ]);
             
             // Log::info('HERE ========>');
@@ -205,9 +210,11 @@ class ProductionController extends Controller
             $transaction_data['transaction_date'] = $this->productUtil->uf_date($transaction_data['transaction_date'], true);
             $transaction_data['final_total'] = 0;
             if (empty($request->input('final_total'))){
+                Log::info('empty---------------------');
                 $transaction_data['final_total'] = 0;
             } elseif (!empty($request->input('final_total'))) {
-                $transaction_data['final_total'] = $this->productUtil->num_uf($transaction_data['final_total']);
+                Log::info('no empty---------------------');
+                $transaction_data['final_total'] = $this->productUtil->num_uf($request->input('final_total'));
             }
 
             //Update reference count
@@ -267,6 +274,9 @@ class ProductionController extends Controller
             }
 
             DB::beginTransaction();
+
+            Log::info("TRANSACTION DATA ------------------------->");
+            Log::info(json_encode($transaction_data, JSON_PRETTY_PRINT));
 
             $transaction = Transaction::create($transaction_data);
 
@@ -329,6 +339,9 @@ class ProductionController extends Controller
                     'mfg_ingredient_group_id' => $mfg_ingredient_group_id,
                 ];
             }
+
+            Log::info("TRANSACTION SELL DATA ------------------------->");
+            Log::info(json_encode($transaction_sell_data, JSON_PRETTY_PRINT));
 
             //Create Sell Transfer transaction
             $production_sell = Transaction::create($transaction_sell_data);
