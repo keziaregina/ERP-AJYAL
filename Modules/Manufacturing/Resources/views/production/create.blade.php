@@ -134,17 +134,27 @@
 			</div>
 			@endcan
 		</div>
-		{!! Form::hidden('final_total', 0, ['id' => 'final_total']); !!}
-		@can('manufacturing.access_price')
+		@if(auth()->user()->can('manufacturing.access_price'))
 		<div class="row">
 			<div class="col-md-3 col-md-offset-9">
+				{!! Form::hidden('final_total', 0, ['id' => 'final_total']); !!}
 				<strong>
 					{{__('manufacturing::lang.total_cost')}}:
 				</strong>
 				<span id="final_total_text" class="display_currency" data-currency_symbol="true">0</span>
 			</div>
 		</div>
-		@endcan
+		@else 
+		{!! Form::hidden('final_total', 0, ['id' => 'final_total']); !!}
+		{{-- <div class="row">
+			<div class="col-md-3 col-md-offset-9">
+				<strong>
+					{{__('manufacturing::lang.total_cost')}}:
+				</strong>
+				<span id="final_total_text" class="display_currency" data-currency_symbol="true">0</span>
+			</div>
+		</div> --}}
+		@endif
 		<div class="row">
 			<div class="col-md-3 col-md-offset-9">
 				<div class="form-group">
