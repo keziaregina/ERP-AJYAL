@@ -112,7 +112,7 @@
             </div>
 
             {{-- Select Employee Glorious --}}
-            {{-- <div class="tw-mt-6 tw-p-4 tw-bg-gray-50 tw-rounded-lg tw-border tw-border-gray-200">
+            <div class="tw-mt-6 tw-p-4 tw-bg-gray-50 tw-rounded-lg tw-border tw-border-gray-200">
 
                 <div class="tw-flex tw-justify-between">
                     <h4 class="tw-text-lg tw-font-semibold tw-mb-3 tw-text-gray-700">@lang('essentials::lang.employee_glorious_this_month')</h4>
@@ -139,7 +139,7 @@
                         <p>-</p>
                     @endif
                 </div>
-            </div> --}}
+            </div>
 
 
         @endcomponent
@@ -451,6 +451,12 @@
                 showMonths: 1,
                 static: true
             });
+        });
+    </script>
+    <script>
+        document.querySelector('[data-target="#selectGEModal"]').addEventListener('click', function() {
+        document.getElementById('selectGEModal').classList.add('show');
+        document.getElementById('selectGEModal').style.display = 'block';
         });
     </script>
 @endsection
