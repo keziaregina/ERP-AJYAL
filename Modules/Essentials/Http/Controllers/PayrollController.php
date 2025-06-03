@@ -744,6 +744,7 @@ class PayrollController extends Controller
      */
     public function show($id)
     {
+        // Log::info($id);
         $business_id = request()->session()->get('user.business_id');
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
             abort(403, 'Unauthorized action.');
@@ -756,6 +757,7 @@ class PayrollController extends Controller
             $query->where('expense_for', auth()->user()->id);
         }
         $payroll = $query->findOrFail($id);
+        // Log::info(json_encode($payroll, JSON_PRETTY_PRINT));
        
         $transaction_date = \Carbon::parse($payroll->transaction_date);
 
@@ -811,7 +813,7 @@ class PayrollController extends Controller
         // Log::info('TOTAL OVERTIME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         // Log::info($total_overtime);
         $total_absent = $payroll->total_absent;
-        $total_leaves = $payroll->total_leaves;
+        $total_leaves = $payroll->total_leaves;        
    
 
         return view('essentials::payroll.show')
@@ -835,7 +837,7 @@ class PayrollController extends Controller
             $query->where('expense_for', auth()->user()->id);
         }
         $payrolls = $query->get();  
-        // dd($payrolls->toArray());      
+        // dd($payrolls->toArray());   
 
         $payrollData = [];
 
@@ -878,7 +880,10 @@ class PayrollController extends Controller
             $diff += 1;
             $total_leaves += $diff;
         }
+        // Log::info('data????????????????????????????????????????????????/');
+        // Log::info(json_encode($payroll, JSON_PRETTY_PRINT));
 
+        $printDate = \Carbon::now()->format('Y-m-d');
         $total_days_present = $payroll->total_days_worked;
         $month = $payroll->payroll_month;
         $employee_id = $payroll?->transaction_for?->id;
@@ -913,7 +918,8 @@ class PayrollController extends Controller
             'employee_id' => $employee_id,
             'total_overtime' => $total_overtime,
             'total_absent' => $total_absent,
-            'payroll' => $payroll
+            'payroll' => $payroll,
+            'printDate' => $printDate
         ];
         }
         

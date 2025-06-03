@@ -3,7 +3,8 @@
 	<div class="modal-content">		
 			@php
 			$item = (object)$item;
-			@endphp	      				
+			@endphp	      		
+			@dd($item);
 				<div class="modal-body">
 					<div class="table-responsive">
 						<table class="table table-bordered" id="payroll-view">
@@ -63,13 +64,13 @@
 					</tr>
 					@php
 		      			$max_rows = max(
-							  1 + (isset($item?->allowances['allowance_names']) ? count($item?->allowances['allowance_names']) : 0),
-		      				(isset($item?->deductions['deduction_names']) ? count($item?->deductions['deduction_names']) : 0)
+							  1 + (isset($item->allowances['allowance_names']) ? count($item->allowances['allowance_names']) : 0),
+		      				(isset($item->deductions['deduction_names']) ? count($item->deductions['deduction_names']) : 0)
 						);
 						$row = 0;
-						$total_earnings = $item?->payroll->essentials_duration * $item?->payroll->essentials_amount_per_unit_duration;
+						$total_earnings = $item->payroll->essentials_duration * $item->payroll->essentials_amount_per_unit_duration;
 		      			$total_deduction = 0;
-		      		@endphp
+		      		@endphp					
 		      		@for($i = 0; $i < $max_rows; $i++)
 						<tr>
 					@if($i == 0)
@@ -88,7 +89,7 @@
 		      					{{ $item?->allowances['allowance_amounts'][$i-1] }}
 		      				</span>
 						</td>
-					@php $total_earnings += !empty($item?->allowances['allowance_amounts'][$i-1]) ? $item->allowances['allowance_amounts'][$i-1] : 0; @endphp
+					@php $total_earnings += !empty($item?->allowances['allowance_amounts'][$i-1]) ? $item->allowances['allowance_amounts'][$i-1] : 0; @endphp					
 					@else
 						<td></td><td></td>
 					@endif
@@ -107,9 +108,9 @@
 					@endfor								
 					<tr class="bg-light">
 						<td><strong>@lang('essentials::lang.total_earnings')</strong></td>
-						<td><strong><span class="display_currency" data-currency_symbol="true">{{$item?->payroll?->total_earnings}}</span></strong></td>
+						<td><strong><span class="display_currency" data-currency_symbol="true">{{$total_earnings}}</span></strong></td>
 						<td><strong>@lang('essentials::lang.total_deductions')</strong></td>
-						<td><strong><span class="display_currency" data-currency_symbol="true">{{$item?->payroll?->total_deduction}}</span></strong></td>
+						<td><strong><span class="display_currency" data-currency_symbol="true">{{$total_deduction}}</span></strong></td>
 					</tr>
 					<tr class="bg-success">
 						<td colspan="2" class="text-right"><strong>@lang('essentials::lang.net_pay')</strong></td>
@@ -133,7 +134,7 @@
 									<th>{{ __('sale.payment_note') }}</th>
 								</tr>
 								@php $total_paid = 0; @endphp
-																			
+																	
 								@if(!empty($item->payroll))
 									@forelse($item->payroll->payment_lines as $payment_line)
 									@php
@@ -144,8 +145,8 @@
 										}
 										@endphp
 									<tr>
-										<td>{{ $item?->loop?->iteration }}</td>
-										<td>{{ @format_date($item?->payment_line?->paid_on) }}</td>
+										<td>{{ $item?->loop?->iteration }}</td>										
+										<td>{{ @format_date($payment_line->paid_on) }}</td>
 										<td>{{ $item?->payment_line?->payment_ref_no }}</td>
 										<td><span class="display_currency" data-currency_symbol="true">{{ $item?->payment_line?->amount }}</span></td>
 										<td>{{ $item?->payment_types[$payment_line->method]}}</td>
