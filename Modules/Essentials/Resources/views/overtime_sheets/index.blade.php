@@ -118,7 +118,7 @@
                     <h4 class="tw-text-lg tw-font-semibold tw-mb-3 tw-text-gray-700">@lang('essentials::lang.employee_glorious_this_month')</h4>
                     <div class="box-tools">
                         <!-- Button trigger modal -->
-                        <button type="button" class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right" data-toggle="modal" data-target="#selectGEModal">
+                        <button type="button" class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right" data-toggle="modal" data-target="#modalleGE">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
@@ -206,6 +206,51 @@
                     </div>
                 </form>
                 
+            </div>
+        </div>
+    </div>
+
+    {{-- Select Employee Glorious --}}
+    <div class="modal fade" id="modalleGE" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">@lang('essentials::lang.select_employee_glorious_this_month')</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form action="{{ action([\Modules\Essentials\Http\Controllers\GloriousEmployeeController::class, 'store']) }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="user_id">@lang('essentials::lang.employee_name')</label>
+                            <select name="user_id" id="user_id" class="form-control" required>
+                                <option value="">@lang('essentials::lang.select_employee')</option>
+                                @foreach ($employees as $employee)
+                                    @if ($gloriousEmployeeThisMonth && $employee['id'] == $gloriousEmployeeThisMonth->user_id)
+                                        <option value="{{ $employee['id'] }}" selected>{{ $employee['full_name'] }}</option>
+                                    @else   
+                                        <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>   
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="date">@lang('essentials::lang.date')</label>
+                            <input type="text" name="date" id="date" class="form-control" value="{{ date('M, Y') }}" disabled>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>           
             </div>
         </div>
     </div>
@@ -337,53 +382,7 @@
                 
             </div>
         </div>
-    </div>
-
-    {{-- Select Employee Glorious --}}
-    <div class="modal fade" id="selectGEModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">@lang('essentials::lang.select_employee_glorious_this_month')</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                <form action="{{ action([\Modules\Essentials\Http\Controllers\GloriousEmployeeController::class, 'store']) }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="user_id">@lang('essentials::lang.employee_name')</label>
-                            <select name="user_id" id="user_id" class="form-control" required>
-                                <option value="">@lang('essentials::lang.select_employee')</option>
-                                @foreach ($employees as $employee)
-                                    @if ($gloriousEmployeeThisMonth && $employee['id'] == $gloriousEmployeeThisMonth->user_id)
-                                        <option value="{{ $employee['id'] }}" selected>{{ $employee['full_name'] }}</option>
-                                    @else   
-                                        <option value="{{ $employee['id'] }}">{{ $employee['full_name'] }}</option>   
-                                    @endif
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="date">@lang('essentials::lang.date')</label>
-                            <input type="text" name="date" id="date" class="form-control" value="{{ date('M, Y') }}" disabled>
-                        </div>
-                        
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </form>
-                
-            </div>
-        </div>
-    </div>
+    </div>        
         
 @endsection
 
@@ -452,11 +451,5 @@
                 static: true
             });
         });
-    </script>
-    <script>
-        document.querySelector('[data-target="#selectGEModal"]').addEventListener('click', function() {
-        document.getElementById('selectGEModal').classList.add('show');
-        document.getElementById('selectGEModal').style.display = 'block';
-        });
-    </script>
+    </script>    
 @endsection
