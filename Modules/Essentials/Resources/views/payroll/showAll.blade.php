@@ -4,7 +4,7 @@
 			@php
 			$item = (object)$item;
 			@endphp	      		
-			@dd($item);
+			{{-- @dd($item); --}}
 				<div class="modal-body">
 					<div class="table-responsive">
 						<table class="table table-bordered" id="payroll-view">
@@ -138,19 +138,19 @@
 								@if(!empty($item->payroll))
 									@forelse($item->payroll->payment_lines as $payment_line)
 									@php
-										if($item->payment_line->is_return == 1){
-										$total_paid -= $item->payment_line->amount;
+										if($payment_line->is_return == 1){
+										$total_paid -= $payment_line->amount;
 									} else {
-											$total_paid += $item->payment_line->amount;
+											$total_paid += $payment_line->amount;
 										}
 										@endphp
 									<tr>
-										<td>{{ $item?->loop?->iteration }}</td>										
+										<td>{{ $loop->iteration }}</td>										
 										<td>{{ @format_date($payment_line->paid_on) }}</td>
-										<td>{{ $item?->payment_line?->payment_ref_no }}</td>
-										<td><span class="display_currency" data-currency_symbol="true">{{ $item?->payment_line?->amount }}</span></td>
+										<td>{{ $payment_line?->payment_ref_no }}</td>
+										<td><span class="display_currency" data-currency_symbol="true">{{ $payment_line?->amount }}</span></td>
 										<td>{{ $item?->payment_types[$payment_line->method]}}</td>
-										<td>@if($item?->payment_line->note) {{ ucfirst($item?->payment_line?->note) }} @else -- @endif</td>
+										<td>@if($payment_line->note) {{ ucfirst($payment_line?->note) }} @else -- @endif</td>
 									</tr>
 								@empty
 									<tr><td colspan="6" class="text-center">@lang('purchase.no_records_found')</td></tr>
