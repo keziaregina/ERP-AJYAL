@@ -204,6 +204,7 @@ class PayrollController extends Controller
         $year = $month_year_arr[1];
 
         $transaction_date = $year.'-'.$month.'-01';
+        // $transaction_end_date = $year.'-'.$month.'-30';
 
         //check if payrolls exists for the month year
         $payrolls = Transaction::where('business_id', $business_id)
@@ -223,6 +224,7 @@ class PayrollController extends Controller
             //initialize required data
             // dd($transaction_date);
             $start_date = $transaction_date;
+            // $end_date = \Carbon::parse($transaction_end_date);
             $end_date = \Carbon::parse($start_date)->lastOfMonth();
             $month_name = $end_date->format('F');
 

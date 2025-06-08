@@ -141,7 +141,7 @@
                                         $total_work_duration = 4;
                                         $duration_unit = __('essentials::lang.week');
                                     } elseif ($payroll['essentials_pay_period'] == 'day') {
-                                        $total_work_duration = \Carbon::parse($transaction_date)->daysInMonth;
+                                        $total_work_duration = 30;
                                         $duration_unit = __('lang_v1.day');
                                     }
                                     $total = $total_work_duration * $amount_per_unit_duration;
