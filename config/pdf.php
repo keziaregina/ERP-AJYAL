@@ -2,8 +2,8 @@
 
 return [
     'mode'                     => '',
-    'format'                   => 'A4',
-    'default_font_size'        => '12',
+    'format'                   => 'A5',
+    'default_font_size'        => '9',
     'default_font'             => 'sans-serif',
     'margin_left'              => 10,
     'margin_right'             => 10,
@@ -11,7 +11,7 @@ return [
     'margin_bottom'            => 10,
     'margin_header'            => 0,
     'margin_footer'            => 0,
-    'orientation'              => 'L',
+    'orientation'              => 'P',
     'title'                    => 'Ajyal Almadina - Export PDF',
     'subject'                  => '',
     'author'                   => '',
