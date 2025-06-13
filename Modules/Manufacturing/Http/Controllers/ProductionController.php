@@ -113,7 +113,11 @@ class ProductionController extends Controller
 
             return Datatables::of($productions)
                 ->addColumn('action', function ($row) {
+                    if (auth()->user()->hasRole('Super Admin')) {
                     $html = '<button data-href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'show'], $row->id).'" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline  tw-dw-btn-info btn-modal" data-container=".view_modal"><i class="fa fa-eye"></i> '.__('messages.view').'</button>';
+                    } else {
+                        $html = '';
+                    }
                     if ($row->mfg_is_final == 0) {
                         $html .= ' <a href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'edit'], $row->id).'" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline  tw-dw-btn-primary"><i class="fa fa-edit"></i> '.__('messages.edit').'</a>';
 
