@@ -40,7 +40,11 @@
                         <th>@lang( 'lang_v1.price' ) @show_tooltip(__('manufacturing::lang.price_updated_live'))</th>
                         @can('manufacturing.access_price', 'web')
                             <th>@lang( 'sale.unit_price' )</th>
-                            <th>@lang( 'messages.action' )</th>
+                            @if (auth()->user()->hasRole('Super Admin'))                    
+                                <th>@lang( 'messages.action' )</th>
+                            @else
+                                <th class="hidden">@lang( 'messages.action' )</th>    
+                            @endif
                         @else
                             <th class="hidden">@lang( 'sale.unit_price' )</th>
                             <th class="hidden">@lang( 'messages.action' )</th>

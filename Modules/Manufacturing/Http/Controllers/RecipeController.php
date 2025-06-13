@@ -54,6 +54,8 @@ class RecipeController extends Controller
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'manufacturing_module')) || ! auth()->user()->can('manufacturing.access_recipe')) {
             abort(403, 'Unauthorized action.');
         }
+        // $user = auth()->user();
+        //         dd(json_decode($user));
 
         if (request()->ajax()) {
             $recipes = MfgRecipe::join('variations as v', 'mfg_recipes.variation_id', '=', 'v.id')
@@ -83,10 +85,25 @@ class RecipeController extends Controller
                                     'sc.name as sub_category'
                                 );
 
-            $datatables = Datatables::of($recipes)
-                ->addColumn('action', '<button data-href="{{action(\'\Modules\Manufacturing\Http\Controllers\RecipeController@show\', [$id])}}" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-accent btn-modal" data-container=".view_modal"><i class="fa fa-eye"></i> @lang("messages.view")</button> &nbsp; @can("manufacturing.edit_recipe") <a href="{{action(\'\Modules\Manufacturing\Http\Controllers\RecipeController@addIngredients\')}}?variation_id={{$variation_id}}" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-primary" ><i class="fa fa-edit"></i> @lang("messages.edit")</a>
-                    &nbsp; 
-                    <button data-href="{{action(\'\Modules\Manufacturing\Http\Controllers\RecipeController@destroy\',[$id])}}" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error delete_recipe"><i class="fa fa-trash"></i> @lang("messages.delete")</button> @endcan')
+            $datatables = Datatables::of($recipes)                
+            ->addColumn('action', function($row) {                
+        
+                if (auth()->user()->hasRole('Super Admin')) {
+                    $action = '<button data-href="'.action('\Modules\Manufacturing\Http\Controllers\RecipeController@show', [$row->id]).'" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-accent btn-modal" data-container=".view_modal">
+                    <i class="fa fa-eye"></i> View
+                    </button>';
+
+                    $action .= ' <a href="'.action('\Modules\Manufacturing\Http\Controllers\RecipeController@addIngredients').'?variation_id='.$row->variation_id.'" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-primary">
+                        <i class="fa fa-edit"></i> Edit
+                    </a>';
+        
+                    $action .= ' <button data-href="'.action('\Modules\Manufacturing\Http\Controllers\RecipeController@destroy', [$row->id]).'" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error delete_recipe">
+                        <i class="fa fa-trash"></i> Delete
+                    </button>';
+                }
+        
+                return $action ?? '';
+            })
                 ->addColumn('recipe_total', function ($row) {
                     //Recipe price is dynamically calculated from each ingredients
                     $price = $this->mfgUtil->getRecipeTotal($row);
