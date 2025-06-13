@@ -86,9 +86,7 @@ class RecipeController extends Controller
                                 );
 
             $datatables = Datatables::of($recipes)                
-            ->addColumn('action', function($row) {                
-        
-                if (auth()->user()->hasRole('Super Admin')) {
+            ->addColumn('action', function($row) {                                
                     $action = '<button data-href="'.action('\Modules\Manufacturing\Http\Controllers\RecipeController@show', [$row->id]).'" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-accent btn-modal" data-container=".view_modal">
                     <i class="fa fa-eye"></i> View
                     </button>';
@@ -100,9 +98,8 @@ class RecipeController extends Controller
                     $action .= ' <button data-href="'.action('\Modules\Manufacturing\Http\Controllers\RecipeController@destroy', [$row->id]).'" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error delete_recipe">
                         <i class="fa fa-trash"></i> Delete
                     </button>';
-                }
         
-                return $action ?? '';
+                return $action;
             })
                 ->addColumn('recipe_total', function ($row) {
                     //Recipe price is dynamically calculated from each ingredients

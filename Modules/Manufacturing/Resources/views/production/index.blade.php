@@ -64,7 +64,11 @@
                         <th>@lang('lang_v1.quantity')</th>
                         @can('manufacturing.access_price', 'web')
                             <th>@lang('manufacturing::lang.total_cost')</th>
-                            <th>@lang('messages.action')</th>
+                            @if (auth()->user()->hasRole('Super Admin'))                    
+                                <th>@lang( 'messages.action' )</th>
+                            @else
+                                <th class="hidden">@lang( 'messages.action' )</th>    
+                            @endif
                         @else
                             <th class="hidden">@lang('manufacturing::lang.total_cost')</th>
                             <th class="hidden">@lang('messages.action')</th>
