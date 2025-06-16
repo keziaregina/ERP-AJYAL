@@ -1334,6 +1334,39 @@ $(document).on('click', '#import_purchase_products', function(){
     productDz.processQueue();
 })
 
+$(document).on('click', '.delete-purchase', function(e) {
+    e.preventDefault();
+    var url = $(this).attr('href');
+
+    swal({
+        title: LANG.sure,
+        icon: 'warning',
+        buttons: true,
+        dangerMode: true,
+    }).then((willDelete) => {
+        if (willDelete) {
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(result) {
+                    if (result.success) {
+                        toastr.success(result.msg);
+                        location.reload();
+                    } else {
+                        toastr.error(result.msg);
+                    }
+                },
+                error: function() {
+                    toastr.error('Something went wrong.');
+                }
+            });
+        }
+    });
+});
+
 function submitQuickAddPurchaseContactForm(form) {
     var data = $(form).serialize();
     $.ajax({

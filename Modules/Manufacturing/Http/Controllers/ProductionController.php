@@ -115,16 +115,22 @@ class ProductionController extends Controller
                 ->addColumn('action', function ($row) {
                     if (auth()->user()->hasRole('Super Admin')) {
                     $html = '<button data-href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'show'], $row->id).'" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline  tw-dw-btn-info btn-modal" data-container=".view_modal"><i class="fa fa-eye"></i> '.__('messages.view').'</button>';
-                    $html .= ' <a href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'edit'], $row->id).'" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline  tw-dw-btn-primary"><i class="fa fa-edit"></i> '.__('messages.edit').'</a>';
-                    $html .= ' <button data-href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'destroy'], [$row->id]).'" class="delete-production tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error"><i class="fa fa-trash"></i> '.__('messages.delete').'</button>';
+                        if (auth()->user()->hasRole('Admin#1')) {
+                            $html .= ' <a href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'edit'], $row->id).'" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline  tw-dw-btn-primary"><i class="fa fa-edit"></i> '.__('messages.edit').'</a>';
+
+                            $html .= ' <button data-href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'destroy'], [$row->id]).'" class="delete-production tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error"><i class="fa fa-trash"></i> '.__('messages.delete').'</button>';
+                        } else {
+                            if ($row->mfg_is_final == 0) {
+                                $html .= ' <a href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'edit'], $row->id).'" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline  tw-dw-btn-primary"><i class="fa fa-edit"></i> '.__('messages.edit').'</a>';
+
+                                $html .= ' <button data-href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'destroy'], [$row->id]).'" class="delete-production tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error"><i class="fa fa-trash"></i> '.__('messages.delete').'</button>';
+                            } else {
+                                $html = '';
+                            } 
+                    }
                     } else {
                         $html = '';
-                    }
-                    if ($row->mfg_is_final == 0) {
-                        $html .= ' <a href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'edit'], $row->id).'" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline  tw-dw-btn-primary"><i class="fa fa-edit"></i> '.__('messages.edit').'</a>';
-
-                        $html .= ' <button data-href="'.action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'destroy'], [$row->id]).'" class="delete-production tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error"><i class="fa fa-trash"></i> '.__('messages.delete').'</button>';
-                    }
+                    }                    
 
                     return $html;
                 })
@@ -538,15 +544,17 @@ class ProductionController extends Controller
                                     ->where('type', 'production_purchase')
                                     ->with(['purchase_lines', 'purchase_lines.variations', 'purchase_lines.variations.product_variation', 'purchase_lines.variations.product', 'media'])
                                     ->findOrFail($id);
+        // \Log::info('here_1');
+        // \Log::info(json_encode($production_purchase, JSON_PRETTY_PRINT));
 
         //Finalized production should not be editable
-        if ($production_purchase->mfg_is_final == 1) {
-            $output = ['success' => 0,
-                'msg' => __('messages.something_went_wrong'),
-            ];
-
-            return redirect()->action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'index'])->with('status', $output);
-        }
+        if (!auth()->user()->hasRole('Admin#1') && $production_purchase->mfg_is_final == 1) {            
+                $output = ['success' => 0,
+                    'msg' => __('messages.something_went_wrong'),
+                ];
+    
+                return redirect()->action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'index'])->with('status', $output);
+        }                 
 
         $production_sell = Transaction::where('business_id', $business_id)
                                     ->where('type', 'production_sell')
@@ -743,13 +751,13 @@ class ProductionController extends Controller
                                     ->findOrFail($id);
 
             //Finalized production should not be editable
-            if ($transaction->mfg_is_final == 1) {
+            if (!auth()->user()->hasRole('Admin#1') && $production_purchase->mfg_is_final == 1) {            
                 $output = ['success' => 0,
                     'msg' => __('messages.something_went_wrong'),
                 ];
-
+    
                 return redirect()->action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'index'])->with('status', $output);
-            }
+            } 
             DB::beginTransaction();
 
             $transaction->update($transaction_data);
