@@ -937,6 +937,9 @@ class PayrollController extends Controller
         $pdf = PDF::loadView('essentials::payroll.showAll',
          [
         'payrollData' => $payrollData
+        ],[], [
+            'format' => 'A5',
+            'orientation'=> 'P'
         ]);
         return $pdf->stream('Document.pdf'); 
     }
