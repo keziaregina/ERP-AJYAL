@@ -79,6 +79,7 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
             [Modules\Essentials\Http\Controllers\AttendanceController::class, 'getUserAttendanceSummary']
         );
 
+        Route::get('/printAll', [Modules\Essentials\Http\Controllers\PayrollController::class, 'printAll'])->name('printAll');
         Route::get('/location-employees', [Modules\Essentials\Http\Controllers\PayrollController::class, 'getEmployeesBasedOnLocation']);
         Route::get('/my-payrolls', [Modules\Essentials\Http\Controllers\PayrollController::class, 'getMyPayrolls']);
         Route::get('/get-allowance-deduction-row', [Modules\Essentials\Http\Controllers\PayrollController::class, 'getAllowanceAndDeductionRow']);
@@ -116,6 +117,5 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
         // Route for Employee Bic Code
         Route::resource('/bic-code', EmployeeBicCodeController::class);
 
-        Route::get('/printAll', [Modules\Essentials\Http\Controllers\PayrollController::class, 'printAll'])->name('printAll');
     });
 });
