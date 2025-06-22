@@ -517,13 +517,17 @@ class ProductionController extends Controller
 
         $total_production_cost = 0;
         if (! empty($production_purchase->mfg_production_cost)) {
-            $total_production_cost = $production_purchase->mfg_production_cost;
-            if ($production_purchase->mfg_production_cost_type == 'percentage') {
-                $total_production_cost = $this->transactionUtil->calc_percentage($total_ingredients_price, $production_purchase->mfg_production_cost);
-            } elseif ($production_purchase->mfg_production_cost_type == 'per_unit') {
-                $total_production_cost = $production_purchase->mfg_production_cost * $quantity;
-            }
+            $total_production_cost = $production_purchase->mfg_production_cost * $quantity;            
         }
+
+        // if (! empty($production_purchase->mfg_production_cost)) {
+        //        $total_production_cost = $production_purchase->mfg_production_cost;
+        //     if ($production_purchase->mfg_production_cost_type == 'percentage') {
+        //         $total_production_cost = $this->transactionUtil->calc_percentage($total_ingredients_price,$production_purchase->mfg_production_cost);
+        //   } elseif ($production_purchase->mfg_production_cost_type == 'per_unit') {
+        //         $total_production_cost = $production_purchase->mfg_production_cost * $quantity;
+        //     }
+        // }
 
         return view('manufacturing::production.show')->with(compact('production_purchase', 'production_sell', 'purchase_line', 'ingredients', 'unit_name', 'quantity', 'quantity_wasted', 'actual_quantity', 'total_production_cost', 'ingredient_groups'));
     }
