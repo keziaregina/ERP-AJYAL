@@ -117,7 +117,7 @@
                                         </button>
                                         <a href="{{ action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'printAll']) }}"
                                             class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full space-x-2"
-                                            style="margin-left: 32.2cm;" target="_blank">
+                                            style="float:right; margin-right:10px;" target="_blank">
                                             @lang('messages.print_all')
                                         </a>
                                     </div>
