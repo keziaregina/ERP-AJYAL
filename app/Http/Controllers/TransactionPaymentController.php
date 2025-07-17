@@ -13,12 +13,14 @@ use App\Utils\TransactionUtil;
 use Datatables;
 use DB;
 use Illuminate\Http\Request;
-
+use App\Utils\CashRegisterUtil;
 class TransactionPaymentController extends Controller
 {
     protected $transactionUtil;
 
     protected $moduleUtil;
+
+    protected $cashRegisterUtil;
 
     /**
      * Constructor
@@ -26,10 +28,14 @@ class TransactionPaymentController extends Controller
      * @param  TransactionUtil  $transactionUtil
      * @return void
      */
-    public function __construct(TransactionUtil $transactionUtil, ModuleUtil $moduleUtil)
+    public function __construct(
+    TransactionUtil $transactionUtil,
+    ModuleUtil $moduleUtil, 
+    CashRegisterUtil $cashRegisterUtil)
     {
         $this->transactionUtil = $transactionUtil;
         $this->moduleUtil = $moduleUtil;
+        $this->cashRegisterUtil = $cashRegisterUtil;
     }
 
     /**
@@ -130,6 +136,16 @@ class TransactionPaymentController extends Controller
                 //update payment status
                 $payment_status = $this->transactionUtil->updatePaymentStatus($transaction_id, $transaction->final_total);
                 $transaction->payment_status = $payment_status;
+                
+               //  add register transaction
+               $payments = [
+                  [
+                      'amount' => $inputs['amount'],
+                      'method' => $inputs['method'],
+                      'is_return' => 0
+                  ]
+              ];
+                 $res = $this->cashRegisterUtil->addSellPayments($transaction, $payments);
 
                 $this->transactionUtil->activityLog($transaction, 'payment_edited', $transaction_before);
 
@@ -537,15 +553,31 @@ class TransactionPaymentController extends Controller
      */
     public function postPayContactDue(Request $request)
     {
+        $sub_type = request()->get('sub_type');
         if (! (auth()->user()->can('sell.payments') || auth()->user()->can('purchase.payments'))) {
             abort(403, 'Unauthorized action.');
         }
+        
+        if ($this->cashRegisterUtil->countOpenedRegister() == 0) {
+         return redirect()->action([\App\Http\Controllers\CashRegisterController::class, 'create'], ['sub_type' => $sub_type]);
+     }
 
         try {
             DB::beginTransaction();
 
             $business_id = request()->session()->get('business.id');
             $tp = $this->transactionUtil->payContact($request);
+            $payments = [
+               [
+                   'amount' => $tp->amount,
+                   'method' => $tp->method,
+                   'is_return' => $tp->is_return ?? 0
+               ]
+           ];
+           $transaction = Transaction::where('business_id', $business_id)
+           ->find($tp->payment_for);
+           $res = $this->cashRegisterUtil->addSellPayments($transaction, $payments);
+
 
             $pos_settings = ! empty(session()->get('business.pos_settings')) ? json_decode(session()->get('business.pos_settings'), true) : [];
             $enable_cash_denomination_for_payment_methods = ! empty($pos_settings['enable_cash_denomination_for_payment_methods']) ? $pos_settings['enable_cash_denomination_for_payment_methods'] : [];

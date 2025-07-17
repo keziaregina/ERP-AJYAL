@@ -46,6 +46,9 @@ class CashRegisterUtil extends Util
                 if ($transaction->type == 'expense') {
                     $type = 'debit';
                 }
+                if ($transaction->type == 'production_sell') {
+                   $transaction->type = 'sell';
+                }
 
                 $payments_formatted[] = new CashRegisterTransaction([
                     'amount' => $payment_amount,
@@ -54,6 +57,7 @@ class CashRegisterUtil extends Util
                     'transaction_type' => $transaction->type,
                     'transaction_id' => $transaction->id,
                 ]);
+                
             }
         }
 
