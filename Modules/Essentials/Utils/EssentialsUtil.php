@@ -91,6 +91,7 @@ class EssentialsUtil extends Util
         if (! empty($start_date) && ! empty($end_date)) {
             $query->where(function ($q) use ($start_date, $end_date) {
                 $q->whereNull('applicable_date')
+                    ->orWhere('applicable_date', '<=', $start_date)
                     ->orWhereBetween('applicable_date', [$start_date, $end_date]);
             });
         }

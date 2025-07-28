@@ -222,8 +222,10 @@ class PayrollController extends Controller
 
             //initialize required data
             // dd($transaction_date);
+            
             $start_date = $transaction_date;
             $end_date = \Carbon::parse($start_date)->lastOfMonth();
+            // dd($end_date);
             $month_name = $end_date->format('F');
 
             $employees = User::where('business_id', $business_id)
@@ -326,7 +328,8 @@ class PayrollController extends Controller
                 //get earnings & deductions of employee
                 $employee = User::find($employee->id);
                 $allowances_and_deductions = $this->essentialsUtil->getEmployeeAllowancesAndDeductions($business_id, $employee->id, $start_date, $end_date);
-
+                // dd($employee);
+                // dd($allowances_and_deductions);
                 $vacationDays = EmployeeOvertime::countEmployeOvertimeByTypeAndMonth(
                     businessId: $business_id,
                     employeeId: $employee->id,
@@ -477,7 +480,7 @@ class PayrollController extends Controller
             // Log::info('test');
             // Log::info($grorious_employee);
 
-
+            // dd($payrolls);
             $action = 'create';
 
             return view('essentials::payroll.create2')
@@ -562,7 +565,7 @@ class PayrollController extends Controller
                 }
                 unset($payroll['allowance_names'], $payroll['allowance_types'], $payroll['allowance_percent'], $payroll['allowance_amounts'], $payroll['deduction_names'], $payroll['deduction_types'], $payroll['deduction_percent'], $payroll['deduction_amounts'], $payroll['total']);
 
-                // dd($payroll);
+                dd($payroll);
                 // $payroll['total_days_worked'] = $allowances_and_deductions['total_days_worked'];
                 // $payroll['total_work_duration'] = $allowances_and_deductions['total_work_duration'];
 
