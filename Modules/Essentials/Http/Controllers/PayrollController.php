@@ -33,6 +33,7 @@ use Modules\Essentials\Entities\EssentialsAllowanceAndDeduction;
 use Modules\Essentials\Entities\EssentialsUserAllowancesAndDeduction;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
+ini_set("pcre.backtrack_limit", "20000000");
 class PayrollController extends Controller
 {
     /**
