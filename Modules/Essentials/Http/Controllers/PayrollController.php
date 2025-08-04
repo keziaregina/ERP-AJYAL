@@ -567,7 +567,6 @@ class PayrollController extends Controller
                 }
                 unset($payroll['allowance_names'], $payroll['allowance_types'], $payroll['allowance_percent'], $payroll['allowance_amounts'], $payroll['deduction_names'], $payroll['deduction_types'], $payroll['deduction_percent'], $payroll['deduction_amounts'], $payroll['total']);
 
-                dd($payroll);
                 // $payroll['total_days_worked'] = $allowances_and_deductions['total_days_worked'];
                 // $payroll['total_work_duration'] = $allowances_and_deductions['total_work_duration'];
 
