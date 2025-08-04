@@ -33,7 +33,7 @@ use Modules\Essentials\Entities\EssentialsAllowanceAndDeduction;
 use Modules\Essentials\Entities\EssentialsUserAllowancesAndDeduction;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
-ini_set("pcre.backtrack_limit", "20000000");
+// ini_set("pcre.backtrack_limit", "20000000");
 class PayrollController extends Controller
 {
     /**
@@ -817,8 +817,9 @@ class PayrollController extends Controller
         
         $payrollData = (object)$payrollData;
 
-        ini_set("pcre.backtrack_limit", "10000000");
+        // ini_set("pcre.backtrack_limit", "10000000");
 
+        ini_set("pcre.backtrack_limit", "500000000"); 
         $pdf = PDF::loadView('essentials::payroll.showAll',
         [
         'payrollData' => $payrollData
