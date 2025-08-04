@@ -4196,7 +4196,6 @@ class ReportController extends Controller
                 ];
             });
 
-            Log::info(json_encode($result,JSON_PRETTY_PRINT));
 
             // Calculate total overtime across all employees
             $totalAllOvertime = 0;
@@ -4213,7 +4212,6 @@ class ReportController extends Controller
                 'total_all_overtime' => $totalAllOvertime
             ];
 
-            Log::info(json_encode($resultWithTotal,JSON_PRETTY_PRINT));
 
             return $resultWithTotal;
         } catch (\Exception $e) {

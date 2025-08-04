@@ -182,8 +182,6 @@ class StockAdjustmentController extends Controller
         try {
             DB::beginTransaction();
 
-            Log::info("request alll --------------------------------------------->");
-            Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
 
             $input_data = $request->only(['location_id', 'transaction_date', 'adjustment_type', 'additional_notes', 'total_amount_recovered', 'final_total', 'ref_no']);
             $business_id = $request->session()->get('user.business_id');
@@ -226,7 +224,6 @@ class StockAdjustmentController extends Controller
                     }
                     $product_data[] = $adjustment_line;
 
-                    Log::info("HERE 1 --------------------------------------------->");
                     
                     //Decrease available quantity
                     $this->productUtil->decreaseProductQuantity(
@@ -236,13 +233,10 @@ class StockAdjustmentController extends Controller
                         $this->productUtil->num_uf($product['quantity'])
                     );
 
-                    Log::info("HERE 2 --------------------------------------------->");
                 }
 
                 $stock_adjustment = Transaction::create($input_data);
                 $stock_adjustment->stock_adjustment_lines()->createMany($product_data);
-
-                Log::info("HERE 3 --------------------------------------------->");
 
 
                 //Map Stock adjustment & Purchase.
@@ -251,16 +245,10 @@ class StockAdjustmentController extends Controller
                     'location_id' => $input_data['location_id'],
                 ];
 
-                Log::info("business====================>");
-                Log::info(json_encode($business,JSON_PRETTY_PRINT));
                 
                 $this->transactionUtil->mapPurchaseSell($business, $stock_adjustment->stock_adjustment_lines, 'stock_adjustment');
 
-                Log::info("HERE 4 --------------------------------------------->");
-
                 event(new StockAdjustmentCreatedOrModified($stock_adjustment, 'added'));
-
-                Log::info("HERE 5 --------------------------------------------->");
 
                 $this->transactionUtil->activityLog($stock_adjustment, 'added', null, [], false);
             }

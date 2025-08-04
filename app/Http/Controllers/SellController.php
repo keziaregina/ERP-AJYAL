@@ -77,7 +77,6 @@ class SellController extends Controller
     public function index()
     {
         $is_admin = $this->businessUtil->is_admin(auth()->user());
-        Log::info("SELL CONTROLLER -------------------------------------------------->");
 
         if (! $is_admin && ! auth()->user()->hasAnyPermission(['sell.view', 'sell.create', 'direct_sell.access', 'direct_sell.view', 'view_own_sell_only', 'view_commission_agent_sell', 'access_shipping', 'access_own_shipping', 'access_commission_agent_shipping', 'so.view_all', 'so.view_own'])) {
             abort(403, 'Unauthorized action.');
@@ -98,9 +97,6 @@ class SellController extends Controller
             $sale_type = ! empty(request()->input('sale_type')) ? request()->input('sale_type') : 'sell';
 
             $sells = $this->transactionUtil->getListSells($business_id, $sale_type);
-
-            Log::info("SELL CONTROLLER DATA QUERY 1 -------------------------------------------------->");
-            Log::info(json_encode($sells->get(),JSON_PRETTY_PRINT));
 
             // only display sell invoice we add it because project invoive show in sell list
             if($sale_type == 'sell'){
@@ -351,9 +347,6 @@ class SellController extends Controller
             if ($this->businessUtil->isModuleEnabled('subscription')) {
                 $sells->addSelect('transactions.is_recurring', 'transactions.recur_parent_id');
             }
-
-            Log::info("SELL CONTROLLER DATA QUERY -------------------------------------------------->");
-            Log::info(json_encode($sells->get(),JSON_PRETTY_PRINT));
 
             $sales_order_statuses = Transaction::sales_order_statuses();
             $datatable = Datatables::of($sells)

@@ -353,7 +353,6 @@ class OvertimeSheetController extends Controller
             // Format the total to ensure minutes have two digits
             $totalAllOvertime = number_format($totalAllOvertime, 2, '.', '');
 
-            // Log::info(json_encode($totalAllOvertime,JSON_PRETTY_PRINT));
 
             // Add the total to the result
             $resultWithTotal = [
@@ -361,8 +360,6 @@ class OvertimeSheetController extends Controller
                 'total_all_overtime' => $totalAllOvertime
             ];
 
-            // Log::info(json_encode($resultWithTotal,JSON_PRETTY_PRINT));
-            // die;
 
             return $resultWithTotal;
         } catch (\Exception $e) {

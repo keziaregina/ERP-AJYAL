@@ -50,10 +50,6 @@ class SalesTargetController extends Controller
                             DB::raw("CONCAT(COALESCE(surname, ''), ' ', COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as full_name"), ]);
             // $users = User::getActiveEmployeesPerBusiness(businessId: $business_id)->values()->toArray();
 
-            Log::info("users on sales targer------------>");
-            Log::info(json_encode($users, JSON_PRETTY_PRINT));
-
-            // die;
             return Datatables::of($users)
                 ->addColumn(
                     'action',

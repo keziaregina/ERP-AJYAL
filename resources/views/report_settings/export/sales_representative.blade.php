@@ -165,8 +165,6 @@
         <h1>Ajyal Al - Madina Al - Asria</h1>
         <span>{{ env('APP_TITLE') }}</span>
 
-        {{ Log::info('CUSTOMER & SUPPLIER -------------------------------------------------->') }}
-        {{ Log::info(json_encode($report, JSON_PRETTY_PRINT)) }}
     </div>
 
     <div class="report-title">

@@ -350,20 +350,9 @@ class PayrollController extends Controller
                 $isGloriousEmployee = GloriousEmployee::isGloriousEmployee($business_id, $month, $employee->id);
                 $gloriousEmployee = EssentialsAllowanceAndDeduction::where('description', 'like', '%glorious employee%')->first();
 
-                Log::info('gloriousEmployee --> : '. $gloriousEmployee);
-                Log::info('emplyoe name: '.$employee->user_full_name);
-                Log::info('isGloriousEmployee: '.$isGloriousEmployee);
-                
-                Log::info('allowances_and_deductions --> : '. json_encode($allowances_and_deductions, JSON_PRETTY_PRINT));
-
                 foreach ($allowances_and_deductions as $ad) {
                     if ($ad->type == 'allowance') {
-                        Log::info('ad --> : '. $ad->description);
                         if (str_contains(strtolower($ad->description), 'overtime')) {
-                            Log::info('overtime');
-                            Log::info('is contain glor overtime: '. str_contains(strtolower($ad->description), 'glorious employee'));
-
-                            Log::info('desc: '.$ad->description);
                             $total_overtime = EmployeeOvertime::getAndCalculateTotalOvertime($business_id, $employee->id, $month);
                             $payrolls[$employee->id]['allowances']['allowance_names'][] = $ad->description;
                             $payrolls[$employee->id]['allowances']['allowance_short_names'][] = 'overtime';
@@ -373,13 +362,7 @@ class PayrollController extends Controller
                             $payrolls[$employee->id]['allowances']['allowance_col_types'][] = 'auto';
                             $payrolls[$employee->id]['allowances']['allowance_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
                         } else if (str_contains(strtolower($ad->description), 'glorious employee')) {
-                            Log::info('desc --> : '. strtolower($ad->description));
-                            Log::info('isGloriousEmployee --> : '. $isGloriousEmployee);
-                            Log::info('is contain glor yes: '. str_contains(strtolower($ad->description), 'glorious employee'));
                             if ($isGloriousEmployee) {
-                                Log::info('glorious employee');
-                                Log::info('desc: '.$ad->description);
-
                                 $payrolls[$employee->id]['allowances']['allowance_names'][] = $ad->description;
                                 $payrolls[$employee->id]['allowances']['allowance_short_names'][] = 'glorious_employee';
                                 $payrolls[$employee->id]['allowances']['allowance_amounts'][] = $ad->amount;
@@ -391,10 +374,6 @@ class PayrollController extends Controller
                                 Log::info('is contain glor no: '. str_contains(strtolower($ad->description), 'glorious employee'));
                             }
                         } else {
-                            Log::info('allowance else');
-                            Log::info('is contain glor else: '. str_contains(strtolower($ad->description), 'glorious employee'));
-
-                            Log::info('desc: '.$ad->description);
                             $payrolls[$employee->id]['allowances']['allowance_names'][] = $ad->description;
                             $payrolls[$employee->id]['allowances']['allowance_short_names'][] = $ad->description;
                             $payrolls[$employee->id]['allowances']['allowance_amounts'][] = $ad->amount;
@@ -408,8 +387,6 @@ class PayrollController extends Controller
                         
 
                         if (str_contains(strtolower($ad->description), 'absant')) {
-                            Log::info('absent');
-                            Log::info('desc: '.$ad->description);
                             $absent_days = EmployeeOvertime::countEmployeOvertimeByTypeAndMonth($business_id, $employee->id, $month, 'A');
                             $payrolls[$employee->id]['deductions']['deduction_names'][] = $ad->description;
                             $payrolls[$employee->id]['deductions']['deduction_short_names'][] = "absent";
@@ -418,12 +395,6 @@ class PayrollController extends Controller
                             $payrolls[$employee->id]['deductions']['deduction_col_types'][] = 'auto';
                             $payrolls[$employee->id]['deductions']['deduction_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
                         } else if (str_contains(strtolower($ad->description), 'social security')) {
-                            Log::info('social security');
-                            Log::info('desc: '.$ad->description);
-                            Log::info('amount: '.$ad->amount);
-                            Log::info('total work duration: '.$total_work_duration);
-                            Log::info('calculate : '. $total_work_duration * $ad->amount / 100 );
-
                             $payrolls[$employee->id]['deductions']['deduction_names'][] = $ad->description;
                             $payrolls[$employee->id]['deductions']['deduction_short_names'][] = "social_security";
                             $payrolls[$employee->id]['deductions']['deduction_amounts'][] = $ad->amount_type == 'percent' ? $total * $ad->amount / 100 : $ad->amount;
@@ -431,8 +402,6 @@ class PayrollController extends Controller
                             $payrolls[$employee->id]['deductions']['deduction_col_types'][] = 'auto';
                             $payrolls[$employee->id]['deductions']['deduction_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
                         } else {
-                            Log::info('default');
-                            Log::info('desc: '.$ad->description);
                             $payrolls[$employee->id]['deductions']['deduction_names'][] = $ad->description;
                             $payrolls[$employee->id]['deductions']['deduction_short_names'][] = $ad->description;
                             $payrolls[$employee->id]['deductions']['deduction_amounts'][] = $ad->amount_type == 'fixed' ? $ad->amount : 0;
@@ -458,7 +427,6 @@ class PayrollController extends Controller
                 if ($vacationDays > 0 && $payrolls[$employee->id]['allowances'] != null) {
                     // Log::info('vacation days');
                     // Log::info("Payroll--------------------------->");
-                    Log::info($payrolls[$employee->id]);
                     foreach ($payrolls[$employee->id]['allowances']['allowance_names'] as $key => $value) {
                         $food_allowance = 0;
                         if (str_contains(strtolower($value), 'food')) {
@@ -513,10 +481,6 @@ class PayrollController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        // dd($request->all());
-        Log::info("payroll in store------------>");
-        Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
-        // die;
         try {
             $transaction_date                     = $request->input('transaction_date');
             $payrolls                             = $request->input('payrolls');
@@ -568,12 +532,6 @@ class PayrollController extends Controller
                 }
                 unset($payroll['allowance_names'], $payroll['allowance_types'], $payroll['allowance_percent'], $payroll['allowance_amounts'], $payroll['deduction_names'], $payroll['deduction_types'], $payroll['deduction_percent'], $payroll['deduction_amounts'], $payroll['total']);
 
-                // $payroll['total_days_worked'] = $allowances_and_deductions['total_days_worked'];
-                // $payroll['total_work_duration'] = $allowances_and_deductions['total_work_duration'];
-
-                Log::info('payroll before create / update------------------>');
-                Log::info(json_encode($payroll,JSON_PRETTY_PRINT));
-
                 $transaction = Transaction::create($payroll);
                 $transaction_ids[] = $transaction->id;
 
@@ -608,10 +566,6 @@ class PayrollController extends Controller
     // FIXME: on submit payroll
     private function getAllowanceAndDeductionJson($payroll)
     {
-        Log::info("payroll in getallow");
-        Log::info(json_encode($payroll,JSON_PRETTY_PRINT));
-        // die;
-        // dd($payroll);
 
         $allowance_names = $payroll['allowance_names'];
         $allowance_short_names = $payroll['allowance_short_names'];
@@ -672,74 +626,8 @@ class PayrollController extends Controller
             'deduction_percents' => $deduction_percents_array,
         ]);
 
-        Log::info("output ------------>");
-        Log::info(json_encode($output,JSON_PRETTY_PRINT));
-        // die;
         return $output;
 
-        // // $allowance_names = $payroll['allowance_names'];
-        // $allowance_names = $payroll['allowances']['description'];
-        
-        // // $allowance_types = $payroll['allowance_types'];
-        // $allowance_types = $payroll['allowances']['amount_type'];
-
-        // // $allowance_percents = $payroll['allowance_percent'];
-        // $allowance_percents = $payroll['allowances']['amount'];
-
-        // $allowance_names_array = [];
-        // $allowance_percent_array = [];
-        // $allowance_amounts = [];
-
-        // // foreach ($payroll['allowance_amounts'] as $key => $value) {
-        // foreach ($payroll['allowances']['amount'] as $key => $value) {
-        //     if (! empty($allowance_names[$key])) {
-        //         $allowance_amounts[] = $this->moduleUtil->num_uf($value);
-        //         $allowance_names_array[] = $allowance_names[$key];
-        //         $allowance_percent_array[] = 0;
-        //         // $allowance_percent_array[] = ! empty($allowance_percents[$key]) ? $this->moduleUtil->num_uf($allowance_percents[$key]) : 0;
-        //         // $allowance_percent_array[] = ! empty($allowance_percents[$key]) ? $this->moduleUtil->num_uf($allowance_percents[$key]) : 0;
-        //     }
-        // }
-
-        // // $deduction_names = $payroll['deduction_names'];
-        // $deduction_names = $payroll['deductions']['description'];
-
-        // // $deduction_types = $payroll['deduction_types'];
-        // $deduction_types = $payroll['deductions']['amount_type'];
-
-        // // $deduction_percents = $payroll['deduction_percent'];
-        // $deduction_percents = $payroll['deductions']['percentage'];
-
-        // $deduction_names_array = [];
-        // $deduction_percents_array = [];
-        // $deduction_amounts = [];
-
-        // // foreach ($payroll['deduction_amounts'] as $key => $value) {
-        // foreach ($payroll['deductions']['amount'] as $key => $value) {
-        //     if (! empty($deduction_names[$key])) {
-        //         // dd($value);
-        //         // dd($deduction_names[$value]);
-        //         $deduction_names_array[] = $deduction_names[$key];
-        //         $deduction_amounts[] = $this->moduleUtil->num_uf($value);
-        //         $deduction_percents_array[] = ! empty($deduction_percents[$key]) ? $this->moduleUtil->num_uf($deduction_percents[$key]) : 0;
-        //     }
-        // }
-
-        // $output['essentials_allowances'] = json_encode([
-        //     'allowance_names' => $allowance_names_array,
-        //     'allowance_amounts' => $allowance_amounts,
-        //     'allowance_types' => $allowance_types,
-        //     'allowance_percents' => $allowance_percent_array,
-        // ]);
-        // $output['essentials_deductions'] = json_encode([
-        //     'deduction_names' => $deduction_names_array,
-        //     'deduction_amounts' => $deduction_amounts,
-        //     'deduction_types' => $deduction_types,
-        //     'deduction_percents' => $deduction_percents_array,
-        // ]);
-
-        // // dd($output);
-        // return $output;
     }
 
     /**
@@ -762,7 +650,6 @@ class PayrollController extends Controller
             $query->where('expense_for', auth()->user()->id);
         }
         $payroll = $query->findOrFail($id);
-        // Log::info(json_encode($payroll, JSON_PRETTY_PRINT));
        
         $transaction_date = \Carbon::parse($payroll->transaction_date);
 
@@ -928,17 +815,12 @@ class PayrollController extends Controller
         ];
         }
         
-        Log::info('FOREACH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        Log::info(json_encode($payrollData, JSON_PRETTY_PRINT));
         $payrollData = (object)$payrollData;
-        // $pdf = PDF::loadView('essentials::payroll.showAll',
-        //  [
-        // 'payrollData' => $payrollData
-        // ]);
-        // Log::info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+
         ini_set("pcre.backtrack_limit", "10000000");
+
         $pdf = PDF::loadView('essentials::payroll.showAll',
-         [
+        [
         'payrollData' => $payrollData
         ],[], [
             'format' => 'A5',
@@ -996,9 +878,6 @@ class PayrollController extends Controller
     {
         $business_id = request()->session()->get('user.business_id');
 
-        Log::info("update in payroll-->");
-        Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
-        // die;
         if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module')) && ! auth()->user()->can('essentials.update_payroll')) {
             abort(403, 'Unauthorized action.');
         }
@@ -1306,9 +1185,6 @@ class PayrollController extends Controller
         $year = null;
         foreach ($payroll_group->payrollGroupTransactions as $transaction) {
 
-            Log::info("transaction ------------>");
-            Log::info(json_encode($transaction,JSON_PRETTY_PRINT));
-            // die;
             //payroll info
             if (empty($transaction_date) && empty($month_name) && empty($year)) {
                 $transaction_date = \Carbon::parse($transaction->transaction_date);
@@ -1333,11 +1209,6 @@ class PayrollController extends Controller
             $payrolls[$transaction->expense_for]['total_work_duration'] = $transaction->total_work_duration;
             $payrolls[$transaction->expense_for]['total_days_worked'] = $transaction->total_days_worked;
            
-            // $payrolls[$transaction->expense_for]['total_days_worked'] = $this->essentialsUtil->getTotalDaysWorkedForGivenDateOfAnEmployee($business_id, $transaction->expense_for, $start_date, $end_date);
-
-            //get total work duration of employee(attendance)
-            // $payrolls[$transaction->expense_for]['total_work_duration'] = $this->essentialsUtil->getTotalWorkDuration('hour', $transaction->expense_for, $business_id, $start_date->format('Y-m-d'), $end_date->format('Y-m-d'));
-            
             //get earnings employee
             $allowances = ! empty($transaction->essentials_allowances) ? json_decode($transaction->essentials_allowances, true) : [];
 
@@ -1363,9 +1234,6 @@ class PayrollController extends Controller
         }
 
         $action = 'edit';
-        // Log::info("payrolls ------------>");
-        // Log::info(json_encode($payrolls,JSON_PRETTY_PRINT));
-        // die;
 
         $grorious_employee = number_format(EssentialsAllowanceAndDeduction::where('description','like' ,'%glorious employee allowance%' )->get()->first()->amount, 3, '.');
             
@@ -1377,8 +1245,6 @@ class PayrollController extends Controller
 
     public function getUpdatePayrollGroup(Request $request)
     {
-        Log::info('in getupdatepay --------->');
-        Log::info(json_encode($request->all()));
 
         $business_id = request()->session()->get('user.business_id');
         if (! (auth()->user()->can('superadmin') || auth()->user()->can('essentials.update_payroll') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
@@ -1417,8 +1283,6 @@ class PayrollController extends Controller
                                         ->where('type', 'payroll')
                                         ->find($transaction_id);
                                         
-                Log::info('isi payroll---------->');
-                Log::info(json_encode($payroll,JSON_PRETTY_PRINT));
 
                 if (! empty($payroll_trans)) {
                     $payroll_trans->update($payroll);

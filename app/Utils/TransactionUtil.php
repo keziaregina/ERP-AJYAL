@@ -2636,10 +2636,6 @@ class TransactionUtil extends Util
                             'T.is_tax_group'
                         );
 
-        //Check for permitted locations of a user
-        // Log::info("user------------------------->");
-        // Log::info(json_encode(auth()->user(),JSON_PRETTY_PRINT));
-
         $permitted_locations = [];
 
         if (auth()->user()) {
@@ -3218,9 +3214,6 @@ class TransactionUtil extends Util
             $business['pos_settings'] = json_decode($business['pos_settings'], true);
         }
 
-        Log::info("business====================>");
-        Log::info(json_encode($business,JSON_PRETTY_PRINT));
-
         $allow_overselling = ! empty($business['pos_settings']['allow_overselling']) ?
                             true : false;
         // $allow_overselling = true;
@@ -3237,8 +3230,6 @@ class TransactionUtil extends Util
 
         $qty_selling = null;
         foreach ($transaction_lines as $line) {
-                Log::info("trans line====================>");
-                Log::info(json_encode($line,JSON_PRETTY_PRINT));
             //Check if stock is not enabled then no need to assign purchase & sell
             $product = Product::find($line->product_id);
             if (empty($product) || $product->enable_stock != 1) {
@@ -3299,8 +3290,6 @@ class TransactionUtil extends Util
 
             //Iterate over the rows, assign the purchase line to sell lines.
             $qty_selling = $line->quantity;
-            Log::info("qty_selling====================>");
-            Log::info($qty_selling);
             foreach ($rows as $k => $row) {
                 $qty_allocated = 0;
 

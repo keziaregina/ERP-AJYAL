@@ -80,13 +80,6 @@ class EssentialsUtil extends Util
                 ->where('business_id', $business_id)
                 ->where('euad.user_id', $user_id);
 
-        Log::info("start date");
-        Log::info($start_date);
-
-        Log::info("end date");
-        Log::info($end_date);
-                
-
         //Filter if applicable one
         if (! empty($start_date) && ! empty($end_date)) {
             $query->where(function ($q) use ($start_date, $end_date) {

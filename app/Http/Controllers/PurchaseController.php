@@ -231,8 +231,6 @@ class PurchaseController extends Controller
     public function create()
     {
         
-        // Log::info('test----------->');
-        // die;
         if (! auth()->user()->can('purchase.create') && ! auth()->user()->can('purchase.create_only')) {
             abort(403, 'Unauthorized action.');
         }
@@ -315,8 +313,7 @@ class PurchaseController extends Controller
             //$transaction_data['exchange_rate'] = $transaction_data['exchange_rate'];
 
             //TODO: Check for "Undefined index: total_before_tax" issue
-            // Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
-            // dd($request->all());
+
             //Adding temporary fix by validating
             $request->validate([
                 'status' => 'required',
@@ -436,10 +433,8 @@ class PurchaseController extends Controller
             
             if (auth()->user()->can('purchase.create')) {
                 // abort(403, 'Unauthorized action.');
-                Log::info("here1");
                 return redirect('purchases')->with('status', $output);
             } else if (auth()->user()->can('purchase.create_only')) {
-                Log::info("here2");
                 return redirect()->back()->with('status', $output);
                 // return redirect()->route('purchases.show', $transaction->id)->with('status', $output);
             }
@@ -453,7 +448,6 @@ class PurchaseController extends Controller
             $output = ['success' => 0,
             'msg' => __('messages.something_went_wrong'),
         ];
-        Log::info("here3");
 
             return redirect()->back()->with('status', $output);
         }

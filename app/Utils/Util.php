@@ -1606,31 +1606,18 @@ class Util
         }
 
         if (empty($user_details['allow_login']) || ! $user_details['allow_login']) {
-            Log::info("ALLOW LOGIN");
             unset($user_details['username']);
             unset($user_details['password']);
             $user_details['allow_login'] = 0;
         } else {
             $user_details['allow_login'] = 1;
         }
-        
-        Log::info("USER DETAILS BEFORE============>");
-        Log::info(json_encode($user_details,JSON_PRETTY_PRINT));
-
-        Log::info("USER PASSWORD UNHASEHD============>");
-        Log::info(json_encode($user_details['password'],JSON_PRETTY_PRINT));
 
         $user_details['selected_contacts'] = isset($user_details['selected_contacts']) ? $user_details['selected_contacts'] : 0;
 
         $user_details['bank_details'] = ! empty($user_details['bank_details']) ? json_encode($user_details['bank_details']) : null;
 
         $user_details['password'] = $user_details['allow_login'] ? Hash::make($user_details['password']) : null;
-
-        Log::info("USER DETAILS============>");
-        Log::info(json_encode($user_details,JSON_PRETTY_PRINT));
-
-        Log::info("USER PASSWORD============>");
-        Log::info(json_encode($user_details['password'],JSON_PRETTY_PRINT));
 
         if ($user_details['allow_login']) {
             if (empty($user_details['username'])) {

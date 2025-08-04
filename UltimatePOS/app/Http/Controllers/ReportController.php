@@ -111,8 +111,6 @@ class ReportController extends Controller
     
             // $data['closing_stock'] = $data['closing_stock'] - $data['total_sell_return'];
  
-            Log::info("PROFIT OR LOSS DATA PAGE -------------------------------------------------->");
-            Log::info(json_encode($data,JSON_PRETTY_PRINT));
             return view('report.partials.profit_loss_details', compact('data'))->render();
         }
 

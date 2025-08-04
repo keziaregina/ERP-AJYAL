@@ -306,8 +306,6 @@ class ReportEmailService
                 ];
             });
 
-            Log::info(json_encode($result,JSON_PRETTY_PRINT));
-
             // Calculate total overtime across all employees
             $totalAllOvertime = 0;
             foreach ($result as $employeeData) {
@@ -322,8 +320,6 @@ class ReportEmailService
                 'employees' => $result,
                 'total_all_overtime' => $totalAllOvertime
             ];
-
-            Log::info(json_encode($resultWithTotal,JSON_PRETTY_PRINT));
 
             return $resultWithTotal;
         } catch (\Exception $e) {
@@ -479,10 +475,6 @@ class ReportEmailService
 
         $data = $this->transactionUtil->getProfitLossDetails($business_id, $location_id, $startDate, $endDate, $user_id, $permitted_locations);
 
-        Log::info("PROFIT OR LOSS -------------------------------------------------->");
-        Log::info(json_encode($data,JSON_PRETTY_PRINT));
-
-
         return $data;
     }
     public function getRegisterReport(User $user, $start_date = null, $end_date = null, $location_id = null, $contact_id = null)
@@ -573,10 +565,6 @@ class ReportEmailService
 
         $customer_group = $query->get();
 
-        // Auth::logout();
-        // Log::info("CUSTOMER GROUP -------------------------------------------------->");
-        // Log::info(json_encode($customer_group,JSON_PRETTY_PRINT));
-
         return $customer_group;
 
     }
@@ -653,9 +641,6 @@ class ReportEmailService
             DB::raw("SUM(IF(adjustment_type = 'abnormal', final_total, 0)) as total_abnormal")
         )->first();
 
-        Log::info("STOCK ADJUSTMENT DETAILS -------------------------------------------------->");
-        Log::info(json_encode($stock_adjustment_details,JSON_PRETTY_PRINT));
-
         return [
             'collection' => $datas,
             'details' => $stock_adjustment_details
@@ -680,9 +665,7 @@ class ReportEmailService
 
         $products = $this->productUtil->getTrendingProducts($business_id, $filters);
         
-        Log::info("TRENDING PRODUCTS -------------------------------------------------->");
-        Log::info(json_encode($products,JSON_PRETTY_PRINT));
-
+       
         Auth::logout();
 
         return $products;
@@ -756,10 +739,6 @@ class ReportEmailService
         }
         
         $items_report = $query->get();
-
-        // Log::info("ITEMS REPORT DATA-------------------------------------------------->");
-        // Log::info(json_encode($items_report,JSON_PRETTY_PRINT));
-
         return $items_report;
             
     }
@@ -820,9 +799,6 @@ class ReportEmailService
         }
 
         $product_purchase_report = $query->get();
-
-        Log::info("PRODUCT PURCHASE REPORT -------------------------------------------------->");
-        Log::info(json_encode($product_purchase_report,JSON_PRETTY_PRINT));
 
         return $product_purchase_report;
     
@@ -897,9 +873,6 @@ class ReportEmailService
 
         $product_sell_report = $query->get();
 
-        Log::info("PRODUCT SELL REPORT -------------------------------------------------->");
-        Log::info(json_encode($product_sell_report,JSON_PRETTY_PRINT));
-
         return $product_sell_report;
 
     }
@@ -969,9 +942,6 @@ class ReportEmailService
 
 
         $purchase_payment_report = $query->get();
-
-        Log::info("PURCHASE PAYMENT REPORT -------------------------------------------------->");
-        Log::info(json_encode($purchase_payment_report,JSON_PRETTY_PRINT));
 
         return $purchase_payment_report;
         
