@@ -52,9 +52,9 @@
 
                 @if (!Gate::check('disable_quotation') || auth()->user()->can('superadmin') || auth()->user()->can('admin'))
                     <button type="button"
-                        class="tw-font-bold tw-text-gray-700 tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-1 @if ($is_mobile) col-xs-6 @endif"
+                        class="tw-font-bold tw-text-white tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-1 tw-bg-[rgb(40,183,123)] tw-rounded-md tw-p-2 tw-w-[6rem] @if ($is_mobile) col-xs-6 @endif"
                         id="pos-quotation" @if (!empty($only_payment)) disabled @endif><i
-                            class="fas fa-edit tw-text-[#E7A500]"></i> @lang('lang_v1.quotation')</button>
+                            class="fas fa-edit tw-text-white"></i> @lang('lang_v1.quotation')</button>
                 @endif
 
                 @if (!Gate::check('disable_suspend_sale') || auth()->user()->can('superadmin') || auth()->user()->can('admin'))
@@ -73,18 +73,18 @@
                     @if (empty($pos_settings['disable_credit_sale_button']))
                         <input type="hidden" name="is_credit_sale" value="0" id="is_credit_sale">
                         <button type="button"
-                            class=" tw-font-bold tw-text-gray-700 tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-1 no-print pos-express-finalize @if ($is_mobile) col-xs-6 @endif"
+                            class=" tw-font-bold tw-text-white tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-1 tw-bg-[rgb(40,183,123)] tw-rounded-md tw-p-2 tw-w-[6rem] no-print pos-express-finalize credit-sale-btn @if ($is_mobile) col-xs-6 @endif"
                             data-pay_method="credit_sale" title="@lang('lang_v1.tooltip_credit_sale')"
                             @if (!empty($only_payment)) disabled @endif>
-                            <i class="fas fa-check tw-text-[#5E5CA8]" aria-hidden="true"></i> @lang('lang_v1.credit_sale')
+                            <i class="fas fa-check tw-text-white" aria-hidden="true"></i> @lang('lang_v1.credit_sale')
                         </button>
                     @endif
                 @endif
                 @if (!Gate::check('disable_card') || auth()->user()->can('superadmin') || auth()->user()->can('admin'))
                     <button type="button"
-                        class="tw-font-bold tw-text-gray-700 tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-1  no-print @if (!empty($pos_settings['disable_suspend']))  @endif pos-express-finalize @if (!array_key_exists('card', $payment_types)) hide @endif @if ($is_mobile) col-xs-6 @endif"
+                        class="tw-font-bold tw-text-white tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-1 tw-bg-[rgb(40,183,123)] tw-rounded-md tw-p-2 tw-w-[6rem] no-print @if (!empty($pos_settings['disable_suspend']))  @endif pos-express-finalize @if (!array_key_exists('card', $payment_types)) hide @endif @if ($is_mobile) col-xs-6 @endif"
                         data-pay_method="card" title="@lang('lang_v1.tooltip_express_checkout_card')">
-                        <i class="fas fa-credit-card tw-text-[#D61B60]" aria-hidden="true"></i> @lang('lang_v1.express_checkout_card')
+                        <i class="fas fa-credit-card tw-text-white" aria-hidden="true"></i> @lang('lang_v1.express_checkout_card')
                     </button>
                 @endif
 
