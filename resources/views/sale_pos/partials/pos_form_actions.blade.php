@@ -52,6 +52,7 @@
 
                 @if (!Gate::check('disable_quotation') || auth()->user()->can('superadmin') || auth()->user()->can('admin'))
                     <button type="button"
+                        style="background-color: #F4B000;"
                         class="tw-font-bold tw-text-white tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-1 tw-bg-[rgb(40,183,123)] tw-rounded-md tw-p-2 tw-w-[6rem] @if ($is_mobile) col-xs-6 @endif"
                         id="pos-quotation" @if (!empty($only_payment)) disabled @endif><i
                             class="fas fa-edit tw-text-white"></i> @lang('lang_v1.quotation')</button>
@@ -73,6 +74,7 @@
                     @if (empty($pos_settings['disable_credit_sale_button']))
                         <input type="hidden" name="is_credit_sale" value="0" id="is_credit_sale">
                         <button type="button"
+                        style="background-color: #5E5CA8;"
                             class=" tw-font-bold tw-text-white tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-1 tw-bg-[rgb(40,183,123)] tw-rounded-md tw-p-2 tw-w-[6rem] no-print pos-express-finalize credit-sale-btn @if ($is_mobile) col-xs-6 @endif"
                             data-pay_method="credit_sale" title="@lang('lang_v1.tooltip_credit_sale')"
                             @if (!empty($only_payment)) disabled @endif>
@@ -82,7 +84,8 @@
                 @endif
                 @if (!Gate::check('disable_card') || auth()->user()->can('superadmin') || auth()->user()->can('admin'))
                     <button type="button"
-                        class="tw-font-bold tw-text-white tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-1 tw-bg-[rgb(40,183,123)] tw-rounded-md tw-p-2 tw-w-[6rem] no-print @if (!empty($pos_settings['disable_suspend']))  @endif pos-express-finalize @if (!array_key_exists('card', $payment_types)) hide @endif @if ($is_mobile) col-xs-6 @endif"
+                    style="background-color: #D61B60;"
+                        class="tw-font-bold tw-text-white tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-1 tw-bg-red-500 tw-rounded-md tw-p-2 tw-w-[6rem] no-print @if (!empty($pos_settings['disable_suspend']))  @endif pos-express-finalize @if (!array_key_exists('card', $payment_types)) hide @endif @if ($is_mobile) col-xs-6 @endif"
                         data-pay_method="card" title="@lang('lang_v1.tooltip_express_checkout_card')">
                         <i class="fas fa-credit-card tw-text-white" aria-hidden="true"></i> @lang('lang_v1.express_checkout_card')
                     </button>
