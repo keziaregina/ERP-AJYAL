@@ -374,6 +374,17 @@ class ProductionController extends Controller
 
             DB::commit();
 
+            // Update Stock    
+            $stock_details = $this->productUtil->getVariationStockDetails($business_id, request()->input('variation_id'), $transaction->location_id);
+            $stock_history = $this->productUtil->getVariationStockHistory($business_id, request()->input('variation_id'), $transaction->location_id);
+    
+            //if mismach found update stock in variation location details
+            if (isset($stock_history[0]) && (float) $stock_details['current_stock'] != (float) $stock_history[0]['stock']) {
+                VariationLocationDetails::where('variation_id', request()->input('variation_id'))
+                                    ->where('location_id', $transaction->location_id)
+                                    ->update(['qty_available' => $stock_history[0]['stock']]);
+            }
+
             $output = ['success' => 1,
                 'msg' => __('lang_v1.added_success'),
             ];
@@ -841,6 +852,19 @@ class ProductionController extends Controller
 
             DB::commit();
 
+            // Update Stock    
+            $transactionInstance = Transaction::where('business_id', $business_id)
+                                        ->where('type', 'production_purchase')
+                                        ->findOrFail($id);
+            $stock_details = $this->productUtil->getVariationStockDetails($business_id, request()->input('variation_id'), $transactionInstance->location_id);
+            $stock_history = $this->productUtil->getVariationStockHistory($business_id, request()->input('variation_id'), $transactionInstance->location_id);
+    
+            //if mismach found update stock in variation location details
+            if (isset($stock_history[0]) && (float) $stock_details['current_stock'] != (float) $stock_history[0]['stock']) {
+                VariationLocationDetails::where('variation_id', request()->input('variation_id'))
+                                    ->where('location_id', $transactionInstance->location_id)
+                                    ->update(['qty_available' => $stock_history[0]['stock']]);
+            }
             $output = ['success' => 1,
                 'msg' => __('lang_v1.updated_success'),
             ];
