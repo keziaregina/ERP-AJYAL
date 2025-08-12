@@ -253,3 +253,49 @@
     });
 
 </script>
+<script>
+let exportFooterData = {};
+
+var table = $('#myTable').DataTable({
+    footerCallback: function(row, data, start, end, display) {
+        var footer_expense_total = 0;
+        var footer_total_due = 0;
+        var footer_total_tax = 0;
+
+        for (var r in data) {
+            footer_expense_total += $(data[r].final_total).data('orig-value') ? parseFloat($(data[r].final_total).data('orig-value')) : 0;
+            footer_total_due += $(data[r].payment_due).data('orig-value') ? parseFloat($(data[r].payment_due).data('orig-value')) : 0;
+            footer_total_tax += $(data[r].tax).data('orig-value') ? parseFloat($(data[r].tax).data('orig-value')) : 0;
+        }
+
+        $('.footer_expense_total').html(__currency_trans_from_en(footer_expense_total));
+        $('.footer_total_due').html(__currency_trans_from_en(footer_total_due));
+        $('.footer_payment_status_count').html(__count_status(data, 'payment_status'));
+
+        exportFooterData = {
+            expense_total: footer_expense_total,
+            total_due: footer_total_due,
+            total_tax: footer_total_tax
+        };
+    },
+    dom: 'Bfrtip',
+    buttons: [
+        {
+            extend: 'pdfHtml5', 
+            text: '<i class="fa fa-file-pdf"></i> Export PDF',
+            customize: function(doc) {
+                let footerRow = [
+                    { text: 'TOTAL', bold: true, alignment: 'right' },
+                    { text: __currency_trans_from_en(exportFooterData.expense_total), alignment: 'center' },
+                    { text: __currency_trans_from_en(exportFooterData.total_due), alignment: 'center' },
+                    { text: __currency_trans_from_en(exportFooterData.total_tax), alignment: 'center' }
+                ];
+
+                const tableIndex = doc.content.findIndex(item => item.table);
+                doc.content[tableIndex].table.body.push(footerRow);
+            }
+        }
+    ]
+});
+
+</script>

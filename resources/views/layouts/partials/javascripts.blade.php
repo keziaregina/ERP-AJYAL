@@ -613,6 +613,11 @@
         return datatablesButton;
     }
 </script>
+<script>
+
+
+
+</script>
 
 <script>
     // const colvis = localStorage.getItem('colvisState_product');
