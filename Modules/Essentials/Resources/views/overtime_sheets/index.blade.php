@@ -290,10 +290,9 @@
                         <div class="form-group">
                             <label for="date">@lang('essentials::lang.date')</label>
                             @if (auth()->user()->hasRole('Admin#1'))
-                                <input type="text" name="date" id="date" 
-                                class="form-control datepicker"
-                                value="{{ date('Y-m-d') }}"
-                                max="{{ date('Y-m-d') }}">
+                                <input type="text" name="date" id="edit_date" 
+                                class="form-control datepicker-edit"
+                                value="{{ date('Y-m-d') }}">
                             @else
                                 <input type="date" name="date" id="date" class="form-control" value="{{ date('Y-m-d') }}" disabled>
                             @endif
@@ -450,6 +449,22 @@
                 showMonths: 1,
                 static: true
             });
+
+            @if(auth()->user()->hasRole('Admin#1'))
+            flatpickr(".datepicker-edit", {
+                dateFormat: "Y-m-d",
+                maxDate: "today",
+                minDate: new Date(today.getFullYear() - 1, 0, 1),
+                disable: [
+                    function(date) {
+                        return date > today;
+                    }
+                ],
+                theme: "material_blue",
+                showMonths: 1,
+                static: true
+            });
+            @endif
         });
     </script>    
 @endsection
