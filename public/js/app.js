@@ -1536,6 +1536,7 @@ $(document).ready(function() {
                 d.expense_category_id = $('select#expense_category_id').val();
                 d.expense_sub_category_id = $('select#expense_sub_category_id_filter').val();
                 d.payment_status = $('select#expense_payment_status').val();
+                d.expense_user_filter = $('select#expense_user_filter').val();
                 d.start_date = $('input#expense_date_range')
                     .data('daterangepicker')
                     .startDate.format('YYYY-MM-DD');
@@ -1584,7 +1585,7 @@ $(document).ready(function() {
 
     $('select#location_id, select#expense_for, select#expense_contact_filter, \
         select#expense_category_id, select#expense_payment_status, \
-        select#expense_sub_category_id_filter').on(
+        select#expense_sub_category_id_filter, select#expense_user_filter').on(
         'change',
         function() {
             expense_table.ajax.reload();
