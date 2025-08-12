@@ -116,7 +116,7 @@
                                             </svg> @lang('messages.add')
                                         </button>   
 
-                                        {{-- print all button new --}}
+                                        {{-- print by filter button --}}
                                         <button type="button"
                                             class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right"
                                             data-toggle="modal" data-target="#print_all_payroll_modal" style="margin-right: 10px;">
@@ -124,11 +124,11 @@
                                         </button>
 
                                         {{-- print all button old --}}
-                                        <a href="{{ action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'printAll']) }}"
+                                        {{-- <a href="{{ action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'printAll']) }}"
                                             class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full space-x-2"
                                             style="float:right; margin-right:10px;" target="_blank">
                                             @lang('messages.print_all1')
-                                        </a>
+                                        </a> --}}
 
                                     </div>
                                     <br><br><br>

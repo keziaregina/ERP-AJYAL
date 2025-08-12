@@ -371,4 +371,6 @@ return[
     'total_absent' => 'إجمالي الغياب',
     'total_leaves' => 'إجمالي الإجازات',
     'earnings' => 'الأرباح',
+    'status' => 'الحالة',
+    'no_payroll_data_found' => 'لم يتم العثور على بيانات كشوف المرتبات',
 ];
