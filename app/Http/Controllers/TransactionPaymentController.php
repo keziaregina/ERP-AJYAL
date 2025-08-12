@@ -501,7 +501,7 @@ class TransactionPaymentController extends Controller
                 DB::raw("SUM(IF(t.type = 'opening_balance', (SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as opening_balance_paid")
             );
             $contact_details = $query->first();
-
+            
             $payment_line = new TransactionPayment();
             if ($due_payment_type == 'purchase') {
                 $contact_details->total_purchase = empty($contact_details->total_purchase) ? 0 : $contact_details->total_purchase;
@@ -540,8 +540,25 @@ class TransactionPaymentController extends Controller
             //Accounts
             $accounts = $this->moduleUtil->accountsDropdown($business_id, true);
 
+            $due = $this->transactionUtil->getLedgerDetails($contact_id, now()->startOfYear()->format('Y-m-d'), now()->endOfYear()->format('Y-m-d'), 'format_2', null);
+
+            $balance_due_calc = 0;
+
+            foreach ($due['ledger'] as $data) {
+                if (empty($data['total_due'])) {
+                    continue;
+                }
+
+                if ($data['payment_status'] != 'paid' && !empty($data['due_date'])) {
+                    if (!empty($data['transaction_type']) && $data['transaction_type'] == 'ledger_discount') {
+                        $data['total_due'] = -1 * $data['total_due'];
+                    }
+                    $balance_due_calc += $data['total_due'];
+                }
+            }
+
             return view('transaction_payment.pay_supplier_due_modal')
-                        ->with(compact('contact_details', 'payment_types', 'payment_line', 'due_payment_type', 'ob_due', 'amount_formated', 'accounts'));
+                        ->with(compact('contact_details', 'payment_types', 'payment_line', 'due_payment_type', 'ob_due', 'amount_formated', 'accounts', 'balance_due_calc'));
         }
     }
 
