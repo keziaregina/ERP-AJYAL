@@ -54,10 +54,32 @@
 			<td class="align-right">@format_currency($ledger_details['ledger_discount'])</td>
 		</tr>
 	@endif
-	<tr>
-		<td><strong>@lang('lang_v1.balance_due')</strong></td>
-		<td class="align-right">@format_currency($ledger_details['balance_due'] - $ledger_details['ledger_discount'])</td>
-	</tr>
+		{{-- <tr>
+			<td><strong>@lang('lang_v1.balance_due')</strong></td>
+			<td class="align-right">@format_currency($ledger_details['balance_due'] - $ledger_details['ledger_discount'])</td>
+		</tr>  --}}
+	<!-- New Code -->
+	@php
+		$balance_due_calc = 0;
+
+		foreach($ledger_details['ledger'] as $data) {
+			if (empty($data['total_due'])) {
+				continue;
+			}
+
+			if ($data['payment_status'] != 'paid' && !empty($data['due_date'])) {
+				if (!empty($data['transaction_type']) && $data['transaction_type'] == 'ledger_discount') {
+					$data['total_due'] = -1 * $data['total_due'];
+				}
+				$balance_due_calc += $data['total_due'];
+			}
+		}
+	@endphp
+
+<tr>
+	<td><strong>@lang('lang_v1.balance_due')</strong></td>
+	<td class="align-right">@format_currency($balance_due_calc)</td>
+</tr>
 	</table>
 </div>
 <div class="col-md-12 col-sm-12 @if(!empty($for_pdf)) width-100 @endif">
@@ -100,8 +122,9 @@
 
 						@if(!empty($is_admin) && !empty($data['transaction_id']) && $data['transaction_type'] == 'ledger_discount')
 							<br>
-							<button type="button" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error delete_ledger_discount" data-href="{{action([\App\Http\Controllers\LedgerDiscountController::class, 'destroy'], ['id' => $data['transaction_id']])}}"><i class="fas fa-trash"></i></button>
-							<button type="button" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-primary btn-modal" data-href="{{action([\App\Http\Controllers\LedgerDiscountController::class, 'edit'], ['id' => $data['transaction_id']])}}" data-container="#edit_ledger_discount_modal"><i class="fas fa-edit"></i></button>
+							<!-- Old -->
+							{{-- <button type="button" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error delete_ledger_discount" data-href="{{action([\App\Http\Controllers\LedgerDiscountController::class, 'destroy'], ['id' => $data['transaction_id']])}}"><i class="fas fa-trash"></i></button>
+							<button type="button" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-primary btn-modal" data-href="{{action([\App\Http\Controllers\LedgerDiscountController::class, 'edit'], ['id' => $data['transaction_id']])}}" data-container="#edit_ledger_discount_modal"><i class="fas fa-edit"></i></button> --}}
 						@endif
 					</td>
 				</tr>

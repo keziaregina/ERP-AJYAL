@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
 use Yajra\DataTables\Facades\DataTables;
 use App\Events\ContactCreatedOrModified;
+use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
