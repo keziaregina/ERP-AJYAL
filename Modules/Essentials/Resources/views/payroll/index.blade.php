@@ -114,12 +114,22 @@
                                                 <path d="M12 5l0 14" />
                                                 <path d="M5 12l14 0" />
                                             </svg> @lang('messages.add')
+                                        </button>   
+
+                                        {{-- print all button new --}}
+                                        <button type="button"
+                                            class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right"
+                                            data-toggle="modal" data-target="#print_all_payroll_modal" style="margin-right: 10px;">
+                                            @lang('messages.print')
                                         </button>
+
+                                        {{-- print all button old --}}
                                         <a href="{{ action([\Modules\Essentials\Http\Controllers\PayrollController::class, 'printAll']) }}"
                                             class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full space-x-2"
                                             style="float:right; margin-right:10px;" target="_blank">
-                                            @lang('messages.print_all')
+                                            @lang('messages.print_all1')
                                         </a>
+
                                     </div>
                                     <br><br><br>
                                 @endcan
@@ -217,6 +227,9 @@
         </div>
         @can('essentials.create_payroll')
             @includeIf('essentials::payroll.payroll_modal')
+        @endcan
+        @can('essentials.create_payroll')
+            @includeIf('essentials::payroll.print_all_payroll_modal')
         @endcan
         <div class="modal fade" id="add_allowance_deduction_modal" tabindex="-1" role="dialog"
             aria-labelledby="gridSystemModalLabel"></div>
