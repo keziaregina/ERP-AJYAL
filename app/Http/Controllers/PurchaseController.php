@@ -98,6 +98,17 @@ class PurchaseController extends Controller
                             ->whereDate('transactions.transaction_date', '<=', $end);
             }
 
+            if (auth()->user()->can('purchase.view') || auth()->user()->can('view_all_purchase_n_stock_adjustment')) {
+                if (request()->has('purchase_user_filter')) {
+                    $userFilter = request()->get('purchase_user_filter');
+                    if ($userFilter !== null && $userFilter !== '') {
+                        $purchases->where('transactions.created_by', $userFilter);
+                    }
+                }
+            } else {
+                $purchases->where('transactions.created_by', auth()->id());
+            }
+            
             if (! auth()->user()->can('purchase.view') && auth()->user()->can('view_own_purchase')) {
                 $purchases->where('transactions.created_by', request()->session()->get('user.id'));
             }
@@ -217,10 +228,11 @@ class PurchaseController extends Controller
 
         $business_locations = BusinessLocation::forDropdown($business_id);
         $suppliers = Contact::suppliersDropdown($business_id, false);
+        $users = User::forDropdown($business_id, false, true, true);
         $orderStatuses = $this->productUtil->orderStatuses();
 
         return view('purchase.index')
-            ->with(compact('business_locations', 'suppliers', 'orderStatuses'));
+            ->with(compact('business_locations', 'suppliers', 'orderStatuses', 'users'));
     }
 
     /**
