@@ -13,6 +13,7 @@ use App\Utils\BusinessUtil;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Utils\TransactionUtil;
+use App\VariationLocationDetails;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
@@ -274,6 +275,11 @@ class ProductionController extends Controller
 
             if (! empty($request->input('sub_unit_id'))) {
                 $purchase_line_data['sub_unit_id'] = $request->input('sub_unit_id');
+            }
+
+            $product_id = Variation::where('id', $request->input('variation_id'))->first()->product_id;
+            if ($product_id) {
+                $transaction_data['opening_stock_product_id'] = $product_id;
             }
 
             DB::beginTransaction();
@@ -899,7 +905,28 @@ class ProductionController extends Controller
                             ->where('business_id', $business_id)
                             ->where('type', 'production_purchase')
                             ->where('mfg_is_final', 0)
-                            ->delete();
+                            ->first();
+
+                Log::info($transaction);
+
+                $variation_location = VariationLocationDetails::where('product_id', $transaction->opening_stock_product_id)
+                                        ->where('location_id', $transaction->location_id)->first();
+                Log::info($variation_location);
+
+                if ($variation_location) {
+                    // Update Stock    
+                    $stock_details = $this->productUtil->getVariationStockDetails($business_id, $variation_location->variation_id, $transaction->location_id);
+                    $stock_history = $this->productUtil->getVariationStockHistory($business_id, $variation_location->variation_id, $transaction->location_id);
+    
+                    $transaction->delete();
+                    //if mismach found update stock in variation location details
+                    if (isset($stock_history[0]) && (float) $stock_details['current_stock'] != (float) $stock_history[0]['stock']) {
+                        $variation_location->update(['qty_available' => $stock_history[0]['stock']]);
+                    }
+                } else {
+                    $transaction->delete();
+                }
+
                 $output = [
                     'success' => true,
                     'msg' => __('lang_v1.deleted_success'),
