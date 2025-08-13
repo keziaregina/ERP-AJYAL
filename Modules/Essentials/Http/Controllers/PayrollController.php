@@ -152,6 +152,18 @@ class PayrollController extends Controller
                         return $html;
                     }
                 )
+                ->addColumn('searchable_date', function ($row){
+                     $transaction_date = \Carbon::parse($row->transaction_date);
+            
+                    // Include multiple date formats for better searching
+                    return $transaction_date->format('d/m/Y') . ' ' .        // 15/07/2024
+                        $transaction_date->format('F Y') . ' ' .          // July 2024
+                        $transaction_date->format('M Y') . ' ' .          // Jul 2024
+                        $transaction_date->format('m/Y') . ' ' .          // 07/2024
+                        $transaction_date->format('Y') . ' ' .            // 2024
+                        $transaction_date->format('F') . ' ' .            // July
+                        $transaction_date->format('M');                   // Jul
+                })
                 ->addColumn('transaction_date', function ($row) {
                     $transaction_date = \Carbon::parse($row->transaction_date);
 
@@ -160,6 +172,42 @@ class PayrollController extends Controller
                 ->editColumn('final_total', '<span class="display_currency" data-currency_symbol="true">{{$final_total}}</span>')
                 ->filterColumn('user', function ($query, $keyword) {
                     $query->whereRaw("CONCAT(COALESCE(u.surname, ''), ' ', COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) like ?", ["%{$keyword}%"]);
+                })
+                ->filterColumn('searchable_date', function ($query, $keyword) {
+                    $monthMapping = [
+                        // English
+                        'january' => '01', 'jan' => '01',
+                        'february' => '02', 'feb' => '02', 
+                        'march' => '03', 'mar' => '03',
+                        'april' => '04', 'apr' => '04',
+                        'may' => '05',
+                        'june' => '06', 'jun' => '06',
+                        'july' => '07', 'jul' => '07',
+                        'august' => '08', 'aug' => '08',
+                        'september' => '09', 'sep' => '09',
+                        'october' => '10', 'oct' => '10',
+                        'november' => '11', 'nov' => '11',
+                        'december' => '12', 'dec' => '12',
+                    ];
+
+                    $keyword_lower = strtolower($keyword);
+                    $converted_keyword = $keyword;
+                        foreach ($monthMapping as $month_name => $month_number) {
+                            if (strpos($keyword_lower, $month_name) !== false) {
+                                $converted_keyword = str_ireplace($month_name, $month_number, $keyword);
+                                break;
+                            }
+                        }
+
+                    $query->where(function($q) use ($keyword, $converted_keyword) {
+                        $q->whereRaw("DATE_FORMAT(transaction_date, '%d/%m/%Y') LIKE ?", ["%{$keyword}%"])
+                        ->orWhereRaw("DATE_FORMAT(transaction_date, '%M %Y') LIKE ?", ["%{$keyword}%"])
+                        ->orWhereRaw("DATE_FORMAT(transaction_date, '%b %Y') LIKE ?", ["%{$keyword}%"])
+                        ->orWhereRaw("DATE_FORMAT(transaction_date, '%m/%Y') LIKE ?", ["%{$converted_keyword}%"])
+                        ->orWhereRaw("DATE_FORMAT(transaction_date, '%Y') LIKE ?", ["%{$keyword}%"])
+                        ->orWhereRaw("DATE_FORMAT(transaction_date, '%M') LIKE ?", ["%{$keyword}%"])
+                        ->orWhereRaw("DATE_FORMAT(transaction_date, '%b') LIKE ?", ["%{$keyword}%"]);
+                    });
                 })
                 ->editColumn(
                     'payment_status',
