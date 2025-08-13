@@ -907,24 +907,23 @@ class ProductionController extends Controller
                             ->where('mfg_is_final', 0)
                             ->first();
 
-                Log::info($transaction);
+                $purchase_lines = $transaction->purchase_lines;
 
-                $variation_location = VariationLocationDetails::where('product_id', $transaction->opening_stock_product_id)
-                                        ->where('location_id', $transaction->location_id)->first();
-                Log::info($variation_location);
+                $transactionInstance = $transaction;
+                $transaction->delete();
 
-                if ($variation_location) {
-                    // Update Stock    
-                    $stock_details = $this->productUtil->getVariationStockDetails($business_id, $variation_location->variation_id, $transaction->location_id);
-                    $stock_history = $this->productUtil->getVariationStockHistory($business_id, $variation_location->variation_id, $transaction->location_id);
-    
-                    $transaction->delete();
-                    //if mismach found update stock in variation location details
-                    if (isset($stock_history[0]) && (float) $stock_details['current_stock'] != (float) $stock_history[0]['stock']) {
-                        $variation_location->update(['qty_available' => $stock_history[0]['stock']]);
+                if ($purchase_lines->count() > 0) {
+                    foreach ($purchase_lines as $data) {
+                        $stock_details = $this->productUtil->getVariationStockDetails($business_id, $data->variation_id, $transactionInstance->location_id);
+                        $stock_history = $this->productUtil->getVariationStockHistory($business_id, $data->variation_id, $transactionInstance->location_id);
+                        
+                        //if mismach found update stock in variation location details
+                        if (isset($stock_history[0]) && (float) $stock_details['current_stock'] != (float) $stock_history[0]['stock']) {
+                            VariationLocationDetails::where('variation_id', $data->variation_id)
+                            ->where('location_id', $transactionInstance->location_id)
+                            ->update(['qty_available' => $stock_history[0]['stock']]);
+                        }
                     }
-                } else {
-                    $transaction->delete();
                 }
 
                 $output = [
