@@ -1519,31 +1519,31 @@ $(document).ready(function() {
             expense_table.ajax.reload();
         });
     }
- const tableButton = 
+ const tableButton = [
             [
                 {
                     extend: 'csvHtml5',
-                    text: "<i class='fa fa-file-csv'></i> {{ __('datatables.buttons.csv') }}",
+                    text: function(){ return "<i class='fa fa-file-csv'></i> " + (window.dtButtons ? window.dtButtons.csv : 'CSV'); },
                     className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
                 },
                 {
                     extend: 'excelHtml5',
-                    text: "<i class='fa fa-file-excel'></i> {{ __('datatables.buttons.excel') }}",
+                    text: function(){ return "<i class='fa fa-file-excel'></i> " + (window.dtButtons ? window.dtButtons.excel : 'Excel'); },
                     className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
                 },
                 {
                     extend: 'print',
-                    text: "<i class='fa fa-print'></i> {{ __('datatables.buttons.print') }}",
+                    text: function(){ return "<i class='fa fa-print'></i> " + (window.dtButtons ? window.dtButtons.print : 'Print'); },
                     className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
                 },
                 {
                     extend: 'colvis',
-                    text: "<i class='fa fa-columns'></i> {{ __('datatables.buttons.colvis') }}",
+                    text: function(){ return "<i class='fa fa-columns'></i> " + (window.dtButtons ? window.dtButtons.colvis : 'Columns'); },
                     className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
                 },
                 {
                     extend: 'pdfHtml5',  
-                    text: "<i class='fa fa-file-pdf'></i> {{ __('datatables.buttons.pdf') }}",
+                    text: function(){ return "<i class='fa fa-file-pdf'></i> " + (window.dtButtons ? window.dtButtons.pdf : 'PDF'); },
                     className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2',
                     title: null,
                     filename: 'Ajyal Al-Madina',
@@ -1552,8 +1552,8 @@ $(document).ready(function() {
                     exportOptions: {
                         columns: function(idx, data, node) {
                             var colHeader = $(node).text();
-                            var isVisible = $('expense_table').DataTable().column(idx).visible();
-                            return colHeader !== 'Action' && colHeader !== 'خيار'  &&colHeader !== ''  & isVisible;
+                            var isVisible = $('#expense_table').DataTable().column(idx).visible();
+                            return colHeader !== 'Action' && colHeader !== 'خيار' && colHeader !== '' && isVisible;
                         }
                     },
                     customize: function(doc) {
@@ -1614,22 +1614,25 @@ $(document).ready(function() {
                         });
 
                         doc.content.splice(3, 0, {
-                            text: 'expense',
+                            text: 'Expenses Report',
                             alignment: 'center',
                             fontSize: 11,
                             bold: true,
                             margin: [0, 10, 0, 10]
                         });
 
+                        var timeExportLabel = (window.dtLabels && window.dtLabels.time_export) ? window.dtLabels.time_export : 'Time export';
+                        var byExportLabel = (window.dtLabels && window.dtLabels.by_export) ? window.dtLabels.by_export : 'By';
+
                         doc.content.splice(4, 0, {
-                            text: `{{ __('datatables.time_export') }} : ${formattedTime}`,
+                            text: timeExportLabel + ' : ' + (formattedTime || '-') ,
                             alignment: window.userLang,
                             fontSize: 9,
                             margin: [0, 10, 0, 5]
-                        });
+                        }); 
 
                         doc.content.splice(5, 0, {
-                            text: `{{ __('datatables.by_export') }} : ${username}`,
+                            text: byExportLabel + ' : ' + (username || '-') ,
                             alignment: window.userLang,
                             fontSize: 9,
                             margin: [0, 0, 0, 10]
@@ -1690,7 +1693,7 @@ $(document).ready(function() {
                         }
 
                         const newBody = [];
-                        fullBody[0].unshift({ text: '#', style:     eader', alignment: 'center' });
+                        fullBody[0].unshift({ text: '#', style: 'tableHeader', alignment: 'center' });
                     
                         newBody.push(fullBody[0]);
                     
@@ -1707,6 +1710,23 @@ $(document).ready(function() {
                         }
                     
                         const colCount = newBody[0].length;
+
+                        // Append totals row directly after data (no extra whitespace before footer)
+                        try {
+                            var paidCountText = ($('.footer_payment_status_count').text() || '').trim();
+                            var totalAmountText = ($('.footer_expense_total').text() || '').trim();
+                            var totalDueText = ($('.footer_total_due').text() || '').trim();
+                            var totalLabelInline = (typeof LANG !== 'undefined' && LANG.total) ? LANG.total + ':' : 'Total:';
+
+                            var spanCols = Math.max(1, colCount - 3);
+                            var totalRow = Array(colCount).fill('');
+                            totalRow[0] = { text: totalLabelInline, bold: true, fontSize: 11, fillColor: '#e9ecef', border: [true, true, false, true], colSpan: spanCols, alignment: 'left' };
+                            for (let i = 1; i < spanCols; i++) { totalRow[i] = ''; }
+                            totalRow[colCount - 3] = { text: paidCountText || '-', bold: true, fontSize: 11, fillColor: '#e9ecef', border: [false, true, false, true], alignment: 'center' };
+                            totalRow[colCount - 2] = { text: totalAmountText || '0', bold: true, fontSize: 11, fillColor: '#e9ecef', border: [false, true, false, true], alignment: 'right' };
+                            totalRow[colCount - 1] = { text: totalDueText || '0', bold: true, fontSize: 11, fillColor: '#e9ecef', border: [false, true, true, true], alignment: 'right' };
+                            newBody.push(totalRow);
+                        } catch (e) {}
 
                         fullTable.body = newBody;
                         fullTable.headerRows = 1;
@@ -1729,17 +1749,19 @@ $(document).ready(function() {
                         };
 
                         var footerDir = window.userLang === 'right' ? 'left' : 'right';
+
+                        // Keep compact page numbering footer only
                         doc.footer = function(currentPage, pageCount) {
                             return {
-                            text: "{{ __('datatables.page') }} " + currentPage + " {{ __('datatables.of') }} " + pageCount,
-                            alignment: footerDir,
-                            fontSize: 9,
-                            margin: [25, 0, 25, 0]
+                                text: "{{ __('datatables.page') }} " + currentPage + " {{ __('datatables.of') }} " + pageCount,
+                                alignment: footerDir,
+                                fontSize: 9,
+                                margin: [25, 0, 25, 0]
                             };
                         };
                     }
                 } 
-                
+            ], 
         ];
     
     //Expense table

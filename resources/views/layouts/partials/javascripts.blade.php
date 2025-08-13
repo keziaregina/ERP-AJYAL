@@ -38,6 +38,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/vfs_fonts.min.js" integrity="sha512-EFlschXPq/G5zunGPRSYqazR1CMKj0cQc8v6eMrQwybxgIbhsfoO5NAMQX3xFDQIbFlViv53o7Hy+yCWw6iZxA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
+    window.dtButtons = {
+        csv: "{!! __('datatables.buttons.csv') !!}",
+        excel: "{!! __('datatables.buttons.excel') !!}",
+        print: "{!! __('datatables.buttons.print') !!}",
+        colvis: "{!! __('datatables.buttons.colvis') !!}",
+        pdf: "{!! __('datatables.buttons.pdf') !!}"
+    };
     window.reportTitles = {
         cg: "{!! __('datatables.title.cg') !!}",
         attendances: "{!! __('datatables.title.attendances') !!}",
@@ -152,6 +159,7 @@
                     pageSize: 'A4',
                     exportOptions: {
                         columns: function(idx, data, node) {
+                            // console.log('tess aja lah', data);
                             var colHeader = $(node).text();
                             var isVisible = $(table_id).DataTable().column(idx).visible();
                             return colHeader !== 'Action' && colHeader !== 'خيار'  &&colHeader !== ''  & isVisible;
