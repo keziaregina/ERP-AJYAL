@@ -1071,9 +1071,29 @@ class SellPosController extends Controller
 
         $invoice_layouts = InvoiceLayout::forDropdown($business_id);
 
-        $customer_due = $this->transactionUtil->getContactDue($transaction->contact_id, $transaction->business_id);
+        // Old Code
+        // $customer_due = $this->transactionUtil->getContactDue($transaction->contact_id, $transaction->business_id);
+        // $customer_due = $customer_due != 0 ? $this->transactionUtil->num_f($customer_due, true) : '';
 
-        $customer_due = $customer_due != 0 ? $this->transactionUtil->num_f($customer_due, true) : '';
+        // New Code
+        $due = $this->transactionUtil->getLedgerDetails($transaction->contact_id, now()->startOfYear()->format('Y-m-d'), now()->endOfYear()->format('Y-m-d'), 'format_2', null);
+
+            $balance_due_calc = 0;
+
+            foreach ($due['ledger'] as $data) {
+                if (empty($data['total_due'])) {
+                    continue;
+                }
+
+                if ($data['payment_status'] != 'paid' && !empty($data['due_date'])) {
+                    if (!empty($data['transaction_type']) && $data['transaction_type'] == 'ledger_discount') {
+                        $data['total_due'] = -1 * $data['total_due'];
+                    }
+                    $balance_due_calc += $data['total_due'];
+                }
+            }
+
+        $customer_due = $balance_due_calc != 0 ? $this->transactionUtil->num_f($balance_due_calc, true) : '';
 
         //Added check because $users is of no use if enable_contact_assign if false
         $users = config('constants.enable_contact_assign') ? User::forDropdown($business_id, false, false, false, true) : [];
