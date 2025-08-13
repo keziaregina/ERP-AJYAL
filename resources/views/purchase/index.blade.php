@@ -76,13 +76,8 @@
             @if(auth()->user()->can('purchase.view') || auth()->user()->can('view_all_purchase_n_stock_adjustment'))
                 <div class="col-md-3">
                     <div class="form-group">
-                        {!! Form::label('purchase_user_filter', __('User') . ':') !!}
-                        {!! Form::select('purchase_user_filter', $users, null, [
-                            'id' => 'purchase_user_filter',
-                            'class' => 'form-control select2',
-                            'style' => 'width:100%',
-                            'placeholder' => __('lang_v1.all'),
-                          ]) !!}
+                        {!! Form::label('purchase_user_filter', __('user.users') . ':') !!}
+                        {!! Form::select('purchase_user_filter', $users, null, ['id' => 'purchase_user_filter', 'class' => 'form-control select2', 'style' => 'width:100%']) !!}
                     </div>
                 </div>
             @endif
@@ -119,7 +114,7 @@
         <div class="modal fade edit_payment_modal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
         </div>
 
-        @include('purchase.partials.update_purchase_status_modal')
+        @include('urchase.partials.update_purchase_status_modal')
 
     </section>
 
