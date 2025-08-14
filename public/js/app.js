@@ -1747,61 +1747,71 @@ $(document).ready(function() {
                         }
                     
                         const colCount = newBody[0].length;
-
-                       try {
+                        try {
                             var paidCountText = ($('.footer_payment_status_count').text() || '').trim();
                             var totalAmountText = ($('.footer_expense_total').text() || '').trim();
                             var totalDueText = ($('.footer_total_due').text() || '').trim();
                             var totalLabelInline = (typeof LANG !== 'undefined' && LANG.total) ? LANG.total + ':' : 'Total:';
 
-                            var spanCols = Math.max(1, colCount - 3);
                             var totalRow = Array(colCount).fill('');
 
-                            totalRow[0] = { 
+                            const footerColor = '#d3d7dc'; 
+
+                            for (let i = 0; i < 3; i++) {
+                                totalRow[i] = { text: '', fillColor: footerColor, border: [false, false, false, false] };
+                            }
+
+                            totalRow[3] = { 
                                 text: totalLabelInline, 
                                 bold: true, 
                                 fontSize: 11, 
-                                fillColor: '#d3d7de', 
-                                border: [true, true, false, true], 
-                                colSpan: spanCols, 
-                                alignment: 'center',
-                                height: 25
+                                fillColor: footerColor, 
+                                border: [false, false, false, false], 
+                                colSpan: 4, 
+                                alignment: 'left' 
                             };
-                            for (let i = 1; i < spanCols; i++) { 
-                                totalRow[i] = { fillColor: '#d3d7de', border: [false, true, false, true], text: '', height: 25 }; 
+                            for (let i = 4; i < 7; i++) { 
+                                totalRow[i] = { text: '', fillColor: footerColor, border: [false, false, false, false] };
                             }
 
-                            totalRow[colCount - 3] = { 
+                            totalRow[7] = { 
                                 text: paidCountText || '-', 
-                                bold: false, 
+                                bold: true, 
                                 fontSize: 11, 
-                                fillColor: '#d3d7de', 
-                                border: [false, true, false, true], 
-                                alignment: 'center',
-                                height: 25
+                                fillColor: footerColor, 
+                                border: [true, true, true, true], 
+                                borderColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff'], 
+                                alignment: 'center' 
                             };
 
-                            totalRow[colCount - 2] = { 
+                            totalRow[8] = { text: '', fillColor: footerColor, border: [false, false, false, false] };
+
+                            totalRow[9] = { 
                                 text: totalAmountText || '0', 
-                                bold: false, 
+                                bold: true, 
                                 fontSize: 11, 
-                                fillColor: '#d3d7de', 
-                                border: [false, true, false, true], 
-                                alignment: 'right',
-                                height: 25
+                                fillColor: footerColor, 
+                                border: [true, true, true, true], 
+                                borderColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff'], 
+                                alignment: 'right' 
                             };
 
-                            totalRow[colCount - 1] = { 
-                                text: (parseFloat(totalDueText) > 0) ? totalDueText : '', 
-                                fillColor: '#d3d7de', 
-                                border: [false, true, true, true], 
-                                alignment: 'right',
-                                height: 25
+                            totalRow[10] = { 
+                                text: totalDueText || '0', 
+                                bold: true, 
+                                fontSize: 11, 
+                                fillColor: footerColor, 
+                                border: [true, true, true, true], 
+                                borderColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff'], 
+                                alignment: 'right' 
                             };
+
+                            for (let i = 11; i < colCount; i++) {
+                                totalRow[i] = { text: '', fillColor: footerColor, border: [false, false, false, false] };
+                            }
 
                             newBody.push(totalRow);
                         } catch (e) {}
-
 
                         fullTable.body = newBody;
                         fullTable.headerRows = 1;
