@@ -298,7 +298,9 @@
                     },
                     {
                         data: 'transaction_date',
-                        name: 'transaction_date'
+                        name: 'searchable_date',
+                        searchable: true,
+                        orderable: true
                     },
                     {
                         data: 'ref_no',
