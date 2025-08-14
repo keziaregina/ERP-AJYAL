@@ -851,12 +851,11 @@ class PayrollController extends Controller
         } catch (\Exception $e) {
             Log::error('Error print payroll ----> '.$e->getMessage());
             \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
-
-            return redirect()->action([self::class, 'index'])
-                ->with('status', [
-                    'success' => false,
-                    'msg' => __('messages.something_went_wrong')
-                ]);
+            
+            return back()->with('status', [
+                'success' => false,
+                'msg' => __('messages.something_went_wrong')
+            ]);
         }
     }
 
