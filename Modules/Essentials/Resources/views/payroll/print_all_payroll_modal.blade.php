@@ -32,6 +32,7 @@
                         'style' => 'width: 100%;',
                         'multiple',
                         'id' => 'print_employee_ids',
+                        'required'
                     ]) !!}
                 </div>
 
@@ -107,17 +108,7 @@
 $(function () {
     function togglePrintButton() {
         var hasValue = false;
-        var hasMonthYear = $('#print_month_year').val() && $('#print_month_year').val().trim() !== '';
-        
-        // Jika ada month/year, maka tidak perlu employee wajib dipilih
-        if (hasMonthYear) {
-            hasValue = true;
-        } else {
-            // Jika tidak ada month/year, maka employee wajib dipilih
-            if ($('#print_employee_ids').val() && $('#print_employee_ids').val().length > 0) hasValue = true;
-        }
-        
-        // Filter lain tetap opsional - bisa digunakan sebagai pengganti employee atau kombinasi
+
         if ($('#print_employee_ids').val() && $('#print_employee_ids').val().length > 0) hasValue = true;
         if ($('#print_department_id').val()) hasValue = true;
         if ($('#print_designation_id').val()) hasValue = true;
@@ -176,14 +167,13 @@ $(function () {
         var $form = $('#print_payroll_form');
         var $btn = $(this);
         var selectedEmployees = $('#print_employee_ids').val();
-        var monthYear = $('#print_month_year').val();
 
-        // Validasi yang diperbaiki - cek jika ada month/year maka employee tidak wajib
-        if ((!selectedEmployees || selectedEmployees.length === 0) && (!monthYear || monthYear.trim() === '')) {
+        // Validate employee selection
+        if (!selectedEmployees || selectedEmployees.length === 0) {
             if (typeof toastr !== 'undefined') {
-                toastr.error('Please select at least one employee or specify month/year');
+                toastr.error('Please select at least one employee');
             } else {
-                alert('Please select at least one employee or specify month/year');
+                alert('Please select at least one employee');
             }
             return false;
         }
@@ -217,6 +207,7 @@ $(function () {
                     }
                 }
                 
+                // If we get here, validation passed or no validation response
                 // Remove check_only parameter and open print URL
                 var printData = $form.serializeArray().filter(function(item) {
                     return item.name !== 'check_only';
