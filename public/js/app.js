@@ -1523,27 +1523,27 @@ $(document).ready(function() {
             [
                 {
                     extend: 'csvHtml5',
-                    text: function(){ return "<i class='fa fa-file-csv'></i> " + (window.dtButtons ? window.dtButtons.csv : 'CSV'); },
+                    text: function(){ return "<i class='fa fa-file-csv'></i> " + (window.exportDataExpenses ? window.exportDataExpenses.csv : 'CSV'); },
                     className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
                 },
                 {
                     extend: 'excelHtml5',
-                    text: function(){ return "<i class='fa fa-file-excel'></i> " + (window.dtButtons ? window.dtButtons.excel : 'Excel'); },
+                    text: function(){ return "<i class='fa fa-file-excel'></i> " + (window.exportDataExpenses ? window.exportDataExpenses.excel : 'Excel'); },
                     className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
                 },
                 {
                     extend: 'print',
-                    text: function(){ return "<i class='fa fa-print'></i> " + (window.dtButtons ? window.dtButtons.print : 'Print'); },
+                    text: function(){ return "<i class='fa fa-print'></i> " + (window.exportDataExpenses ? window.exportDataExpenses.print : 'Print'); },
                     className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
                 },
                 {
                     extend: 'colvis',
-                    text: function(){ return "<i class='fa fa-columns'></i> " + (window.dtButtons ? window.dtButtons.colvis : 'Columns'); },
+                    text: function(){ return "<i class='fa fa-columns'></i> " + (window.exportDataExpenses ? window.exportDataExpenses.colvis : 'Columns'); },
                     className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2'
                 },
                 {
                     extend: 'pdfHtml5',  
-                    text: function(){ return "<i class='fa fa-file-pdf'></i> " + (window.dtButtons ? window.dtButtons.pdf : 'PDF'); },
+                    text: function(){ return "<i class='fa fa-file-pdf'></i> " + (window.exportDataExpenses ? window.exportDataExpenses.pdf : 'PDF'); },
                     className: 'tw-dw-btn-xs tw-dw-btn tw-dw-btn-outline tw-my-2',
                     title: null,
                     filename: 'Ajyal Al-Madina',
@@ -1621,21 +1621,58 @@ $(document).ready(function() {
                             margin: [0, 10, 0, 10]
                         });
 
-                        var timeExportLabel = (window.dtLabels && window.dtLabels.time_export) ? window.dtLabels.time_export : 'Time export';
-                        var byExportLabel = (window.dtLabels && window.dtLabels.by_export) ? window.dtLabels.by_export : 'By';
+                        let topColumns = [];
+                        let bottomColumns = [];
 
-                        doc.content.splice(4, 0, {
-                            text: timeExportLabel + ' : ' + (formattedTime || '-') ,
+                        if (window.userLang === 'right') {
+                            topColumns.push({
+                                width: '*',
+                                text: ''
+                            });
+                            bottomColumns.push({
+                                width: '*',
+                                text: ''
+                            });
+                        }
+
+                        topColumns.push(
+                            {
+                                // text: `{{ __('datatables.time_export') }} : ${formattedTime}`,
+                                text: window.exportDataExpenses.export_at + `: ${formattedTime}`,
+                                alignment: window.userLang,
+                                fontSize: 9,
+                                width: 200
+                            },
+                            { 
+                            text: window.exportDataExpenses.end_date + `:${window.endDate}`,
+                                alignment: window.userLang,
+                                fontSize: 9,
+                                width: 200
+                            }
+                        );
+                        bottomColumns.push({
+                            text: window.exportDataExpenses.export_by + `: ${username}`,
                             alignment: window.userLang,
                             fontSize: 9,
+                            width: 200
+                        },
+                        {
+                            text: window.exportDataExpenses.end_date + `:${window.endDate}`,
+                            alignment: window.userLang,
+                            fontSize: 9,
+                            width: 200
+                        }
+                        )
+                        doc.content.splice(4, 0, {
+                            columns: topColumns,
                             margin: [0, 10, 0, 5]
-                        }); 
+                            
+                        });
 
                         doc.content.splice(5, 0, {
-                            text: byExportLabel + ' : ' + (username || '-') ,
-                            alignment: window.userLang,
-                            fontSize: 9,
-                            margin: [0, 0, 0, 10]
+                            columns: bottomColumns,
+                            margin: [0, 0, 0, 5]
+                            
                         });
 
                         doc.pageMargins = [25, 25, 25, 25];
@@ -1711,8 +1748,7 @@ $(document).ready(function() {
                     
                         const colCount = newBody[0].length;
 
-                        // Append totals row directly after data (no extra whitespace before footer)
-                        try {
+                       try {
                             var paidCountText = ($('.footer_payment_status_count').text() || '').trim();
                             var totalAmountText = ($('.footer_expense_total').text() || '').trim();
                             var totalDueText = ($('.footer_total_due').text() || '').trim();
@@ -1720,13 +1756,52 @@ $(document).ready(function() {
 
                             var spanCols = Math.max(1, colCount - 3);
                             var totalRow = Array(colCount).fill('');
-                            totalRow[0] = { text: totalLabelInline, bold: true, fontSize: 11, fillColor: '#e9ecef', border: [true, true, false, true], colSpan: spanCols, alignment: 'left' };
-                            for (let i = 1; i < spanCols; i++) { totalRow[i] = ''; }
-                            totalRow[colCount - 3] = { text: paidCountText || '-', bold: true, fontSize: 11, fillColor: '#e9ecef', border: [false, true, false, true], alignment: 'center' };
-                            totalRow[colCount - 2] = { text: totalAmountText || '0', bold: true, fontSize: 11, fillColor: '#e9ecef', border: [false, true, false, true], alignment: 'right' };
-                            totalRow[colCount - 1] = { text: totalDueText || '0', bold: true, fontSize: 11, fillColor: '#e9ecef', border: [false, true, true, true], alignment: 'right' };
+
+                            totalRow[0] = { 
+                                text: totalLabelInline, 
+                                bold: true, 
+                                fontSize: 11, 
+                                fillColor: '#d3d7de', 
+                                border: [true, true, false, true], 
+                                colSpan: spanCols, 
+                                alignment: 'center',
+                                height: 25
+                            };
+                            for (let i = 1; i < spanCols; i++) { 
+                                totalRow[i] = { fillColor: '#d3d7de', border: [false, true, false, true], text: '', height: 25 }; 
+                            }
+
+                            totalRow[colCount - 3] = { 
+                                text: paidCountText || '-', 
+                                bold: false, 
+                                fontSize: 11, 
+                                fillColor: '#d3d7de', 
+                                border: [false, true, false, true], 
+                                alignment: 'center',
+                                height: 25
+                            };
+
+                            totalRow[colCount - 2] = { 
+                                text: totalAmountText || '0', 
+                                bold: false, 
+                                fontSize: 11, 
+                                fillColor: '#d3d7de', 
+                                border: [false, true, false, true], 
+                                alignment: 'right',
+                                height: 25
+                            };
+
+                            totalRow[colCount - 1] = { 
+                                text: (parseFloat(totalDueText) > 0) ? totalDueText : '', 
+                                fillColor: '#d3d7de', 
+                                border: [false, true, true, true], 
+                                alignment: 'right',
+                                height: 25
+                            };
+
                             newBody.push(totalRow);
                         } catch (e) {}
+
 
                         fullTable.body = newBody;
                         fullTable.headerRows = 1;
@@ -1753,7 +1828,7 @@ $(document).ready(function() {
                         // Keep compact page numbering footer only
                         doc.footer = function(currentPage, pageCount) {
                             return {
-                                text: "{{ __('datatables.page') }} " + currentPage + " {{ __('datatables.of') }} " + pageCount,
+                                text: `${window.exportDataExpenses.page} ${currentPage} ${window.exportDataExpenses.of} ${pageCount}`,
                                 alignment: footerDir,
                                 fontSize: 9,
                                 margin: [25, 0, 25, 0]
