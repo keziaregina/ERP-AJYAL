@@ -763,11 +763,17 @@ class PayrollController extends Controller
             $payrolls = $query->get();
 
             if ($payrolls->isEmpty()) {
-                return redirect()->action([self::class, 'index'])
-                    ->with('status', [
+                if ($request->ajax() || $request->has('check_only')) {
+                    return response()->json([
                         'success' => false,
                         'msg' => __('essentials::lang.no_payroll_data_found')
                     ]);
+                }
+
+                return back()->with('status', [
+                    'success' => false,
+                    'msg' => __('essentials::lang.no_payroll_data_found')
+                ]);
             }
 
             $payrollData = $payrolls->map(function ($payroll) use ($business_id) {
@@ -858,7 +864,6 @@ class PayrollController extends Controller
             ]);
         }
     }
-
 
     public function printAll () 
     {
