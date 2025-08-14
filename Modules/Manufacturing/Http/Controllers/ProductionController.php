@@ -13,6 +13,7 @@ use App\Utils\BusinessUtil;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Utils\TransactionUtil;
+use App\VariationLocationDetails;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
@@ -276,6 +277,11 @@ class ProductionController extends Controller
                 $purchase_line_data['sub_unit_id'] = $request->input('sub_unit_id');
             }
 
+            $product_id = Variation::where('id', $request->input('variation_id'))->first()->product_id;
+            if ($product_id) {
+                $transaction_data['opening_stock_product_id'] = $product_id;
+            }
+
             DB::beginTransaction();
 
             $transaction = Transaction::create($transaction_data);
@@ -373,6 +379,17 @@ class ProductionController extends Controller
             }
 
             DB::commit();
+
+            // Update Stock    
+            $stock_details = $this->productUtil->getVariationStockDetails($business_id, request()->input('variation_id'), $transaction->location_id);
+            $stock_history = $this->productUtil->getVariationStockHistory($business_id, request()->input('variation_id'), $transaction->location_id);
+    
+            //if mismach found update stock in variation location details
+            if (isset($stock_history[0]) && (float) $stock_details['current_stock'] != (float) $stock_history[0]['stock']) {
+                VariationLocationDetails::where('variation_id', request()->input('variation_id'))
+                                    ->where('location_id', $transaction->location_id)
+                                    ->update(['qty_available' => $stock_history[0]['stock']]);
+            }
 
             $output = ['success' => 1,
                 'msg' => __('lang_v1.added_success'),
@@ -841,6 +858,19 @@ class ProductionController extends Controller
 
             DB::commit();
 
+            // Update Stock    
+            $transactionInstance = Transaction::where('business_id', $business_id)
+                                        ->where('type', 'production_purchase')
+                                        ->findOrFail($id);
+            $stock_details = $this->productUtil->getVariationStockDetails($business_id, request()->input('variation_id'), $transactionInstance->location_id);
+            $stock_history = $this->productUtil->getVariationStockHistory($business_id, request()->input('variation_id'), $transactionInstance->location_id);
+    
+            //if mismach found update stock in variation location details
+            if (isset($stock_history[0]) && (float) $stock_details['current_stock'] != (float) $stock_history[0]['stock']) {
+                VariationLocationDetails::where('variation_id', request()->input('variation_id'))
+                                    ->where('location_id', $transactionInstance->location_id)
+                                    ->update(['qty_available' => $stock_history[0]['stock']]);
+            }
             $output = ['success' => 1,
                 'msg' => __('lang_v1.updated_success'),
             ];
@@ -875,7 +905,27 @@ class ProductionController extends Controller
                             ->where('business_id', $business_id)
                             ->where('type', 'production_purchase')
                             ->where('mfg_is_final', 0)
-                            ->delete();
+                            ->first();
+
+                $purchase_lines = $transaction->purchase_lines;
+
+                $transactionInstance = $transaction;
+                $transaction->delete();
+
+                if ($purchase_lines->count() > 0) {
+                    foreach ($purchase_lines as $data) {
+                        $stock_details = $this->productUtil->getVariationStockDetails($business_id, $data->variation_id, $transactionInstance->location_id);
+                        $stock_history = $this->productUtil->getVariationStockHistory($business_id, $data->variation_id, $transactionInstance->location_id);
+                        
+                        //if mismach found update stock in variation location details
+                        if (isset($stock_history[0]) && (float) $stock_details['current_stock'] != (float) $stock_history[0]['stock']) {
+                            VariationLocationDetails::where('variation_id', $data->variation_id)
+                            ->where('location_id', $transactionInstance->location_id)
+                            ->update(['qty_available' => $stock_history[0]['stock']]);
+                        }
+                    }
+                }
+
                 $output = [
                     'success' => true,
                     'msg' => __('lang_v1.deleted_success'),
