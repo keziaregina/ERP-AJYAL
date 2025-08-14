@@ -5246,11 +5246,17 @@ class TransactionUtil extends Util
                             ->with(['location'])
                             ->select('transactions.*');
 
-        if ($format == 'format_2') {
+        // if ($format == 'format_2' ) {
+        //     $transaction_query->leftjoin('transaction_payments as tp', 'tp.transaction_id', '=', 'transactions.id')
+        //                     ->addSelect(DB::raw('COALESCE(SUM(tp.amount), 0) as total_paid'))
+        //                     ->groupBy('transactions.id');
+        // }
+
+        // if ($format == 'format_2' || $format == 'format_1') {
             $transaction_query->leftjoin('transaction_payments as tp', 'tp.transaction_id', '=', 'transactions.id')
                             ->addSelect(DB::raw('COALESCE(SUM(tp.amount), 0) as total_paid'))
                             ->groupBy('transactions.id');
-        }
+        // }
 
         $transactions = $transaction_query->get();
         $transaction_types = Transaction::transactionTypes();
@@ -5287,12 +5293,21 @@ class TransactionUtil extends Util
                 'transaction_type' => $transaction->type,
             ];
 
-            if ($format == 'format_2') {
+            // Old Code
+            // if ($format == 'format_2' ) {
+            //     $temp_array['final_total'] = $transaction->final_total;
+            //     $temp_array['total_due'] = $transaction->final_total - $transaction->total_paid;
+            //     $temp_array['due_date'] = $transaction->due_date;
+            //     $temp_array['payment_status'] = $transaction->payment_status;
+            // }
+
+            // New Code
+            // if ($format == 'format_2' || $format == 'format_1') {
                 $temp_array['final_total'] = $transaction->final_total;
                 $temp_array['total_due'] = $transaction->final_total - $transaction->total_paid;
                 $temp_array['due_date'] = $transaction->due_date;
                 $temp_array['payment_status'] = $transaction->payment_status;
-            }
+            // }
 
             if ($format == 'format_3') {
                 foreach ($transaction->sell_lines as $key => $value) {
@@ -5429,7 +5444,11 @@ class TransactionUtil extends Util
         }
 
         $total_opening_bal = $beginning_balance + $opening_balance_due;
-        if ($format != 'format_2') {
+        // Old Code
+        // if ($format != 'format_2') {
+
+        // New Code
+        if ($format != 'format_2' || $format != 'format_1') {
             //Add Beginning balance & openining balance to ledger
             $ledger = array_merge([[
                 'date' => $start,

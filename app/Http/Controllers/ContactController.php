@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
 use Yajra\DataTables\Facades\DataTables;
 use App\Events\ContactCreatedOrModified;
+use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
@@ -1647,9 +1648,25 @@ class ContactController extends Controller
     {
         if (request()->ajax()) {
             $business_id = request()->session()->get('user.business_id');
-            $due = $this->transactionUtil->getContactDue($contact_id, $business_id);
+            // $due = $this->transactionUtil->getContactDue($contact_id, $business_id);
+            $due = $this->transactionUtil->getLedgerDetails($contact_id, now()->startOfYear()->format('Y-m-d'), now()->endOfYear()->format('Y-m-d'), 'format_2', null);
 
-            $output = $due != 0 ? $this->transactionUtil->num_f($due, true) : '';
+            $balance_due_calc = 0;
+
+            foreach ($due['ledger'] as $data) {
+                if (empty($data['total_due'])) {
+                    continue;
+                }
+
+                if ($data['payment_status'] != 'paid' && !empty($data['due_date'])) {
+                    if (!empty($data['transaction_type']) && $data['transaction_type'] == 'ledger_discount') {
+                        $data['total_due'] = -1 * $data['total_due'];
+                    }
+                    $balance_due_calc += $data['total_due'];
+                }
+            }
+
+            $output = $balance_due_calc != 0 ? $this->transactionUtil->num_f($balance_due_calc, true) : '';
 
             return $output;
         }

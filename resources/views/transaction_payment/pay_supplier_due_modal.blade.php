@@ -142,9 +142,9 @@
                 <i class="fas fa-money-bill-alt"></i>
               </span>
               @if(in_array($due_payment_type, ['sell_return', 'purchase_return']))
-              {!! Form::text("amount", @num_format($payment_line->amount), ['class' => 'form-control input_number payment_amount', 'required', 'placeholder' => __('sale.amount'), 'data-rule-max-value' => $payment_line->amount, 'data-msg-max-value' => __('lang_v1.max_amount_to_be_paid_is', ['amount' => $amount_formated])]); !!}
+              {!! Form::text("amount", @num_format($balance_due_calc), ['class' => 'form-control input_number payment_amount', 'required', 'placeholder' => __('sale.amount'), 'data-rule-max-value' => $payment_line->amount, 'data-msg-max-value' => __('lang_v1.max_amount_to_be_paid_is', ['amount' => $balance_due_calc])]); !!}
               @else
-                {!! Form::text("amount", @num_format($payment_line->amount), ['class' => 'form-control input_number payment_amount', 'required', 'placeholder' => __('sale.amount')]); !!}
+                {!! Form::text("amount", @num_format($balance_due_calc), ['class' => 'form-control input_number payment_amount', 'required', 'placeholder' => __('sale.amount')]); !!}
               @endif
             </div>
           </div>

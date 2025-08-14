@@ -97,9 +97,33 @@
                 </tr>
             @endif
 
-			<tr >
+			<!-- Old Code -->
+			{{-- <tr >
 				<td><strong>@lang('lang_v1.balance_due')</strong></td>
 				<td class="align-right">@format_currency($ledger_details['all_balance_due'])</td>
+			</tr> --}}
+
+			<!-- New Code -->
+			@php
+				$balance_due_calc = 0;
+
+				foreach($ledger_details['ledger'] as $data) {
+					if (empty($data['total_due'])) {
+						continue;
+					}
+
+					if ($data['payment_status'] != 'paid' && !empty($data['due_date'])) {
+						if (!empty($data['transaction_type']) && $data['transaction_type'] == 'ledger_discount') {
+							$data['total_due'] = -1 * $data['total_due'];
+						}
+						$balance_due_calc += $data['total_due'];
+					}
+				}
+			@endphp
+
+			<tr>
+				<td><strong>@lang('lang_v1.balance_due')</strong></td>
+				<td class="align-right">@format_currency($balance_due_calc)</td>
 			</tr>
 		</table>
 	</div>
