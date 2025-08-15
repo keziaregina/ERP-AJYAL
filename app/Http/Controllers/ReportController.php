@@ -1140,6 +1140,11 @@ class ReportController extends Controller
             abort(403, 'Unauthorized action.');
         }
         $business_id = $request->session()->get('user.business_id');
+         
+        $businesLocationS = BusinessLocation::where('business_id', $business_id)
+        ->first();
+
+        $businesLocationS->default_payment_accounts = json_decode($businesLocationS->default_payment_accounts);
 
         //Return the details in ajax call
         if ($request->ajax()) {
@@ -1151,10 +1156,9 @@ class ReportController extends Controller
         $permitted_locations = auth()->user()->permitted_locations();
 
             $registers = $this->transactionUtil->registerReport($business_id, $permitted_locations, $start_date, $end_date, $user_id);
-            
-            $businesLocationS = BusinessLocation::where('business_id', $business_id)
-                ->first();
-            $businesLocationS->default_payment_accounts = json_decode($businesLocationS->default_payment_accounts);
+           
+            Log::debug("test");
+            Log::debug(json_encode($businesLocationS->default_payment_accounts));
 
             $query = Datatables::of($registers);                                        
                 if(($businesLocationS->default_payment_accounts?->card?->is_enabled ?? 0) == 1) {
@@ -1172,8 +1176,7 @@ class ReportController extends Controller
                 if(($businesLocationS->default_payment_accounts?->cash?->is_enabled ?? 0) == 1) {
                     
                     $query->editColumn('total_cash_payment', function ($row) {
-
-                            return '<span data-orig-value="'.$row->total_cash_payment.'" >'.$this->transactionUtil->num_f($row->total_cash_payment, true).'</span>';                           
+                        return '<span data-orig-value="'.$row->total_cash_payment.'" >'.$this->transactionUtil->num_f($row->total_cash_payment, true).'</span>';                           
                     });
                 }
                 if(($businesLocationS->default_payment_accounts?->bank_transfer?->is_enabled ?? 0) == 1) {
@@ -1186,11 +1189,11 @@ class ReportController extends Controller
                         return '<span data-orig-value="'.$row->total_other_payment.'" >'.$this->transactionUtil->num_f($row->total_other_payment, true).'</span>';
                     });
                 }
-                // if(($businesLocationS->default_payment_accounts?->other?->is_enabled ?? 0) == 1) {
+                if(($businesLocationS->default_payment_accounts?->other?->is_enabled ?? 0) == 1) {
                     $query->editColumn('total_advance_payment', function ($row) {
                         return '<span data-orig-value="'.$row->total_advance_payment.'" >'.$this->transactionUtil->num_f($row->total_advance_payment, true).'</span>';
                     });
-                // }
+                }
                 if(($businesLocationS->default_payment_accounts?->custom_pay_1?->is_enabled ?? 0) == 1) {
                     $query->editColumn('total_custom_pay_1', function ($row) {
                         return '<span data-orig-value="'.$row->total_custom_pay_1.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_1, true).'</span>';
@@ -1254,11 +1257,12 @@ class ReportController extends Controller
         }
 
         $users = User::forDropdown($business_id, false);
+        $paymentOptions = $businesLocationS->default_payment_accounts;
         $payment_types = $this->transactionUtil->payment_types(null, true, $business_id);
 
 
         return view('report.register_report')
-                    ->with(compact('users', 'payment_types'));
+                    ->with(compact('users', 'payment_types', 'paymentOptions'));
     }
 
     /**
