@@ -253,3 +253,8 @@
     });
 
 </script>
+<script>
+let exportFooterData = {};
+
+
+</script>
