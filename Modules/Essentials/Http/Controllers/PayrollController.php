@@ -762,6 +762,157 @@ class PayrollController extends Controller
         'total_overtime', 'location', 'total_days_present', 'total_absent'));
     }
 
+    public function printPayroll(Request $request)
+    {
+        $business_id = session('user.business_id');
+
+        if (!(auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'essentials_module'))) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        try {
+            $query = Transaction::where('business_id', $business_id)
+                ->where('type', 'payroll')
+                ->with(['transaction_for', 'payment_lines']);
+
+            if (!auth()->user()->can('essentials.view_all_payroll')) {
+                $query->where('expense_for', auth()->id());
+            }
+
+            $query->when(!empty($request->employee_ids), function($q) use ($request) {
+                $q->whereIn('expense_for', $request->employee_ids);
+            });
+
+            $query->when($request->department_id, function($q, $department_id) {
+                $q->whereHas('transaction_for', function($q2) use ($department_id) {
+                    $q2->where('essentials_department_id', $department_id);
+                });
+            });
+
+            $query->when($request->designation_id, function($q, $designation_id) {
+                $q->whereHas('transaction_for', function($q2) use ($designation_id) {
+                    $q2->where('essentials_designation_id', $designation_id);
+                });
+            });
+
+            $query->when($request->month_year, function($q, $month_year) {
+                $parts = explode('/', $month_year);
+                if (count($parts) === 2) {
+                    [$month, $year] = $parts;
+                    $q->whereYear('transaction_date', $year)
+                    ->whereMonth('transaction_date', $month);
+                }
+            });
+
+            $query->when($request->status, function($q, $status) {
+                $q->where('payment_status', $status);
+            });
+
+            $payrolls = $query->get();
+
+            if ($payrolls->isEmpty()) {
+                if ($request->ajax() || $request->has('check_only')) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => __('essentials::lang.no_payroll_data_found')
+                    ]);
+                }
+
+                return back()->with('status', [
+                    'success' => false,
+                    'msg' => __('essentials::lang.no_payroll_data_found')
+                ]);
+            }
+
+            $payrollData = $payrolls->map(function ($payroll) use ($business_id) {
+                $transaction_date = \Carbon::parse($payroll->transaction_date);
+
+                $department = Category::where('category_type', 'hrm_department')
+                    ->find($payroll?->transaction_for?->essentials_department_id);
+
+                $designation = Category::where('category_type', 'hrm_designation')
+                    ->find($payroll?->transaction_for?->essentials_designation_id);
+
+                $location = BusinessLocation::where('business_id', $business_id)
+                    ->find($payroll?->transaction_for?->location_id);
+
+                $allowances = json_decode($payroll->essentials_allowances ?? '[]', true);
+                $deductions = json_decode($payroll->essentials_deductions ?? '[]', true);
+                $bank_details = json_decode($payroll?->transaction_for?->bank_details ?? '[]', true);
+
+                $final_total_in_words = $this->commonUtil->numToIndianFormat($payroll->final_total);
+
+                $start_of_month = $transaction_date->copy()->startOfMonth();
+                $end_of_month = $transaction_date->copy()->endOfMonth();
+
+                $leaves = EssentialsLeave::where('business_id', $business_id)
+                    ->where('user_id', $payroll?->transaction_for?->id)
+                    ->whereBetween('start_date', [$start_of_month, $end_of_month])
+                    ->get();
+
+                $total_leaves = $leaves->sum(fn($leave) =>
+                    \Carbon::parse($leave->start_date)->diffInDays(\Carbon::parse($leave->end_date)) + 1
+                );
+
+                $path = public_path('uploads/business_logos/1737635769_logo ajyal.jpg');
+                $base64Image = file_exists($path)
+                    ? 'data:image/' . pathinfo($path, PATHINFO_EXTENSION) . ';base64,' . base64_encode(file_get_contents($path))
+                    : null;
+
+                return [
+                    'transaction_date' => $transaction_date,
+                    'base64Image' => $base64Image,
+                    'department' => $department,
+                    'designation' => $designation,
+                    'location' => $location,
+                    'month_name' => $transaction_date->format('F'),
+                    'year' => $transaction_date->format('Y'),
+                    'allowances' => $allowances,
+                    'deductions' => $deductions,
+                    'bank_details' => $bank_details,
+                    'payment_types' => $this->moduleUtil->payment_types(),
+                    'final_total_in_words' => $final_total_in_words,
+                    'start_of_month' => $start_of_month,
+                    'end_of_month' => $end_of_month,
+                    'leaves' => $leaves,
+                    'total_leaves' => $total_leaves,
+                    'days_in_a_month' => $start_of_month->daysInMonth,
+                    'total_days_present' => $payroll->total_days_worked,
+                    'month' => $payroll->payroll_month,
+                    'employee_id' => $payroll?->transaction_for?->id,
+                    'total_overtime' => EmployeeOvertime::getAndCalculateTotalOvertime(
+                        $business_id,
+                        $payroll?->transaction_for?->id,
+                        $payroll->payroll_month
+                    ),
+                    'total_absent' => $payroll->total_absent,
+                    'payroll' => $payroll,
+                    'printDate' => now()->format('Y-m-d')
+                ];
+            });
+
+            ini_set("pcre.backtrack_limit", "500000000");
+
+            $pdf = PDF::loadView('essentials::payroll.showAll', [
+                'payrollData' => $payrollData
+            ], [], [
+                'format' => 'A5',
+                'orientation'=> 'P'
+            ]);
+
+            return $pdf->stream('Document.pdf');
+
+        } catch (\Exception $e) {
+            Log::error('Error print payroll ----> '.$e->getMessage());
+            \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
+            
+            return back()->with('status', [
+                'success' => false,
+                'msg' => __('messages.something_went_wrong')
+            ]);
+        }
+    }
+
     public function printAll () 
     {
         $business_id = request()->session()->get('user.business_id');
@@ -772,12 +923,14 @@ class PayrollController extends Controller
         $query = Transaction::where('business_id', $business_id)
                         ->where('type', 'payroll')                        
                         ->with(['transaction_for', 'payment_lines']);
+        // dd($business_id);
 
         if (! auth()->user()->can('essentials.view_all_payroll')) {
             $query->where('expense_for', auth()->user()->id);
         }
-        $payrolls = $query->get();  
-        // dd($payrolls->toArray());   
+
+        $payrolls = $query->get(); 
+        // dd($payrolls);
 
         $payrollData = [];
 
