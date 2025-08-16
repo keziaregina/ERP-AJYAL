@@ -133,9 +133,9 @@
 								<i class="fa fa-user"></i>
 							</span>
 							<input type="hidden" id="default_customer_id" 
-							value="{{ $walk_in_customer['id']}}" >
+							value="{{ $walk_in_customer['id'] ?? ''}}" >
 							<input type="hidden" id="default_customer_name" 
-							value="{{ $walk_in_customer['name']}}" >
+							value="{{ $walk_in_customer['name'] ?? ''}}" >
 							<input type="hidden" id="default_customer_balance" value="{{ $walk_in_customer['balance'] ?? ''}}" >
 							<input type="hidden" id="default_customer_address" value="{{ $walk_in_customer['shipping_address'] ?? ''}}" >
 							@if(!empty($walk_in_customer['price_calculation_type']) && $walk_in_customer['price_calculation_type'] == 'selling_price_group')
@@ -177,14 +177,15 @@
 					@endphp
 		              {!! Form::label('pay_term_number', __('contact.pay_term') . ':') !!} @show_tooltip(__('tooltip.pay_term'))
 		              <br/>
-		              {!! Form::number('pay_term_number', $walk_in_customer['pay_term_number'], ['class' => 'form-control width-40 pull-left', 'placeholder' => __('contact.pay_term'), 'required' => $is_pay_term_required]); !!}
-
-		              {!! Form::select('pay_term_type', 
-		              	['months' => __('lang_v1.months'), 
-		              		'days' => __('lang_v1.days')], 
-		              		$walk_in_customer['pay_term_type'], 
-		              	['class' => 'form-control width-60 pull-left','placeholder' => __('messages.please_select'), 'required' => $is_pay_term_required]); !!}
-		            </div>
+						{!! Form::number('pay_term_number', $walk_in_customer['pay_term_number'] ?? null, 
+						['class' => 'form-control width-40 pull-left', 'placeholder' => __('contact.pay_term'),
+						'required' => $is_pay_term_required]) !!}
+						{!! Form::select('pay_term_type',
+						['months' => __('lang_v1.months'),
+							'days' => __('lang_v1.days')],
+							$walk_in_customer['pay_term_type'] ?? null, 
+						 ['class' => 'form-control width-60 pull-left','placeholder' => __('messages.please_select'), 'required' => $is_pay_term_required]); !!}		            
+                    </div>
 		          </div>
 		        </div>
 
