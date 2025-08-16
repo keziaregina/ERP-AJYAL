@@ -114,7 +114,7 @@
         <div class="modal fade edit_payment_modal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
         </div>
 
-        @include('urchase.partials.update_purchase_status_modal')
+        @include('purchase.partials.update_purchase_status_modal')
 
     </section>
 
