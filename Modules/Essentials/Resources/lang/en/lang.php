@@ -374,4 +374,6 @@ return [
     'total_leaves' => 'Total Leaves',
     // 'ab' => 'Total Absent',
     'earnings' => 'Earnings',
+    'status' => 'Status',
+    'no_payroll_data_found' => 'No payroll data found!',
 ];

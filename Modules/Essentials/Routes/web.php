@@ -80,6 +80,7 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
         );
 
         Route::get('/printAll', [Modules\Essentials\Http\Controllers\PayrollController::class, 'printAll'])->name('printAll');
+        Route::get('/printPayroll', [Modules\Essentials\Http\Controllers\PayrollController::class, 'printPayroll'])->name('printPayroll');
         Route::get('/location-employees', [Modules\Essentials\Http\Controllers\PayrollController::class, 'getEmployeesBasedOnLocation']);
         Route::get('/my-payrolls', [Modules\Essentials\Http\Controllers\PayrollController::class, 'getMyPayrolls']);
         Route::get('/get-allowance-deduction-row', [Modules\Essentials\Http\Controllers\PayrollController::class, 'getAllowanceAndDeductionRow']);
