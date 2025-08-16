@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\BusinessLocation;
 use App\CashRegister;
-use App\Utils\CashRegisterUtil;
+use App\BusinessLocation;
 use App\Utils\ModuleUtil;
 use Illuminate\Http\Request;
+use App\Utils\CashRegisterUtil;
+use Illuminate\Support\Facades\Log;
 
 class CashRegisterController extends Controller
 {
@@ -113,17 +114,26 @@ class CashRegisterController extends Controller
         }
 
         $business_id = request()->session()->get('user.business_id');
+        $businesLocationS = BusinessLocation::where('business_id', $business_id)
+        ->first();
+        $businesLocationS->default_payment_accounts = json_decode($businesLocationS->default_payment_accounts);
+        // Log::debug("test");
+            // Log::debug(json_encode($businesLocationS->default_payment_accounts));
 
-        $register_details = $this->cashRegisterUtil->getRegisterDetails($id);
+        $register_details = $this->cashRegisterUtil->getRegisterDetails($id);     
+        // Log::info('Register Details==========================>');
+        // Log::info(json_encode($register_details->all(), JSON_PRETTY_PRINT));
         $user_id = $register_details->user_id;
         $open_time = $register_details['open_time'];
         $close_time = ! empty($register_details['closed_at']) ? $register_details['closed_at'] : \Carbon::now()->toDateTimeString();
         $details = $this->cashRegisterUtil->getRegisterTransactionDetails($user_id, $open_time, $close_time);
+        // Log::info('Details==========================>');
+        // Log::info($details);
 
         $payment_types = $this->cashRegisterUtil->payment_types(null, false, $business_id);
 
         return view('cash_register.register_details')
-                    ->with(compact('register_details', 'details', 'payment_types', 'close_time'));
+                    ->with(compact('register_details', 'details', 'payment_types', 'close_time', 'businesLocationS'));
     }
 
     /**

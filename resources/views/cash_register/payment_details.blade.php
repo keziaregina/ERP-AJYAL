@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-sm-12">
+  <div class="col-sm-12">    
     <table class="table table-condensed">
       <tr>
         <th>@lang('lang_v1.payment_method')</th>
@@ -15,163 +15,189 @@
         </td>
         <td>--</td>
       </tr>
-      <tr>
-        <td>
-          @lang('cash_register.cash_payment'):
-        </th>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash }}</span>
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash_expense }}</span>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          @lang('cash_register.checque_payment'):
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cheque }}</span>
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cheque_expense }}</span>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          @lang('cash_register.card_payment'):
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_card }}</span>
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_card_expense }}</span>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          @lang('cash_register.bank_transfer'):
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_bank_transfer }}</span>
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_bank_transfer_expense }}</span>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          @lang('lang_v1.advance_payment'):
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_advance }}</span>
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_advance_expense }}</span>
-        </td>
-      </tr>
-      @if(array_key_exists('custom_pay_1', $payment_types))
+      @if(($businesLocationS->default_payment_accounts?->cash?->is_enabled ?? 0) == 1)
         <tr>
           <td>
-            {{$payment_types['custom_pay_1']}}:
+            @lang('cash_register.cash_payment'):
+          </th>
+          <td>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash }}</span>
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_1 }}</span>
-          </td>
-          <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_1_expense }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash_expense }}</span>
           </td>
         </tr>
       @endif
-      @if(array_key_exists('custom_pay_2', $payment_types))
+      @if(($businesLocationS->default_payment_accounts?->cheque?->is_enabled ?? 0) == 1)
         <tr>
           <td>
-            {{$payment_types['custom_pay_2']}}:
+            @lang('cash_register.checque_payment'):
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_2 }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cheque }}</span>
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_2_expense }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cheque_expense }}</span>
           </td>
         </tr>
       @endif
-      @if(array_key_exists('custom_pay_3', $payment_types))
+      @if(($businesLocationS->default_payment_accounts?->card?->is_enabled ?? 0) == 1)
         <tr>
           <td>
-            {{$payment_types['custom_pay_3']}}:
+            @lang('cash_register.card_payment'):
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_3 }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_card }}</span>
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_3_expense }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_card_expense }}</span>
           </td>
         </tr>
       @endif
-      @if(array_key_exists('custom_pay_4', $payment_types))
+      @if(($businesLocationS->default_payment_accounts?->bank_transfer?->is_enabled ?? 0) == 1)
         <tr>
           <td>
-            {{$payment_types['custom_pay_4']}}:
+            @lang('cash_register.bank_transfer'):
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_4 }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_bank_transfer }}</span>
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_4_expense }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_bank_transfer_expense }}</span>
           </td>
         </tr>
       @endif
-      @if(array_key_exists('custom_pay_5', $payment_types))
+      @if(($businesLocationS->default_payment_accounts?->other?->is_enabled ?? 0) == 1)
         <tr>
           <td>
-            {{$payment_types['custom_pay_5']}}:
+            @lang('lang_v1.advance_payment'):
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_5 }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_advance }}</span>
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_5_expense }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_advance_expense }}</span>
           </td>
         </tr>
       @endif
-      @if(array_key_exists('custom_pay_6', $payment_types))
+      @if(($businesLocationS->default_payment_accounts?->custom_pay_1?->is_enabled ?? 0) == 1)
+        @if(array_key_exists('custom_pay_1', $payment_types))
+          <tr>
+            <td>
+              {{$payment_types['custom_pay_1']}}:
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_1 }}</span>
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_1_expense }}</span>
+            </td>
+          </tr>
+        @endif
+      @endif
+      @if(($businesLocationS->default_payment_accounts?->custom_pay_2?->is_enabled ?? 0) == 1)
+        @if(array_key_exists('custom_pay_2', $payment_types))
+          <tr>
+            <td>
+              {{$payment_types['custom_pay_2']}}:
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_2 }}</span>
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_2_expense }}</span>
+            </td>
+          </tr>
+        @endif
+      @endif
+      @if(($businesLocationS->default_payment_accounts?->custom_pay_3?->is_enabled ?? 0) == 1)
+        @if(array_key_exists('custom_pay_3', $payment_types))
+          <tr>
+            <td>
+              {{$payment_types['custom_pay_3']}}:
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_3 }}</span>
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_3_expense }}</span>
+            </td>
+          </tr>
+        @endif
+      @endif
+      @if(($businesLocationS->default_payment_accounts?->custom_pay_4?->is_enabled ?? 0) == 1)
+        @if(array_key_exists('custom_pay_4', $payment_types))
+          <tr>
+            <td>
+              {{$payment_types['custom_pay_4']}}:
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_4 }}</span>
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_4_expense }}</span>
+            </td>
+          </tr>
+        @endif
+      @endif
+      @if(($businesLocationS->default_payment_accounts?->custom_pay_5?->is_enabled ?? 0) == 1)
+        @if(array_key_exists('custom_pay_5', $payment_types))
+          <tr>
+            <td>
+              {{$payment_types['custom_pay_5']}}:
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_5 }}</span>
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_5_expense }}</span>
+            </td>
+          </tr>
+        @endif
+      @endif
+      @if(($businesLocationS->default_payment_accounts?->custom_pay_6?->is_enabled ?? 0) == 1)
+        @if(array_key_exists('custom_pay_6', $payment_types))
+          <tr>
+            <td>
+              {{$payment_types['custom_pay_6']}}:
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_6 }}</span>
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_6_expense }}</span>
+            </td>
+          </tr>
+        @endif
+      @endif
+      @if(($businesLocationS->default_payment_accounts?->custom_pay_7?->is_enabled ?? 0) == 1)
+        @if(array_key_exists('custom_pay_7', $payment_types))
+          <tr>
+            <td>
+              {{$payment_types['custom_pay_7']}}:
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_7 }}</span>
+            </td>
+            <td>
+              <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_7_expense }}</span>
+            </td>
+          </tr>
+        @endif
+      @endif
+      @if(($businesLocationS->default_payment_accounts?->other?->is_enabled ?? 0) == 1)
         <tr>
           <td>
-            {{$payment_types['custom_pay_6']}}:
+            @lang('cash_register.other_payments'):
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_6 }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_other }}</span>
           </td>
           <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_6_expense }}</span>
+            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_other_expense }}</span>
           </td>
         </tr>
       @endif
-      @if(array_key_exists('custom_pay_7', $payment_types))
-        <tr>
-          <td>
-            {{$payment_types['custom_pay_7']}}:
-          </td>
-          <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_7 }}</span>
-          </td>
-          <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_7_expense }}</span>
-          </td>
-        </tr>
-      @endif
-      <tr>
-        <td>
-          @lang('cash_register.other_payments'):
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_other }}</span>
-        </td>
-        <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_other_expense }}</span>
-        </td>
-      </tr>
     </table>
     <hr>
     <table class="table table-condensed">

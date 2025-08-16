@@ -1157,8 +1157,8 @@ class ReportController extends Controller
 
             $registers = $this->transactionUtil->registerReport($business_id, $permitted_locations, $start_date, $end_date, $user_id);
            
-            Log::debug("test");
-            Log::debug(json_encode($businesLocationS->default_payment_accounts));
+            // Log::debug("test");
+            // Log::debug(json_encode($businesLocationS->default_payment_accounts));
 
             $query = Datatables::of($registers);                                        
                 if(($businesLocationS->default_payment_accounts?->card?->is_enabled ?? 0) == 1) {
