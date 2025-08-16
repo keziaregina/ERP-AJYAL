@@ -62,6 +62,14 @@
                         {!! Form::select('expense_payment_status', ['paid' => __('lang_v1.paid'), 'due' => __('lang_v1.due'), 'partial' => __('lang_v1.partial')], null, ['class' => 'form-control select2', 'style' => 'width:100%', 'placeholder' => __('lang_v1.all')]); !!}
                     </div>
                 </div>
+                @if(auth()->user()->can('all_expense.access'))
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            {!! Form::label('expense_user_filter', __('expense user').':') !!}
+                            {!! Form::select('expense_user_filter', $users, null, ['class' => 'form-control select2', 'style' => 'width:100%', 'placeholder' => __('lang_v1.all')]); !!}
+                        </div>
+                    </div>
+                @endif
             @endcomponent
         </div>
     </div>

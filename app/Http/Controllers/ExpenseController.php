@@ -18,6 +18,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 use App\Events\ExpenseCreatedOrModified;
+use Illuminate\Support\Facades\Log;
+use Psy\Readline\Hoa\Console;
 
 class ExpenseController extends Controller
 {
@@ -43,6 +45,7 @@ class ExpenseController extends Controller
      */
     public function index()
     {
+
         if (! auth()->user()->can('all_expense.access') && ! auth()->user()->can('view_own_expense')) {
             abort(403, 'Unauthorized action.');
         }
@@ -158,13 +161,28 @@ class ExpenseController extends Controller
             }
 
             $is_admin = $this->moduleUtil->is_admin(auth()->user(), $business_id);
+            // Log::info('MATEMORIS',$is_admin);
             if (! $is_admin && ! auth()->user()->can('all_expense.access')) {
                 $user_id = auth()->user()->id;
                 $expenses->where(function ($query) use ($user_id) {
                     $query->where('transactions.created_by', $user_id)
                         ->orWhere('transactions.expense_for', $user_id);
-                });
+                    });
             }
+           
+            if (auth()->user()->can('all_expense.access')) {
+                if (request()->filled('expense_user_filter')) {
+                    $userFilter = request()->get('expense_user_filter');
+                    if (!empty($userFilter)) {
+                        $expenses->where('transactions.created_by', $userFilter);
+                    }
+                }
+            } else {
+                $expenses->where('transactions.created_by', auth()->id());
+            }
+            
+            // Log::info('tesss aja', $userFilter);
+
 
             return Datatables::of($expenses)
                 ->addColumn(
