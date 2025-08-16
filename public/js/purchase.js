@@ -558,6 +558,9 @@ $(document).ready(function() {
                 if ($('#purchase_list_filter_status').length) {
                     d.status = $('#purchase_list_filter_status').val();
                 }
+                if ($('#purchase_user_filter').length) {
+                    d.purchase_user_filter = $('#purchase_user_filter').val();
+                }
 
                 var start = '';
                 var end = '';
@@ -569,6 +572,7 @@ $(document).ready(function() {
                         .data('daterangepicker')
                         .endDate.format('YYYY-MM-DD');
                 }
+                d.purchase_user_filter = $('select#purchase_user_filter').val();
                 d.start_date = start;
                 d.end_date = end;
 
@@ -624,23 +628,21 @@ $(document).ready(function() {
 
     var pdfButton = document.querySelector('.buttons-pdf');
     var target = document.querySelector('.hover-q');
-    var originalContent = target.getAttribute('data-content');
-
-    pdfButton.addEventListener('mouseenter', function () {
-        // console.log(target.getAttribute('data-content'));
-        target.setAttribute('data-content', 'test');
-        // console.log(target.getAttribute('data-content'));
-    });
-    pdfButton.addEventListener('mouseleave', function () {
-        target.setAttribute('data-content', originalContent);
-        // console.log(target.getAttribute('data-content'));
-    });
+    if (pdfButton && target) {
+        var originalContent = target.getAttribute('data-content');
+        pdfButton.addEventListener('mouseenter', function () {
+            target.setAttribute('data-content', 'test');
+        });
+        pdfButton.addEventListener('mouseleave', function () {
+            target.setAttribute('data-content', originalContent);
+        });
+    }
 
     $(document).on(
         'change',
         '#purchase_list_filter_location_id, \
                     #purchase_list_filter_supplier_id, #purchase_list_filter_payment_status,\
-                     #purchase_list_filter_status',
+                     #purchase_list_filter_status, #purchase_user_filter',
         function() {
             purchase_table.ajax.reload();
         }
