@@ -6,6 +6,7 @@
         <th>@lang('sale.sale')</th>
         <th>@lang('lang_v1.expense')</th>
       </tr>
+      @if(($businesLocationS->default_payment_accounts?->cash?->is_enabled ?? 0) == 1)
       <tr>
         <td>
           @lang('cash_register.cash_in_hand'):
@@ -15,18 +16,17 @@
         </td>
         <td>--</td>
       </tr>
-      @if(($businesLocationS->default_payment_accounts?->cash?->is_enabled ?? 0) == 1)
-        <tr>
-          <td>
-            @lang('cash_register.cash_payment'):
-          </th>
-          <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash }}</span>
-          </td>
-          <td>
-            <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash_expense }}</span>
-          </td>
-        </tr>
+      <tr>
+        <td>
+          @lang('cash_register.cash_payment'):
+        </th>
+        <td>
+          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash }}</span>
+        </td>
+        <td>
+          <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash_expense }}</span>
+        </td>
+      </tr>
       @endif
       @if(($businesLocationS->default_payment_accounts?->cheque?->is_enabled ?? 0) == 1)
         <tr>

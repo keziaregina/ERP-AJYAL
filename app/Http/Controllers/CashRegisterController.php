@@ -117,23 +117,19 @@ class CashRegisterController extends Controller
         $businesLocationS = BusinessLocation::where('business_id', $business_id)
         ->first();
         $businesLocationS->default_payment_accounts = json_decode($businesLocationS->default_payment_accounts);
-        // Log::debug("test");
-            // Log::debug(json_encode($businesLocationS->default_payment_accounts));
 
         $register_details = $this->cashRegisterUtil->getRegisterDetails($id);     
-        // Log::info('Register Details==========================>');
-        // Log::info(json_encode($register_details->all(), JSON_PRETTY_PRINT));
+        Log::info(json_encode($register_details,JSON_PRETTY_PRINT));
+        // dd($register_details);
         $user_id = $register_details->user_id;
         $open_time = $register_details['open_time'];
         $close_time = ! empty($register_details['closed_at']) ? $register_details['closed_at'] : \Carbon::now()->toDateTimeString();
         $details = $this->cashRegisterUtil->getRegisterTransactionDetails($user_id, $open_time, $close_time);
-        // Log::info('Details==========================>');
-        // Log::info($details);
 
         $payment_types = $this->cashRegisterUtil->payment_types(null, false, $business_id);
 
         return view('cash_register.register_details')
-                    ->with(compact('register_details', 'details', 'payment_types', 'close_time', 'businesLocationS'));
+            ->with(compact('register_details', 'details', 'payment_types', 'close_time', 'businesLocationS'));
     }
 
     /**
