@@ -1140,6 +1140,11 @@ class ReportController extends Controller
             abort(403, 'Unauthorized action.');
         }
         $business_id = $request->session()->get('user.business_id');
+         
+        $businesLocationS = BusinessLocation::where('business_id', $business_id)
+        ->first();
+
+        $businesLocationS->default_payment_accounts = json_decode($businesLocationS->default_payment_accounts);
 
         //Return the details in ajax call
         if ($request->ajax()) {
@@ -1151,77 +1156,160 @@ class ReportController extends Controller
         $permitted_locations = auth()->user()->permitted_locations();
 
             $registers = $this->transactionUtil->registerReport($business_id, $permitted_locations, $start_date, $end_date, $user_id);
+           
+            // Log::debug("test");
+            // Log::debug(json_encode($businesLocationS->default_payment_accounts));
 
-            return Datatables::of($registers)
-                ->editColumn('total_card_payment', function ($row) {
-                    return '<span data-orig-value="'.$row->total_card_payment.'" >'.$this->transactionUtil->num_f($row->total_card_payment, true).' ('.$row->total_card_slips.')</span>';
-                })
-                ->editColumn('total_cheque_payment', function ($row) {
-                    return '<span data-orig-value="'.$row->total_cheque_payment.'" >'.$this->transactionUtil->num_f($row->total_cheque_payment, true).' ('.$row->total_cheques.')</span>';
-                })
-                ->editColumn('total_cash_payment', function ($row) {
-                    return '<span data-orig-value="'.$row->total_cash_payment.'" >'.$this->transactionUtil->num_f($row->total_cash_payment, true).'</span>';
-                })
-                ->editColumn('total_bank_transfer_payment', function ($row) {
-                    return '<span data-orig-value="'.$row->total_bank_transfer_payment.'" >'.$this->transactionUtil->num_f($row->total_bank_transfer_payment, true).'</span>';
-                })
-                ->editColumn('total_other_payment', function ($row) {
-                    return '<span data-orig-value="'.$row->total_other_payment.'" >'.$this->transactionUtil->num_f($row->total_other_payment, true).'</span>';
-                })
-                ->editColumn('total_advance_payment', function ($row) {
-                    return '<span data-orig-value="'.$row->total_advance_payment.'" >'.$this->transactionUtil->num_f($row->total_advance_payment, true).'</span>';
-                })
-                ->editColumn('total_custom_pay_1', function ($row) {
-                    return '<span data-orig-value="'.$row->total_custom_pay_1.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_1, true).'</span>';
-                })
-                ->editColumn('total_custom_pay_2', function ($row) {
-                    return '<span data-orig-value="'.$row->total_custom_pay_2.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_2, true).'</span>';
-                })
-                ->editColumn('total_custom_pay_3', function ($row) {
-                    return '<span data-orig-value="'.$row->total_custom_pay_3.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_3, true).'</span>';
-                })
-                ->editColumn('total_custom_pay_4', function ($row) {
-                    return '<span data-orig-value="'.$row->total_custom_pay_4.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_4, true).'</span>';
-                })
-                ->editColumn('total_custom_pay_5', function ($row) {
-                    return '<span data-orig-value="'.$row->total_custom_pay_5.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_5, true).'</span>';
-                })
-                ->editColumn('total_custom_pay_6', function ($row) {
-                    return '<span data-orig-value="'.$row->total_custom_pay_6.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_6, true).'</span>';
-                })
-                ->editColumn('total_custom_pay_7', function ($row) {
-                    return '<span data-orig-value="'.$row->total_custom_pay_7.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_7, true).'</span>';
-                })
-                ->editColumn('closed_at', function ($row) {
+            $query = Datatables::of($registers);                                        
+                if(($businesLocationS->default_payment_accounts?->card?->is_enabled ?? 0) == 1) {
+                    $query->editColumn('total_card_payment', function ($row) {
+                        return '<span data-orig-value="'.$row->total_card_payment.'">'
+                            .$this->transactionUtil->num_f($row->total_card_payment, true)
+                            .' ('.$row->total_card_slips.')</span>';
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->cheque?->is_enabled ?? 0) == 1) {
+                    $query->editColumn('total_cheque_payment', function ($row) {
+                        return '<span data-orig-value="'.$row->total_cheque_payment.'" >'.$this->transactionUtil->num_f($row->total_cheque_payment, true).' ('.$row->total_cheques.')</span>';
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->cash?->is_enabled ?? 0) == 1) {
+                    
+                    $query->editColumn('total_cash_payment', function ($row) {
+                        return '<span data-orig-value="'.$row->total_cash_payment.'" >'.$this->transactionUtil->num_f($row->total_cash_payment, true).'</span>';                           
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->bank_transfer?->is_enabled ?? 0) == 1) {
+                    $query->editColumn('total_bank_transfer_payment', function ($row) {
+                        return '<span data-orig-value="'.$row->total_bank_transfer_payment.'" >'.$this->transactionUtil->num_f($row->total_bank_transfer_payment, true).'</span>';
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->other?->is_enabled ?? 0) == 1) {
+                    $query->editColumn('total_other_payment', function ($row) {
+                        return '<span data-orig-value="'.$row->total_other_payment.'" >'.$this->transactionUtil->num_f($row->total_other_payment, true).'</span>';
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->other?->is_enabled ?? 0) == 1) {
+                    $query->editColumn('total_advance_payment', function ($row) {
+                        return '<span data-orig-value="'.$row->total_advance_payment.'" >'.$this->transactionUtil->num_f($row->total_advance_payment, true).'</span>';
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->custom_pay_1?->is_enabled ?? 0) == 1) {
+                    $query->editColumn('total_custom_pay_1', function ($row) {
+                        return '<span data-orig-value="'.$row->total_custom_pay_1.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_1, true).'</span>';
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->custom_pay_2?->is_enabled ?? 0) == 1) {
+                    $query->editColumn('total_custom_pay_2', function ($row) {
+                        return '<span data-orig-value="'.$row->total_custom_pay_2.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_2, true).'</span>';
+                    });
+                }
+
+                if(($businesLocationS->default_payment_accounts?->custom_pay_3?->is_enabled ?? 0) == 1) {                    
+                    $query->editColumn('total_custom_pay_3', function ($row) {
+                        return '<span data-orig-value="'.$row->total_custom_pay_3.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_3, true).'</span>';
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->custom_pay_4?->is_enabled ?? 0) == 1) {
+                    $query->editColumn('total_custom_pay_4', function ($row) {
+                        return '<span data-orig-value="'.$row->total_custom_pay_4.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_4, true).'</span>';
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->custom_pay_5?->is_enabled ?? 0) == 1) {
+                $query->editColumn('total_custom_pay_5', function ($row) {
+                        return '<span data-orig-value="'.$row->total_custom_pay_5.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_5, true).'</span>';
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->custom_pay_6?->is_enabled ?? 0) == 1) {
+                    $query->editColumn('total_custom_pay_6', function ($row) {
+                        return '<span data-orig-value="'.$row->total_custom_pay_6.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_6, true).'</span>';
+                    });
+                }
+                if(($businesLocationS->default_payment_accounts?->custom_pay_7?->is_enabled ?? 0) == 1) {
+                    $query->editColumn('total_custom_pay_7', function ($row) {
+                        return '<span data-orig-value="'.$row->total_custom_pay_7.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_7, true).'</span>';
+                    });
+                }
+                $query->editColumn('closed_at', function ($row) {
                     if ($row->status == 'close') {
                         return $this->productUtil->format_date($row->closed_at, true);
                     } else {
                         return '';
                     }
-                })
-                ->editColumn('created_at', function ($row) {
+                });
+                $query->editColumn('created_at', function ($row) {
                     return $this->productUtil->format_date($row->created_at, true);
-                })
-                ->addColumn('total', function ($row) {
-                    $total = $row->total_card_payment + $row->total_cheque_payment + $row->total_cash_payment + $row->total_bank_transfer_payment + $row->total_other_payment + $row->total_advance_payment + $row->total_custom_pay_1 + $row->total_custom_pay_2 + $row->total_custom_pay_3 + $row->total_custom_pay_4 + $row->total_custom_pay_5 + $row->total_custom_pay_6 + $row->total_custom_pay_7;
+                });
+                $query->addColumn('total', function ($row) use ($businesLocationS) {
+                    $total = 0;
+
+                    if(($businesLocationS->default_payment_accounts?->card?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_card_payment;
+                    }
+
+                    if(($businesLocationS->default_payment_accounts?->cheque?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_cheque_payment;
+                    }
+
+                    if(($businesLocationS->default_payment_accounts?->bank_transfer?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_bank_transfer_payment;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->cash?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_cash_payment;
+                    }
+
+                    if(($businesLocationS->default_payment_accounts?->other?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_other_payment + $row->total_advance_payment;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_1?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_1;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_2?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_2;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_3?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_3;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_4?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_4;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_5?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_5;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_6?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_6;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_7?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_7;
+                    }
 
                     return '<span data-orig-value="'.$total.'" >'.$this->transactionUtil->num_f($total, true).'</span>';
-                })
-                ->addColumn('action', '<button type="button" data-href="{{action(\'App\Http\Controllers\CashRegisterController@show\', [$id])}}" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline  tw-dw-btn-info tw-w-max btn-modal" 
+                });
+                $query->addColumn('action', '<button type="button" data-href="{{action(\'App\Http\Controllers\CashRegisterController@show\', [$id])}}" class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline  tw-dw-btn-info tw-w-max btn-modal" 
                     data-container=".view_register"><i class="fas fa-eye" aria-hidden="true"></i> @lang("messages.view")</button> @if($status != "close" && auth()->user()->can("close_cash_register"))<button type="button" data-href="{{action(\'App\Http\Controllers\CashRegisterController@getCloseRegister\', [$id])}}" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error tw-w-max btn-modal" 
                         data-container=".view_register"><i class="fas fa-window-close"></i> @lang("messages.close")</button> @endif')
                 ->filterColumn('user_name', function ($query, $keyword) {
                     $query->whereRaw("CONCAT(COALESCE(surname, ''), ' ', COALESCE(first_name, ''), ' ', COALESCE(last_name, ''), '<br>', COALESCE(u.email, '')) like ?", ["%{$keyword}%"]);
-                })
-                ->rawColumns(['action', 'user_name', 'total_card_payment', 'total_cheque_payment', 'total_cash_payment', 'total_bank_transfer_payment', 'total_other_payment', 'total_advance_payment', 'total_custom_pay_1', 'total_custom_pay_2', 'total_custom_pay_3', 'total_custom_pay_4', 'total_custom_pay_5', 'total_custom_pay_6', 'total_custom_pay_7', 'total'])
-                ->make(true);
+                });
+                $query->rawColumns(['action', 'user_name', 'total_card_payment', 'total_cheque_payment', 'total_cash_payment', 'total_bank_transfer_payment', 'total_other_payment', 'total_advance_payment', 'total_custom_pay_1', 'total_custom_pay_2', 'total_custom_pay_3', 'total_custom_pay_4', 'total_custom_pay_5', 'total_custom_pay_6', 'total_custom_pay_7', 'total']);
+                return $query->make(true);                
         }
 
         $users = User::forDropdown($business_id, false);
+        $paymentOptions = $businesLocationS->default_payment_accounts;
         $payment_types = $this->transactionUtil->payment_types(null, true, $business_id);
 
+
         return view('report.register_report')
-                    ->with(compact('users', 'payment_types'));
+                    ->with(compact('users', 'payment_types', 'paymentOptions'));
     }
 
     /**

@@ -48,9 +48,12 @@
                             <th>@lang('report.user')</th>
                             <th>@lang('cash_register.total_card_slips')</th>
                             <th>@lang('cash_register.total_cheques')</th>
+                            {{-- @if ($paymentOptions?->cash?->is_enabled) --}}
                             <th>@lang('cash_register.total_cash')</th>
+                            {{-- @endif --}}
                             <th>@lang('lang_v1.total_bank_transfer')</th>
                             <th>@lang('lang_v1.total_advance_payment')</th>
+                            {{-- @dd($paymentOptions?->card?->is_enabled) --}}
                             <th>{{$payment_types['custom_pay_1']}}</th>
                             <th>{{$payment_types['custom_pay_2']}}</th>
                             <th>{{$payment_types['custom_pay_3']}}</th>
@@ -68,7 +71,9 @@
                             <td colspan="4"><strong>@lang('sale.total'):</strong></td>
                             <td class="footer_total_card_payment"></td>
                             <td class="footer_total_cheque_payment"></td>
+                            {{-- @if ($paymentOptions?->cash?->is_enabled) --}}
                             <td class="footer_total_cash_payment"></td>
+                            {{-- @endif --}}
                             <td class="footer_total_bank_transfer_payment"></td>
                             <td class="footer_total_advance_payment"></td>'
                             <td class="footer_total_custom_pay_1"></td>
@@ -100,13 +105,51 @@
 
     <script>
         const key = 'colvisState_register_report';
-        const colvis = localStorage.getItem(key);
+        let paymentOptions = {!! json_encode($paymentOptions) !!}
+        const colvisString = localStorage.getItem(key);
+        
+        let colvis = {};
+        if (colvisString) {
+            try {
+                colvis = JSON.parse(colvisString);
+            } catch (e) {
+                console.log('Error parsing colvis:', e);
+                colvis = {};
+            }
+        }
+
+        let setOptions = {
+            "4": paymentOptions.card?.is_enabled || false,       
+            "5": paymentOptions.cheque?.is_enabled || false,      
+            "6": paymentOptions.cash?.is_enabled || false,       
+            "7": paymentOptions.bank_transfer?.is_enabled || false, 
+            "8": paymentOptions.advance?.is_enabled || false,   
+            "9": paymentOptions.custom_pay_1?.is_enabled || false,   
+            "10": paymentOptions.custom_pay_2?.is_enabled || false,  
+            "11": paymentOptions.custom_pay_3?.is_enabled || false, 
+            "12": paymentOptions.custom_pay_4?.is_enabled || false, 
+            "13": paymentOptions.custom_pay_5?.is_enabled || false,  
+            "14": paymentOptions.custom_pay_6?.is_enabled || false, 
+            "15": paymentOptions.custom_pay_7?.is_enabled || false, 
+            "16": paymentOptions.other?.is_enabled || false,
+        }
+
+        let convertedSetOptions = {};
+        for (let key in setOptions) {
+            convertedSetOptions[key] = setOptions[key] === "1" ? true : false;
+        }
+
+        let mergedOpt = {...colvis, ...convertedSetOptions}
+        let mergedOptString = JSON.stringify(mergedOpt);
+
+        localStorage.setItem(key,mergedOptString);
+
         fetch('/api/save-colvis', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ key, colvis })
+            body: JSON.stringify({ key, mergedOptString })
         });
     </script>
 @endsection

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use App\Account;
-use App\BusinessLocation;
+use App\Utils\Util;
 use App\InvoiceLayout;
 use App\InvoiceScheme;
-use App\SellingPriceGroup;
+use App\BusinessLocation;
 use App\Utils\ModuleUtil;
-use App\Utils\Util;
+use App\SellingPriceGroup;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Yajra\DataTables\Facades\DataTables;
@@ -272,9 +273,25 @@ class BusinessLocationController extends Controller
                 'zip_code', 'invoice_scheme_id',
                 'invoice_layout_id', 'mobile', 'alternate_number', 'email', 'website', 'custom_field1', 'custom_field2', 'custom_field3', 'custom_field4', 'location_id', 'selling_price_group_id', 'default_payment_accounts', 'featured_products', 'sale_invoice_layout_id', 'sale_invoice_scheme_id' ]);
 
-            $business_id = $request->session()->get('user.business_id');
+            $business_id = $request->session()->get('user.business_id');     
 
-            $input['default_payment_accounts'] = ! empty($input['default_payment_accounts']) ? json_encode($input['default_payment_accounts']) : null;
+            $default_accounts = $input['default_payment_accounts'] ?? [];
+
+        $all_methods = [
+            'cash', 'card', 'cheque', 'bank_transfer', 'other',
+            'custom_pay_1', 'custom_pay_2', 'custom_pay_3',
+            'custom_pay_4', 'custom_pay_5', 'custom_pay_6', 'custom_pay_7'
+        ];
+
+        foreach ($all_methods as $method) {
+            if (!isset($default_accounts[$method])) {
+                $default_accounts[$method] = ['is_enabled' => "0"];
+            } elseif (!isset($default_accounts[$method]['is_enabled'])) {
+                $default_accounts[$method]['is_enabled'] = "0";
+            }
+        }
+
+        $input['default_payment_accounts'] = json_encode($default_accounts);
 
             $input['featured_products'] = ! empty($input['featured_products']) ? json_encode($input['featured_products']) : null;
 

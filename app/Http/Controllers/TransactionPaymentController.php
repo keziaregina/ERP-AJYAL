@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use DB;
+use Datatables;
 use App\Contact;
+use App\Transaction;
+use App\Utils\ModuleUtil;
+use App\TransactionPayment;
+use Illuminate\Http\Request;
+use App\Utils\TransactionUtil;
+use App\Utils\CashRegisterUtil;
+use Illuminate\Support\Facades\Log;
 use App\Events\TransactionPaymentAdded;
 use App\Events\TransactionPaymentUpdated;
 use App\Exceptions\AdvanceBalanceNotAvailable;
-use App\Transaction;
-use App\TransactionPayment;
-use App\Utils\ModuleUtil;
-use App\Utils\TransactionUtil;
-use Datatables;
-use DB;
-use Illuminate\Http\Request;
-use App\Utils\CashRegisterUtil;
+
 class TransactionPaymentController extends Controller
 {
     protected $transactionUtil;
