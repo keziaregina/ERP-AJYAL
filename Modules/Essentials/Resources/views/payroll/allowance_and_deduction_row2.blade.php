@@ -1,4 +1,6 @@
 @php
+    $employee = $employee ?? '';
+    
     if($type == 'allowance') {
         $name_col = 'payrolls['.$employee.'][allowance_names]';
         $val_col = 'payrolls['.$employee.'][allowance_amounts]';
