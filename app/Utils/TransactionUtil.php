@@ -5931,6 +5931,25 @@ class TransactionUtil extends Util
 
         $transaction = Transaction::create($transaction_data);
 
+        $register = CashRegister::create([
+            'business_id' => $business_id,
+            'user_id' => $user_id,
+            'location_id' => $transaction_data['location_id'],
+            'status' => 'close',
+            'closing_amount' => $transaction_data['final_total'],
+            'closed_at' => $transaction_data['transaction_date'],
+            'created_at' => $transaction_data['transaction_date'],
+            'updated_at' => $transaction_data['transaction_date'],
+        ]);
+
+        $register->cash_register_transactions()->create([
+            'amount' => $transaction_data['final_total'],
+            'pay_method' => $request['payment'][0]['method'],
+            'type' => 'debit',
+            'transaction_type' => 'expense',
+            'transaction_id' => $transaction->id,
+        ]);
+
         $payments = ! empty($request->input('payment')) ? $request->input('payment') : [];
         //add expense payment
         $this->createOrUpdatePaymentLines($transaction, $payments, $business_id);
