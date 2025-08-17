@@ -328,7 +328,7 @@ class ExpenseController extends Controller
 
         $payment_line = $this->dummyPaymentLine;
 
-        $payment_types = $this->transactionUtil->payment_types(null, false, $business_id);
+        $payment_types = $this->transactionUtil->enabled_payment_types(null, false, $business_id);
 
         $contacts = Contact::contactDropdown($business_id, false, false);
 

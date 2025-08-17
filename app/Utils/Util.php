@@ -188,6 +188,113 @@ class Util
         return $payment_types;
     }
 
+    // Note : if needed filtered payment_types
+    public function enabled_payment_types($location = null, $show_advance = false, $business_id = null)
+    {
+        if (! empty($location)) {
+            $location = is_object($location) ? $location : BusinessLocation::find($location);
+
+            //Get custom label from business settings
+            $custom_labels = Business::find($location->business_id)->custom_labels;
+            $custom_labels = json_decode($custom_labels, true);
+            
+            // Get business location payment accounts
+            $default_payment_accounts = is_object($location->default_payment_accounts) 
+                ? $location->default_payment_accounts 
+                : json_decode($location->default_payment_accounts, true);
+        } else {
+            if (! empty($business_id)) {
+                $custom_labels = Business::find($business_id)->custom_labels;
+                $custom_labels = json_decode($custom_labels, true);
+                
+                // Get business location if business_id is provided
+                $location = BusinessLocation::where('business_id', $business_id)->first();
+                $default_payment_accounts = $location ? json_decode($location->default_payment_accounts, true) : null;
+            } else {
+                $custom_labels = [];
+                $default_payment_accounts = null;
+            }
+        }
+
+        $payment_types = [];
+
+        // Check each payment type like in register report and only add if enabled
+        if (($default_payment_accounts['cash']['is_enabled'] ?? 0) == 1) {
+            $payment_types['cash'] = __('lang_v1.cash');
+        }
+        
+        if (($default_payment_accounts['card']['is_enabled'] ?? 0) == 1) {
+            $payment_types['card'] = __('lang_v1.card');
+        }
+        
+        if (($default_payment_accounts['cheque']['is_enabled'] ?? 0) == 1) {
+            $payment_types['cheque'] = __('lang_v1.cheque');
+        }
+        
+        if (($default_payment_accounts['bank_transfer']['is_enabled'] ?? 0) == 1) {
+            $payment_types['bank_transfer'] = __('lang_v1.bank_transfer');
+        }
+        
+        if (($default_payment_accounts['other']['is_enabled'] ?? 0) == 1) {
+            $payment_types['other'] = __('lang_v1.other');
+            
+            // Add advance if other is enabled and show_advance is true
+            if ($show_advance) {
+                $payment_types['advance'] = __('lang_v1.advance');
+            }
+        }
+
+        // Custom payment types - check each one individually
+        if (($default_payment_accounts['custom_pay_1']['is_enabled'] ?? 0) == 1) {
+            $payment_types['custom_pay_1'] = ! empty($custom_labels['payments']['custom_pay_1']) 
+                ? $custom_labels['payments']['custom_pay_1'] 
+                : __('lang_v1.custom_payment', ['number' => 1]);
+        }
+        
+        if (($default_payment_accounts['custom_pay_2']['is_enabled'] ?? 0) == 1) {
+            $payment_types['custom_pay_2'] = ! empty($custom_labels['payments']['custom_pay_2']) 
+                ? $custom_labels['payments']['custom_pay_2'] 
+                : __('lang_v1.custom_payment', ['number' => 2]);
+        }
+        
+        if (($default_payment_accounts['custom_pay_3']['is_enabled'] ?? 0) == 1) {
+            $payment_types['custom_pay_3'] = ! empty($custom_labels['payments']['custom_pay_3']) 
+                ? $custom_labels['payments']['custom_pay_3'] 
+                : __('lang_v1.custom_payment', ['number' => 3]);
+        }
+        
+        if (($default_payment_accounts['custom_pay_4']['is_enabled'] ?? 0) == 1) {
+            $payment_types['custom_pay_4'] = ! empty($custom_labels['payments']['custom_pay_4']) 
+                ? $custom_labels['payments']['custom_pay_4'] 
+                : __('lang_v1.custom_payment', ['number' => 4]);
+        }
+        
+        if (($default_payment_accounts['custom_pay_5']['is_enabled'] ?? 0) == 1) {
+            $payment_types['custom_pay_5'] = ! empty($custom_labels['payments']['custom_pay_5']) 
+                ? $custom_labels['payments']['custom_pay_5'] 
+                : __('lang_v1.custom_payment', ['number' => 5]);
+        }
+        
+        if (($default_payment_accounts['custom_pay_6']['is_enabled'] ?? 0) == 1) {
+            $payment_types['custom_pay_6'] = ! empty($custom_labels['payments']['custom_pay_6']) 
+                ? $custom_labels['payments']['custom_pay_6'] 
+                : __('lang_v1.custom_payment', ['number' => 6]);
+        }
+        
+        if (($default_payment_accounts['custom_pay_7']['is_enabled'] ?? 0) == 1) {
+            $payment_types['custom_pay_7'] = ! empty($custom_labels['payments']['custom_pay_7']) 
+                ? $custom_labels['payments']['custom_pay_7'] 
+                : __('lang_v1.custom_payment', ['number' => 7]);
+        }
+
+        // If show_advance is true and advance is not already added, add it at the beginning
+        if ($show_advance && !isset($payment_types['advance'])) {
+            $payment_types = ['advance' => __('lang_v1.advance')] + $payment_types;
+        }
+
+        return $payment_types;
+    }
+
     /**
      * Returns the list of modules enabled
      *
