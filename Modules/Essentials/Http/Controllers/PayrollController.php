@@ -463,13 +463,14 @@ class PayrollController extends Controller
 
                 if ($isGloriousEmployee) {
                     // Log::info('glorious employee');
+                    // Log::info(json_encode($gloriousEmployee,JSON_PRETTY_PRINT));
                     $payrolls[$employee->id]['allowances']['allowance_names'][] = $gloriousEmployee->description;
                     $payrolls[$employee->id]['allowances']['allowance_short_names'][] = 'glorious_employee';
                     $payrolls[$employee->id]['allowances']['allowance_amounts'][] = $gloriousEmployee->amount;
                     $payrolls[$employee->id]['allowances']['allowance_types'][] = $gloriousEmployee->amount_type;
                     $payrolls[$employee->id]['allowances']['overtime_hours'][] = null;
                     $payrolls[$employee->id]['allowances']['allowance_col_types'][] = 'auto';
-                    $payrolls[$employee->id]['allowances']['allowance_percents'][] = $ad->amount_type == 'percent' ? $ad->amount : 0;
+                    $payrolls[$employee->id]['allowances']['allowance_percents'][] = $gloriousEmployee->amount_type == 'percent' ? $gloriousEmployee->amount : 0;
                 }
 
                 if ($vacationDays > 0 && $payrolls[$employee->id]['allowances'] != null) {

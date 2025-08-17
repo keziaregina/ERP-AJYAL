@@ -124,7 +124,7 @@ class PurchaseController extends Controller
                             </button>
                             <ul class="dropdown-menu dropdown-menu-left" role="menu">';
                     if (auth()->user()->can('purchase.view')) {
-                        $html .= '<li><a href="#" class="delete-purchase" data-href="'.action([\App\Http\Controllers\PurchaseController::class, 'show'], [$row->id]).'" class="btn-modal" data-container=".view_modal"><i class="fas fa-eye" aria-hidden="true"></i>'.__('messages.view').'</a></li>';
+                        $html .= '<li><a href="#" data-href="'.action([\App\Http\Controllers\PurchaseController::class, 'show'], [$row->id]).'" class="btn-modal" data-container=".view_modal"><i class="fas fa-eye" aria-hidden="true"></i>'.__('messages.view').'</a></li>';
                     }
                     if (auth()->user()->can('purchase.view')) {
                         $html .= '<li><a href="#" class="print-invoice" data-href="'.action([\App\Http\Controllers\PurchaseController::class, 'printInvoice'], [$row->id]).'"><i class="fas fa-print" aria-hidden="true"></i>'.__('messages.print').'</a></li>';
@@ -474,9 +474,10 @@ class PurchaseController extends Controller
      */
     public function show($id)
     {
-        // if (!auth()->user()->can('purchase.view')) {
-        //     abort(403, 'Unauthorized action.');
-        // }
+        if (!auth()->user()->can('purchase.view')) {
+            abort(403, 'Unauthorized action.');
+            Log::error('Unauthorized action.');
+        }
 
         $business_id = request()->session()->get('user.business_id');
         $taxes = TaxRate::where('business_id', $business_id)
