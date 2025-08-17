@@ -264,8 +264,6 @@ class BusinessLocationController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Log::info('ijin update min!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
         if (! auth()->user()->can('business_settings.access')) {
             abort(403, 'Unauthorized action.');
         }

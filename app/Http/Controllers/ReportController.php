@@ -1204,8 +1204,7 @@ class ReportController extends Controller
                         return '<span data-orig-value="'.$row->total_custom_pay_2.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_2, true).'</span>';
                     });
                 }
-                    Log::info('cek data default payment');
-                    Log::info(json_encode($businesLocationS->default_payment_accounts->custom_pay_3->is_enabled, JSON_PRETTY_PRINT));
+
                 if(($businesLocationS->default_payment_accounts?->custom_pay_3?->is_enabled ?? 0) == 1) {                    
                     $query->editColumn('total_custom_pay_3', function ($row) {
                         return '<span data-orig-value="'.$row->total_custom_pay_3.'" >'.$this->transactionUtil->num_f($row->total_custom_pay_3, true).'</span>';
@@ -1241,8 +1240,56 @@ class ReportController extends Controller
                 $query->editColumn('created_at', function ($row) {
                     return $this->productUtil->format_date($row->created_at, true);
                 });
-                $query->addColumn('total', function ($row) {
-                    $total = $row->total_card_payment + $row->total_cheque_payment + $row->total_cash_payment + $row->total_bank_transfer_payment + $row->total_other_payment + $row->total_advance_payment + $row->total_custom_pay_1 + $row->total_custom_pay_2 + $row->total_custom_pay_3 + $row->total_custom_pay_4 + $row->total_custom_pay_5 + $row->total_custom_pay_6 + $row->total_custom_pay_7;
+                $query->addColumn('total', function ($row) use ($businesLocationS) {
+                    $total = 0;
+
+                    if(($businesLocationS->default_payment_accounts?->card?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_card_payment;
+                    }
+
+                    if(($businesLocationS->default_payment_accounts?->cheque?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_cheque_payment;
+                    }
+
+                    if(($businesLocationS->default_payment_accounts?->bank_transfer?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_bank_transfer_payment;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->cash?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_cash_payment;
+                    }
+
+                    if(($businesLocationS->default_payment_accounts?->other?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_other_payment + $row->total_advance_payment;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_1?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_1;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_2?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_2;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_3?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_3;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_4?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_4;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_5?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_5;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_6?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_6;
+                    }
+                    
+                    if(($businesLocationS->default_payment_accounts?->custom_pay_7?->is_enabled ?? 0) == 1) {
+                        $total += $row->total_custom_pay_7;
+                    }
 
                     return '<span data-orig-value="'.$total.'" >'.$this->transactionUtil->num_f($total, true).'</span>';
                 });
