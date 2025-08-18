@@ -627,7 +627,7 @@ class SellController extends Controller
             $sources['woocommerce'] = 'Woocommerce';
         }
 
-        $payment_types = $this->transactionUtil->payment_types(null, true, $business_id);
+        $payment_types = $this->transactionUtil->enabled_payment_types(null, true, $business_id);
 
 
         return view('sell.index')
@@ -698,7 +698,7 @@ class SellController extends Controller
         $customer_groups = CustomerGroup::forDropdown($business_id);
 
         $payment_line = $this->dummyPaymentLine;
-        $payment_types = $this->transactionUtil->payment_types(null, true, $business_id);
+        $payment_types = $this->transactionUtil->enabled_payment_types(null, true, $business_id);
 
         //Selling Price Group Dropdown
         $price_groups = SellingPriceGroup::forDropdown($business_id);

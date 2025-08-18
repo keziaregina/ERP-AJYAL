@@ -285,7 +285,7 @@ class PurchaseController extends Controller
         $shortcuts = json_decode($business_details->keyboard_shortcuts, true);
 
         $payment_line = $this->dummyPaymentLine;
-        $payment_types = $this->productUtil->payment_types(null, true, $business_id);
+        $payment_types = $this->productUtil->enabled_payment_types(null, true, $business_id);
 
         //Accounts
         $accounts = $this->moduleUtil->accountsDropdown($business_id, true);

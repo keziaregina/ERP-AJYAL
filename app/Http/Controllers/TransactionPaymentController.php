@@ -537,7 +537,7 @@ class TransactionPaymentController extends Controller
             $payment_line->method = 'cash';
             $payment_line->paid_on = \Carbon::now()->toDateTimeString();
 
-            $payment_types = $this->transactionUtil->payment_types(null, false, $business_id);
+            $payment_types = $this->transactionUtil->enabled_payment_types(null, false, $business_id);
 
             //Accounts
             $accounts = $this->moduleUtil->accountsDropdown($business_id, true);
