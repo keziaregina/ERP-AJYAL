@@ -97,13 +97,14 @@ class RoleController extends Controller
                                     ->get();
 
         $module_permissions = $this->moduleUtil->getModuleData('user_permissions');
+        $role_permissions = [];
 
         $common_settings = ! empty(session('business.common_settings')) ? session('business.common_settings') : [];
 
         $data = compact('selling_price_groups', 'module_permissions', 'common_settings');
 
         return view('role.create')
-                ->with(compact('selling_price_groups', 'module_permissions', 'common_settings'));
+                ->with(compact('selling_price_groups', 'module_permissions', 'common_settings', 'role_permissions'));
     }
 
     /**
