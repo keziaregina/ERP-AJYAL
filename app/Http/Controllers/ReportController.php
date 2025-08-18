@@ -4206,19 +4206,20 @@ class ReportController extends Controller
             $businessId = request()->session()->get('user.business_id');
 
             // Get all active employees
-            $query = User::query();
+            // $query = User::query();
 
-            if (! empty($locationId)) {
-                $query->where('location_id', $locationId);
-            } else {
-                $query->whereNull('location_id');
-            }
+            // if (! empty($locationId)) {
+            //     $query->where('location_id', $locationId);
+            // } else {
+            //     $query->whereNull('location_id');
+            // }
 
-            $query = $query->where('business_id', $businessId)
-                ->where('status', 'active');
+            // $query = $query->where('business_id', $businessId)
+            //     ->where('status', 'active');
 
-            $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
+            // $employees = $query->select('id', DB::raw("CONCAT(COALESCE(surname, ''),' ',COALESCE(first_name, ''),' ',COALESCE(last_name,'')) as full_name"))->get();
 
+            $employees = User::getActiveEmployeesPerBusiness($businessId);
             // Get all overtime records for the current month
             $overtimeRecords = EmployeeOvertime::where('month', $currentMonth)
                 ->where('year', $currentYear)
@@ -4238,8 +4239,8 @@ class ReportController extends Controller
                 }
 
                 // Fill in the actual overtime data if user has any records
-                if ($overtimeByUser->has($employee->id)) {
-                    foreach ($overtimeByUser->get($employee->id) as $overtime) {
+                if ($overtimeByUser->has($employee['id'])) {
+                    foreach ($overtimeByUser->get($employee['id']) as $overtime) {
                         $overtimeData[$overtime->day] = $overtime->total_hour;
                     }
                 }
@@ -4277,8 +4278,8 @@ class ReportController extends Controller
                 $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 1, '.', '');
 
                 return [
-                    'user_id' => $employee->id,
-                    'full_name' => $employee->full_name,
+                    'user_id' => $employee['id'],
+                    'full_name' => $employee['full_name'],
                     'overtime_data' => $overtimeData,
                     'total_overtime_by_month' => $totalOvertimeMonthly
                 ];
