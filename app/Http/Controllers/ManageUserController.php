@@ -111,12 +111,15 @@ class ManageUserController extends Controller
         $locations = BusinessLocation::where('business_id', $business_id)
                                     ->Active()
                                     ->get();
+        $bicCode = EmployeeBicCode::where('business_id', $business_id)->get();
+        $user       = new \App\User();
+        $salaryCode = SalaryFrequency::where('business_id', $business_id)->get();
 
         //Get user form part from modules
         $form_partials = $this->moduleUtil->getModuleData('moduleViewPartials', ['view' => 'manage_user.create']);
 
         return view('manage_user.create')
-                ->with(compact('roles', 'username_ext', 'locations', 'form_partials'));
+                ->with(compact('roles', 'username_ext', 'locations', 'form_partials', 'bicCode', 'user', 'salaryCode'));
     }
 
     /**
