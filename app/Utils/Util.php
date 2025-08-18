@@ -13,6 +13,8 @@ use App\Business;
 use App\Transaction;
 use GuzzleHttp\Client;
 use App\ReferenceCount;
+use App\EmployeeBicCode;
+use App\SalaryFrequency;
 use App\BusinessLocation;
 use App\TransactionSellLine;
 use App\VariationLocationDetails;
@@ -1692,6 +1694,7 @@ class Util
             'cmmsn_percent', 'max_sales_discount_percent', 'dob', 'gender', 'marital_status', 'blood_group', 'contact_number', 'alt_number', 'family_number', 'fb_link',
             'twitter_link', 'social_media_1', 'social_media_2', 'custom_field_1',
             'custom_field_2', 'custom_field_3', 'custom_field_4', 'guardian_name', 'id_proof_name', 'id_proof_number', 'permanent_address', 'current_address', 'bank_details', 'selected_contacts', 'is_enable_service_staff_pin', 'service_staff_pin',
+            'bic_code', 'salary_code'
         ]);
 
         $user_details['status'] = ! empty($request->input('is_active')) ? $request->input('is_active') : 'inactive';
@@ -1709,6 +1712,38 @@ class Util
                 return $moduleUtil->expiredResponse();
             } elseif (! $moduleUtil->isQuotaAvailable('users', $business_id)) {
                 return $moduleUtil->quotaExpiredResponse('users', $business_id, action([\App\Http\Controllers\ManageUserController::class, 'index']));
+            }
+        }
+
+        $salaryCode = $request->salary_code;
+        if (empty($salaryCode)) {
+            $user_details['salary_id'] = null;
+        } else {
+            $salary = SalaryFrequency::find($request->salary_code);
+            if ($salary) {
+                $user_details['salary_id'] = $request->salary_code;
+            } else {
+                $newSalary = SalaryFrequency::create([
+                    'name' => $request->salary_code,
+                    'business_id' => Auth::user()->business_id,
+                ]);
+                $user_details['salary_id'] = $newSalary->id;
+            }
+        }            
+
+        $bicCode = $request->bic_code;
+        if (empty($bicCode)) {
+            $user_details['bic_id'] = null;
+        } else {
+            $bic = EmployeeBicCode::find($request->bic_code);
+            if ($bic) {
+                $user_details['bic_id'] = $request->bic_code;
+            } else {
+                $newBic = EmployeeBicCode::create([
+                    'name' => $request->bic_code,
+                    'business_id' => Auth::user()->business_id,
+                ]);
+                $user_details['bic_id'] = $newBic->id;
             }
         }
 
