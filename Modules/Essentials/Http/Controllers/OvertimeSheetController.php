@@ -589,7 +589,7 @@ class OvertimeSheetController extends Controller
 
     public function exportExcel(Request $request)
     {   
-        $month = $request->month;
+        $month = ($request->month) ? $request->month : date("m");
         $overtimeData = $this->getOvertimeDataByMonth($month);
         $data = $overtimeData['employees'];
         $totalAllOvertime = $overtimeData['total_all_overtime'];
@@ -600,7 +600,7 @@ class OvertimeSheetController extends Controller
                 now()->format('Y'), 
                 $totalAllOvertime
             ), 
-            'overtime_sheet-'.\Carbon\Carbon::create()->month($month)->format('F_Y').'.xlsx'
+            'overtime_sheet-'.\Carbon\Carbon::create(null, $month, 1)->format('F_Y').'.xlsx'
         );        
     }
 
