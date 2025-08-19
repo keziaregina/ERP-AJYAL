@@ -552,7 +552,7 @@ class OvertimeSheetController extends Controller
     {   
         // dd($request->all());
         try {
-            $month = $request->month;
+            $month = ($request->month) ? $request->month : date("m");
             $logo = public_path('img/logo-small.png');
             $overtimeData = $this->getOvertimeDataByMonth($month);
             $data = $overtimeData['employees'];
@@ -578,8 +578,8 @@ class OvertimeSheetController extends Controller
                 'orientation' => 'L',
                 'format' => 'A4'
             ]);
-
-            return $pdf->download('overtime_report-' . \Carbon\Carbon::create()->month($month)->format('F_Y') . '.pdf');
+            $fileName = 'overtime_report-' . \Carbon\Carbon::create(null, $month, 1)->format('F_Y') . '.pdf';
+            return $pdf->download($fileName);
             
         } catch (\Exception $e) {
             Log::error("Error generating overtime PDF: " . $e->getMessage());
