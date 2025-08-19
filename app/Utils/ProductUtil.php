@@ -2169,7 +2169,7 @@ class ProductUtil extends Util
                     'stock' => $this->roundQuantity($stock),
                     'type' => 'sell',
                     'type_label' => __('manufacturing::lang.ingredient'),
-                    'ref_no' => '',
+                    'ref_no' => $stock_line->ref_no,
                     'stock_in_second_unit' => $this->roundQuantity($stock_in_second_unit),
                 ]);
             } elseif ($stock_line->transaction_type == 'production_purchase') {
