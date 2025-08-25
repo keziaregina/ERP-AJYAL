@@ -79,11 +79,15 @@ class OvertimeSheetController extends Controller
                 'date' => 'nullable|date'
             ]);
 
-            if ( $request->date != null) {
+            if ($request->date != null) {
                 $date = $request->date;
                 $day = date('d', strtotime($date));
+                $month = date('m', strtotime($date));
+                $year = date('Y', strtotime($date));
             } else {
                 $day = date('d');
+                $month = date('m');
+                $year = date('Y');
             }
 
             $users = $request->user_id;
@@ -91,8 +95,8 @@ class OvertimeSheetController extends Controller
                 EmployeeOvertime::updateOrCreate([
                     'user_id' => $user,
                     'day' => $day,
-                    'month' => date('m'),
-                    'year' => date('Y'),
+                    'month' => $month,
+                    'year' => $year,
                 ], [
                     'total_hour' => $request->overtime_hours,
                     'created_by' => auth()->id(),
