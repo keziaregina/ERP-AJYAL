@@ -106,6 +106,7 @@ Route::middleware('web', 'authh', 'auth', 'SetSessionData', 'language', 'timezon
         Route::resource('overtime-sheets', Modules\Essentials\Http\Controllers\OvertimeSheetController::class)->middleware('can:essentials.show_overtime_page');
         Route::get('/print-pdf', [OvertimeSheetController::class, 'exportPdf'])->name('pdfovertime');
         Route::get('/print-excel', [OvertimeSheetController::class, 'exportExcel'])->name('excelovertime');
+        Route::get('/overtime', [OvertimeSheetController::class, 'index'])->name('overtime.index');
 
 
         // Route for glorious employee
