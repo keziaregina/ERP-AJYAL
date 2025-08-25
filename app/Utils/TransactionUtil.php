@@ -5565,6 +5565,12 @@ class TransactionUtil extends Util
         $business_id = request()->session()->get('user.business_id');
         $transaction_type_keys = array_keys(Transaction::transactionTypes());
 
+        Log::info('start');
+        Log::info($start);
+
+        Log::info('end');
+        Log::info($end);
+
         $query = Transaction::where('transactions.contact_id', $contact_id)
                         ->where('transactions.business_id', $business_id)
                         ->where('transactions.status', '!=', 'draft')

@@ -661,6 +661,8 @@ class ContactController extends Controller
      */
     public function show($id)
     {
+        Log::info('test inside hERE');
+        // dd('tes');
         if (! auth()->user()->can('supplier.view') && ! auth()->user()->can('customer.view') && ! auth()->user()->can('customer.view_own') && ! auth()->user()->can('supplier.view_own')) {
             abort(403, 'Unauthorized action.');
         }
@@ -1308,6 +1310,9 @@ class ContactController extends Controller
         $line_details = $format == 'format_3' ? true : false;
 
         $ledger_details = $this->transactionUtil->getLedgerDetails($contact_id, $start_date, $end_date, $format, $location_id, $line_details);
+
+        Log::info("LEDGER==========");
+        Log::info(json_encode($ledger_details,JSON_PRETTY_PRINT));
 
         $location = null;
         if (! empty($location_id)) {

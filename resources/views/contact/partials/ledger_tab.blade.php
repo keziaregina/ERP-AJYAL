@@ -11,6 +11,8 @@
     }
 
     $transaction_types['opening_balance'] = __('lang_v1.opening_balance');
+
+    // @dd($transaction_types)
 @endphp
 <div class="row">
     <div class="col-md-12">
