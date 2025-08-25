@@ -1137,7 +1137,7 @@ class ReportController extends Controller
     public function getRegisterReport(Request $request)
     {
         if (! auth()->user()->can('register_report.view')) {
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Unauthorized action. ');
         }
         $business_id = $request->session()->get('user.business_id');
          
@@ -1155,12 +1155,14 @@ class ReportController extends Controller
 
         $permitted_locations = auth()->user()->permitted_locations();
 
-            $registers = $this->transactionUtil->registerReport($business_id, $permitted_locations, $start_date, $end_date, $user_id);
+        $registers = $this->transactionUtil->registerReport($business_id, $permitted_locations, $start_date, $end_date, $user_id);
            
-            // Log::debug("test");
+            Log::debug("registersss=-=============");
+            // Log::info($registers);
+            Log::info(json_encode($registers->get(), JSON_PRETTY_PRINT));
             // Log::debug(json_encode($businesLocationS->default_payment_accounts));
 
-            $query = Datatables::of($registers);                                        
+            $query = Datatables::of($registers);    
                 if(($businesLocationS->default_payment_accounts?->card?->is_enabled ?? 0) == 1) {
                     $query->editColumn('total_card_payment', function ($row) {
                         return '<span data-orig-value="'.$row->total_card_payment.'">'

@@ -305,6 +305,10 @@ class SellPosController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('VALUE INSIDE STORE');
+        \Log::info(json_encode($request->all(),JSON_PRETTY_PRINT));
+
+        // dd($request->all());
         if (!auth()->user()->can('sell.create') && !auth()->user()->can('direct_sell.access') && !auth()->user()->can('so.create')) {
             abort(403, 'Unauthorized action.');
         }
@@ -342,7 +346,9 @@ class SellPosController extends Controller
 
             //Check Customer credit limit
             $is_credit_limit_exeeded = $this->transactionUtil->isCustomerCreditLimitExeeded($input);
-
+            \Log::info('IS CREDIT LIMIT');
+            \Log::info( json_encode($is_credit_limit_exeeded));
+            // die;
             if ($is_credit_limit_exeeded !== false) {
                 $credit_limit_amount = $this->transactionUtil->num_f($is_credit_limit_exeeded, true);
                 $output = ['success' => 0,
