@@ -36,28 +36,31 @@ class OvertimeSheetController extends Controller
         // $this->middleware('can:essentials.show_overtime_page');
     }
 
-    function index()
+    function index(Request $request)
     {
         try {
             $businessId = request()->session()->get('user.business_id');
         
             $employees = self::getActiveEmployeesPerBusiness(businessId: $businessId);
 
-            $daysInMonth = Carbon::now()->month(date('m'))->daysInMonth;
+            $month = $request->get('month', date('m'));
+            $year  = $request->get('year', date('Y'));
+
+            $daysInMonth = Carbon::now()->month($month)->daysInMonth;
             $overtimeOptions = EmployeeOvertime::OVERTIME_HOURS;
             $findKey = array_search('Glorious Employee Allowance', $overtimeOptions);
             unset($overtimeOptions[$findKey]);            
 
             // Get overtime data for the current month
-            $overtimeData = $this->getOvertimeDataForCurrentMonth();
+            $overtimeData = $this->getOvertimeDataForCurrentMonth($month);
             $overtimeDatas = $overtimeData['employees'];
             $totalAllOvertime = $overtimeData['total_all_overtime'];            
 
-            $gloriousEmployeeThisMonth = GloriousEmployee::where('month', date('m'))
+            $gloriousEmployeeThisMonth = GloriousEmployee::where('month', $month)
             ->where('year', date('Y'))
             ->get()
             ->first();
-
+            
             // dd($gloriousEmployeeThisMonth);
 
             return view('essentials::overtime_sheets.index')->with(compact('employees', 'daysInMonth', 'overtimeOptions', 'overtimeDatas', 'totalAllOvertime', 'gloriousEmployeeThisMonth'));
@@ -170,12 +173,12 @@ class OvertimeSheetController extends Controller
      * 
      * @return \Illuminate\Support\Collection
      */
-    private function getOvertimeDataForCurrentMonth()
+    private function getOvertimeDataForCurrentMonth($month)
     {
         try {
-            $currentMonth = date('m');
+            $currentMonth = $month;
 
-            $currentYear = date('Y');
+            $currentYear = date('Y');          
 
             $businessId = request()->session()->get('user.business_id');
 

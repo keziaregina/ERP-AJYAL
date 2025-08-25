@@ -376,4 +376,5 @@ return [
     'earnings' => 'Earnings',
     'status' => 'Status',
     'no_payroll_data_found' => 'No payroll data found!',
+    'select_month' => 'Select Month',
 ];
