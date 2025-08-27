@@ -738,14 +738,14 @@ class SellPosController extends Controller
         $receipt_printer_type = is_null($printer_type) ? $location_details->receipt_printer_type : $printer_type;
 
         $receipt_details = $this->transactionUtil->getReceiptDetails($transaction_id, $location_id, $invoice_layout, $business_details, $location_details, $receipt_printer_type);
-
+        // dd($receipt_details);
         $currency_details = [
             'symbol' => $business_details->currency_symbol,
             'thousand_separator' => $business_details->thousand_separator,
             'decimal_separator' => $business_details->decimal_separator,
         ];
         $receipt_details->currency = $currency_details;
-
+        
         if ($is_package_slip) {
             $output['html_content'] = view('sale_pos.receipts.packing_slip', compact('receipt_details'))->render();
 
@@ -1076,6 +1076,8 @@ class SellPosController extends Controller
         // $customer_due = $customer_due != 0 ? $this->transactionUtil->num_f($customer_due, true) : '';
 
         // New Code
+
+        /// this is due 
         $due = $this->transactionUtil->getLedgerDetails($transaction->contact_id, now()->startOfYear()->format('Y-m-d'), now()->endOfYear()->format('Y-m-d'), 'format_2', null);
 
             $balance_due_calc = 0;
@@ -1891,6 +1893,7 @@ class SellPosController extends Controller
     public function printInvoice(Request $request, $transaction_id)
     {
         if (request()->ajax()) {
+            // dd("demak demok");
             try {
                 $output = ['success' => 0,
                     'msg' => trans('messages.something_went_wrong'),

@@ -362,6 +362,7 @@ class ContactController extends Controller
             $query->where('contacts.contact_status', request()->input('contact_status'));
         }
 
+        Log::info(json_decode($query->get()));
         $contacts = Datatables::of($query)
             ->addColumn('address', '{{implode(", ", array_filter([$address_line_1, $address_line_2, $city, $state, $country, $zip_code]))}}')
             ->addColumn(
