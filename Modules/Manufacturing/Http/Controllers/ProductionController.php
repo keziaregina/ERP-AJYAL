@@ -801,7 +801,7 @@ class ProductionController extends Controller
 
             foreach ($production_sell->sell_lines as $sell_line) {
                 $variation = $sell_line->variations;
-
+                
                 $line_sub_unit_id = ! empty($ingredient_quantities[$sell_line->id]['sub_unit_id']) ?
                                 $ingredient_quantities[$sell_line->id]['sub_unit_id'] : null;
                 $line_multiplier = 1;
@@ -836,6 +836,16 @@ class ProductionController extends Controller
             }
 
             if ($transaction_sell_data['status'] == 'final') {
+                foreach ($production_sell->sell_lines as $sell_line) {
+                    $variation = $sell_line->variations;
+                    $line_qty = $sell_line->quantity * $line_multiplier;
+                    $this->productUtil->increaseProductQuantity(
+                        $variation->product_id,
+                        $variation->id,
+                        $production_sell->location_id,
+                        $line_qty
+                    );
+                }
                 foreach ($sell_lines as $sell_line) {
                     if ($sell_line['enable_stock']) {
                         $line_qty = $sell_line['quantity'] * $sell_line['base_unit_multiplier'];
