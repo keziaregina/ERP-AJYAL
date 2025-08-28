@@ -532,6 +532,7 @@ $(document).ready(function() {
             __currency_convert_recursively($('#contact_table'));
         },
         "footerCallback": function ( row, data, start, end, display ) {
+            // console.log("tes aja", data);
             var total_due = 0;
             var total_return_due = 0;
             for (var r in data){
