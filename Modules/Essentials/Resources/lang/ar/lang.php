@@ -373,4 +373,5 @@ return[
     'earnings' => 'الأرباح',
     'status' => 'الحالة',
     'no_payroll_data_found' => 'لم يتم العثور على بيانات كشوف المرتبات',
+    'select_month' => 'حدد الشهر',
 ];

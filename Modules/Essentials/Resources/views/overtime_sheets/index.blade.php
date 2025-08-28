@@ -45,7 +45,13 @@
                             @lang('essentials::lang.edit_overtime_hour')
                             </button>
                         </div>           
-                    @endcan  
+                    @endcan 
+                    <div class="box-tools">
+                         <!-- Button trigger modal -->
+                        <button type="button" class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right" data-toggle="modal" data-target="#selectMonth">
+                        @lang('essentials::lang.select_month')
+                        </button>
+                    </div>
                 </div>    
             @can('essentials.add_overtime_hour')
                 @slot('tool')
@@ -319,6 +325,55 @@
         </div>
     </div>
 
+    <div class="modal fade" id="selectMonth" tabindex="-1" role="dialog" aria-labelledby="selectMonthLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="selectMonthLabel">Select Month</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form action="{{ route('overtime.index') }}" method="GET">
+                    <div class="modal-body">
+                        @php
+                            $months = [
+                                '01' => 'January',
+                                '02' => 'February',
+                                '03' => 'March',
+                                '04' => 'April',
+                                '05' => 'May',
+                                '06' => 'June',
+                                '07' => 'July',
+                                '08' => 'August',
+                                '09' => 'September',
+                                '10' => 'October',
+                                '11' => 'November',
+                                '12' => 'December',
+                            ];
+                        @endphp
+
+                        <div class="form-group">
+                            <label for="month">{{ __('essentials::lang.month') }}:*</label>
+                            <select name="month" id="month" class="form-control" required>
+                                @foreach ($months as $key => $value)
+                                    <option value="{{ $key }}" {{ $key == date('m') ? 'selected' : '' }} max="{{ date('Y-m-d') }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Apply</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Export File -->
     <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -466,5 +521,5 @@
             });
             @endif
         });
-    </script>    
+    </script>   
 @endsection
