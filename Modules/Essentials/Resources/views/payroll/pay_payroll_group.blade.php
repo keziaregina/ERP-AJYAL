@@ -49,10 +49,10 @@
 							<label><b>Paid on (All)</b></label>
 							<input type="text" class="form-control global_paid_on" placeholder="Select date for all">
 						</div>
-					<div class="col-md-3">
-						<label><b>Note (All)</b></label>
-						<input type="text" class="form-control global_payment_note" placeholder="Add note for all">
-					</div>
+					 <div class="col-md-3">
+                            <label><b>Note (All)</b></label>
+                            <input class="form-control global_payment_note" placeholder="Add note for all">
+                        </div>
 						<div class="col-md-3">
 							<label><b>Payment Method (All)</b></label>
 							<select class="form-control global_payment_method">
@@ -196,10 +196,9 @@
         let dateVal = $(this).val();
         $(".paid_on").val(dateVal); 
     });
-	$('.global_payment_note').on('input', function() {
+	$(document).on('input', '.global_payment_note', function() {
 		let noteVal = $(this).val();
-		$(".payment_note_").val(noteVal).trigger('change');
-		console.log(noteVal);
+		$('.payment_note').val(noteVal);
 	});
     $('.global_payment_method').on('change', function() {
         let methodVal = $(this).val();
