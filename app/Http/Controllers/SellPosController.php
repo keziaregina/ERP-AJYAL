@@ -1893,7 +1893,6 @@ class SellPosController extends Controller
     public function printInvoice(Request $request, $transaction_id)
     {
         if (request()->ajax()) {
-            // dd("demak demok");
             try {
                 $output = ['success' => 0,
                     'msg' => trans('messages.something_went_wrong'),
