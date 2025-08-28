@@ -30,7 +30,7 @@
 
 <div class="form-group">
 {!! Form::label("payment_note_".$id , __('lang_v1.payment_note') . ':') !!}
-	{!! Form::textarea('payments['.$id.'][payment_note]', null, ['class' => 'form-control', 'placeholder' => __( 'lang_v1.payment_note' ), 'rows' => 2, 'id' => "payment_note_".$id]); !!}
+    {!! Form::textarea("payments[".$id."][payment_note]", null, ['class' => 'form-control payment_note', 'placeholder' => __( 'lang_v1.payment_note' ), 'rows' => 2, 'id' => "payment_note_$id"]) !!}
 </div>
 
 {!! Form::label("method_".$id , __('purchase.payment_method') . ':*') !!}
