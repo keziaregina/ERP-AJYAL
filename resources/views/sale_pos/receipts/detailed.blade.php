@@ -1,3 +1,4 @@
+{{-- ini file blade print invoice--}}
 <table style="width:100%;">
 	<thead>
 		<tr>
@@ -14,7 +15,6 @@
 			</td>
 		</tr>
 	</thead>
-
 	<tbody>
 		<tr>
 				<td class="text-center" style="line-height: 15px !important; padding-bottom: 10px !important">
@@ -82,6 +82,16 @@
 				{{$receipt_details->all_due}}
 			</div>
 		@endif
+		{{-- @if(!empty($receipt_details->due))
+			<div class="bg-light-blue-active text-right font-23 padding-5">
+				<span class="pull-left bg-light-blue-active">
+					{!! $receipt_details->all_bal_label !!}
+				</span>
+
+				{!! $receipt_details->due !!}
+			</div>
+		@endif --}}
+
 		
 		<!-- Total Paid-->
 		@if(!empty($receipt_details->total_paid))

@@ -15,6 +15,7 @@ use App\PurchaseLine;
 use App\InvoiceScheme;
 use App\BusinessLocation;
 use App\CashDenomination;
+use App\Utils\ContactUtil;
 use App\AccountTransaction;
 use App\TransactionPayment;
 use Illuminate\Support\Str;
@@ -41,6 +42,11 @@ class TransactionUtil extends Util
      * @param  int  $user_id
      * @return object
      */
+    protected $contactUtil;
+
+    public function __construct(ContactUtil $contactUtil) {
+        $this->contactUtil = $contactUtil;
+    }
     public function createSellTransaction($business_id, $input, $invoice_total, $user_id, $uf_data = true)
     {
         $sale_type = ! empty($input['type']) ? $input['type'] : 'sell';
@@ -964,6 +970,7 @@ class TransactionUtil extends Util
         $il = $invoice_layout;
 
         $transaction = Transaction::find($transaction_id);
+        Log::info(json_decode($transaction->get()));
         $transaction_type = $transaction->type;
 
         $output = [
@@ -1485,15 +1492,17 @@ class TransactionUtil extends Util
             $output['total_paid_label'] = $il->paid_label;
             $output['total_due'] = ($due == 0) ? 0 : $this->num_f($due, $show_currency, $business_details);
             $output['total_due_label'] = $il->total_due_label;
-
+            $business_id = request()->session()->get('user.business_id');
             if ($il->show_previous_bal == 1) {
-                $all_due = $this->getContactDue($transaction->contact_id);
-                if (! empty($all_due)) {
+                $contact_id = $transaction->contact_id;
+                $all_due = $this->contactUtil->getContactQuery($business_id, 'customer', [$contact_id])
+                    ->first();
+                if ($all_due) {
+                    $all_due = ($all_due->total_invoice ?? 0) - ($all_due->invoice_received ?? 0) - ($all_due->total_ledger_discount ?? 0);
                     $output['all_bal_label'] = $il->prev_bal_label;
                     $output['all_due'] = $this->num_f($all_due, $show_currency, $business_details);
                 }
             }
-
             //Get payment details
             $output['payments'] = [];
             if ($il->show_payments == 1) {

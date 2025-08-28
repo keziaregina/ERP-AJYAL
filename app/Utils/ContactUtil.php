@@ -211,6 +211,7 @@ class ContactUtil extends Util
         return $output;
     }
 
+    // this is the method for table due 
     public function getContactQuery($business_id, $type, $contact_ids = [])
     {
         $query = Contact::leftjoin('transactions AS t', 'contacts.id', '=', 't.contact_id')
