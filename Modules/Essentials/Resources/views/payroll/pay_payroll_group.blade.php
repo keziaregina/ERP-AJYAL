@@ -44,6 +44,29 @@
 							@lang('sale.'.$payroll_group->status)
 						</div>
 					</div>
+					<div class="row mb-3">
+						<div class="col-md-3">
+							<label><b>Paid on (All)</b></label>
+							<input type="text" class="form-control global_paid_on" placeholder="Select date for all">
+						</div>
+					 <div class="col-md-3">
+                            <label><b>Note (All)</b></label>
+                            <input class="form-control global_payment_note" placeholder="Add note for all">
+                        </div>
+						<div class="col-md-3">
+							<label><b>Payment Method (All)</b></label>
+							<select class="form-control global_payment_method">
+								<option value="">@lang('messages.please_select')</option>
+								<option value="cash">@lang('lang_v1.cash')</option>
+								<option value="card">@lang('lang_v1.card')</option>
+								<option value="bank_transfer">@lang('lang_v1.bank_transfer')</option>
+								<option value="cheque">@lang('lang_v1.cheque')</option>
+								<option value="custom_pay_1">@lang('lang_v1.custom_payment_1')</option>
+								<option value="custom_pay_2">@lang('lang_v1.custom_payment_2')</option>
+								<option value="custom_pay_3">@lang('lang_v1.custom_payment_3')</option>
+							</select>
+						</div>
+					</div>
 	                <div class="table-responsive mt-15">
 	                    <table class="table" id="payroll-group-table" style="width: 100% !important;">
                             <tr>
@@ -163,5 +186,25 @@
         	}
         });
 	});
+</script>
+<script>
+	$(function () {
+    $('.global_paid_on').datetimepicker({
+        format: moment_date_format + ' ' + moment_time_format,
+        ignoreReadonly: true,
+    }).on('dp.change', function(e) {
+        let dateVal = $(this).val();
+        $(".paid_on").val(dateVal); 
+    });
+	$(document).on('input', '.global_payment_note', function() {
+		let noteVal = $(this).val();
+		$('.payment_note').val(noteVal);
+	});
+    $('.global_payment_method').on('change', function() {
+        let methodVal = $(this).val();
+        $("select.payment_types").val(methodVal).trigger('change');
+    });
+});
+
 </script>
 @endsection
