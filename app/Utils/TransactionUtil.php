@@ -10,6 +10,7 @@ use App\Business;
 use App\Currency;
 use App\Variation;
 use App\Transaction;
+use App\CashRegisterTransaction;
 use App\CashRegister;
 use App\PurchaseLine;
 use App\InvoiceScheme;
@@ -6238,8 +6239,10 @@ class TransactionUtil extends Util
 
         //Get parent sale
         $sell = Transaction::where('business_id', $business_id)
-            ->with(['sell_lines', 'sell_lines.sub_unit'])
+            ->with(['sell_lines', 'sell_lines.sub_unit', 'payment_lines'])
             ->findOrFail($input['transaction_id']);
+
+        $pay_method = $sell->payment_lines[0]->method;
 
         //Check if any sell return exists for the sale
         $sell_return = Transaction::where('business_id', $business_id)
@@ -6279,6 +6282,20 @@ class TransactionUtil extends Util
             $sell_return_data['created_by'] = $user_id;
             $sell_return_data['return_parent_id'] = $sell->id;
             $sell_return = Transaction::create($sell_return_data);
+
+            $cash_register = $this->cashRegisterUtil->getCurrentCashRegister(auth()->user()->id);
+
+            if ($cash_register) {
+                CashRegisterTransaction::create([
+                    'cash_register_id' => $cash_register->id,
+                    'amount' => $invoice_total['final_total'],
+                    'pay_method' => $pay_method,
+                    'type' => 'debit',
+                    'transaction_type' => 'refund',
+                    'transaction_id' => $sell_return->id,
+                ]);
+            }
+
 
             $this->activityLog($sell_return, 'added');
         } else {

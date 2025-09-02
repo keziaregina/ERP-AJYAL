@@ -59,7 +59,6 @@ class ExpenseController extends Controller
      */
     public function index()
     {
-
         if (! auth()->user()->can('all_expense.access') && ! auth()->user()->can('view_own_expense')) {
             abort(403, 'Unauthorized action.');
         }
