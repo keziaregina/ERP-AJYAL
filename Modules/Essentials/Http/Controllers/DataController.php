@@ -6,6 +6,8 @@ use App\Business;
 use App\BusinessLocation;
 use App\Category;
 use App\User;
+use App\Utils\CashRegisterUtil;
+use App\Utils\ContactUtil;
 use App\Utils\ModuleUtil;
 use App\Utils\TransactionUtil;
 use Carbon\Carbon;
@@ -530,7 +532,7 @@ class DataController extends Controller
         $location_id = null,
         $user_id = null
         ) {
-        $transactionUtil = new TransactionUtil();
+        $transactionUtil = new TransactionUtil(new ContactUtil(), new CashRegisterUtil());
 
         $transaction_totals = $transactionUtil->getTransactionTotals(
             $business_id,
