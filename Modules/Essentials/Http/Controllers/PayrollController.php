@@ -406,8 +406,17 @@ class PayrollController extends Controller
                     typeHour: 'SL'
                 );
 
+                $absentDays = EmployeeOvertime::countEmployeOvertimeByTypeAndMonth(
+                    businessId: $business_id,
+                    employeeId: $employee->id,
+                    month: $month,
+                    typeHour: 'A'
+                );
+
                 $isGloriousEmployee = GloriousEmployee::isGloriousEmployee($business_id, $month, $employee->id);
                 $gloriousEmployee = EssentialsAllowanceAndDeduction::where('description', 'like', '%glorious employee%')->first();
+
+                // dd($allowances_and_deductions->toarray());
 
                 foreach ($allowances_and_deductions as $ad) {
                     if ($ad->type == 'allowance') {
@@ -513,6 +522,25 @@ class PayrollController extends Controller
                             $payrolls[$employee->id]['deductions']['deduction_names'][] = 'Sick Leave Days';
                             $payrolls[$employee->id]['deductions']['deduction_short_names'][] = 'sick_leave_days';
                             $payrolls[$employee->id]['deductions']['deduction_amounts'][] = ($daily_food_allowance + $dailyRate) * $sickLeaveDays;
+                            $payrolls[$employee->id]['deductions']['deduction_types'][] = 'fixed';
+                            $payrolls[$employee->id]['deductions']['deduction_col_types'][] = 'auto';
+                            $payrolls[$employee->id]['deductions']['deduction_percents'][] = 0;
+                        }
+                    }
+                }
+
+                if ($absentDays > 0 && $payrolls[$employee->id]['allowances'] != null) {
+                    // Log::info('vacation days');
+                    // Log::info("Payroll--------------------------->");
+                    foreach ($payrolls[$employee->id]['allowances']['allowance_names'] as $key => $value) {
+                        $food_allowance = 0;
+                        if (str_contains(strtolower($value), 'food')) {
+                            $food_allowance = $payrolls[$employee->id]['allowances']['allowance_amounts'][$key];
+                            $daily_food_allowance = $food_allowance / now()->month($month)->daysInMonth;
+
+                            $payrolls[$employee->id]['deductions']['deduction_names'][] = 'Absent Days';
+                            $payrolls[$employee->id]['deductions']['deduction_short_names'][] = 'absent_days';
+                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] = ($daily_food_allowance + $dailyRate) * $absentDays;
                             $payrolls[$employee->id]['deductions']['deduction_types'][] = 'fixed';
                             $payrolls[$employee->id]['deductions']['deduction_col_types'][] = 'auto';
                             $payrolls[$employee->id]['deductions']['deduction_percents'][] = 0;
