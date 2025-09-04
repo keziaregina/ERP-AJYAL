@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
 use App\TransactionSellLinesPurchaseLines;
-use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as pdh; 
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as pdh;
 use Modules\Essentials\Http\Controllers\OvertimeSheetController;
 
 class ReportEmailService
@@ -45,10 +45,10 @@ class ReportEmailService
         $this->logo = public_path('img/logo-small.png');
     }
 
-    public function generateReportAttachment($data,$dates,$interval)
+    public function generateReportAttachment($data, $dates, $interval)
     {
         $report = null;
-            
+
         $filename = "pdf/report/{$data->user_id}_{$data->type}_" . now()->format('Ymd_His') . ".pdf";
         $user = User::find($data->user_id);
         $directory = dirname($filename);
@@ -60,14 +60,14 @@ class ReportEmailService
         // dd($data->type);
 
         switch ($data->type) {
-            
+
             // DONE (need table)
             case 'profit_or_loss_report':
                 $type = 'profit_or_loss';
                 $data['report_type'] = 'Profit / Loss';
                 $report = $this->getProfitOrLossReport($user, $dates['start_date'], $dates['end_date']);
                 break;
-                
+
             // DONE
             case 'purchase_n_sell_report':
                 $type = 'purchase_n_sale';
@@ -82,7 +82,7 @@ class ReportEmailService
                 $report = $this->getTaxReport($user, $dates['start_date'], $dates['end_date']);
                 break;
 
-                
+
             // DONE
             case 'customer_n_supplier_report':
                 $type = 'customer_n_supplier';
@@ -101,10 +101,10 @@ class ReportEmailService
             case 'stock_report':
                 $type = 'stock';
                 $data['report_type'] = 'Stocks Summary';
-                    $report = [
-                        'stock_report' => $this->getStockReport($user, $dates['start_date'], $dates['end_date']),
-                        'stock_value' => $this->getStockValue($user, $dates['start_date'], $dates['end_date']),
-                    ];
+                $report = [
+                    'stock_report' => $this->getStockReport($user, $dates['start_date'], $dates['end_date']),
+                    'stock_value' => $this->getStockValue($user, $dates['start_date'], $dates['end_date']),
+                ];
                 break;
 
             // DONE
@@ -153,16 +153,16 @@ class ReportEmailService
             case 'sales_representative':
                 $type = 'sales_representative';
                 $data['report_type'] = 'Sales Representative Summary';
-                    $report = [
-                        'overall' => [
-                            'sell' => $this->getSalesRepresentativeTotalSell($user, $dates['start_date'], $dates['end_date'], null),
-                            'expense' => $this->getSalesRepresentativeTotalExpense($user, $dates['start_date'], $dates['end_date'], null)
-                        ],
-                        'collection' => [
-                            'expense' => $this->getSalesRepresentativeExpenseCollection($user, $dates['start_date'], $dates['end_date'], null)->get(),
-                            'sales' => $this->getSalesRepresentativeSalesCollection($user, $dates['start_date'], $dates['end_date'], null)->get(),
-                        ]
-                    ];
+                $report = [
+                    'overall' => [
+                        'sell' => $this->getSalesRepresentativeTotalSell($user, $dates['start_date'], $dates['end_date'], null),
+                        'expense' => $this->getSalesRepresentativeTotalExpense($user, $dates['start_date'], $dates['end_date'], null)
+                    ],
+                    'collection' => [
+                        'expense' => $this->getSalesRepresentativeExpenseCollection($user, $dates['start_date'], $dates['end_date'], null)->get(),
+                        'sales' => $this->getSalesRepresentativeSalesCollection($user, $dates['start_date'], $dates['end_date'], null)->get(),
+                    ]
+                ];
                 break;
             // DONE
             case 'register_report':
@@ -195,21 +195,24 @@ class ReportEmailService
         }
         $view = 'report_settings/export/' . $type;
 
-        $pdf = pdh::loadView($view, [
-            'orientation' => 'L',
-                ],
-                [
-                    'data' => $data, 
-                    'logo' => $this->logo,
-                    'user' => $user,
-                    'report' => $report,
-                    'dates' => $dates,
-                    'currency' => 'ر.ع',
-                    'lang' => $data->attachment_lang,
-                    ]);            
+        $pdf = pdh::loadView(
+            $view,
+            [
+                'orientation' => 'L',
+            ],
+            [
+                'data' => $data,
+                'logo' => $this->logo,
+                'user' => $user,
+                'report' => $report,
+                'dates' => $dates,
+                'currency' => 'ر.ع',
+                'lang' => $data->attachment_lang,
+            ]
+        );
         $data['interval'] = $interval;
 
-        Storage::disk('public')->put($filename, $pdf->output()); 
+        Storage::disk('public')->put($filename, $pdf->output());
 
         Mail::to($user->email)
             ->send(new Reporting($data, $filename, $type));
@@ -274,27 +277,27 @@ class ReportEmailService
                 $totalOvertimeMonthly = 0;
                 $totalHours = 0;
                 $totalThirtyMinutes = 0;
-                
+
                 foreach ($filteredOvertimeData as $overtimeValue) {
                     if (is_numeric($overtimeValue)) {
                         // Split the value into hours and thirty-minute parts
                         $parts = explode('.', (string)$overtimeValue);
                         $hours = (int)$parts[0];
                         $thirtyMin = isset($parts[1]) && $parts[1] == '5' ? 1 : 0; // .5 means 30 minutes
-                        
+
                         // Add to totals
                         $totalHours += $hours;
                         $totalThirtyMinutes += $thirtyMin;
                     }
                 }
-                
+
                 // Convert excess 30-minute intervals to hours
                 $additionalHours = floor($totalThirtyMinutes / 2);
                 $remainingThirtyMin = $totalThirtyMinutes % 2;
-                
+
                 // Calculate final total
                 $totalOvertimeMonthly = $totalHours + $additionalHours + ($remainingThirtyMin * 0.5);
-                
+
                 // Format to ensure consistent decimal format
                 $totalOvertimeMonthly = number_format($totalOvertimeMonthly, 1, '.', '');
 
@@ -311,7 +314,7 @@ class ReportEmailService
             foreach ($result as $employeeData) {
                 $totalAllOvertime += (float)$employeeData['total_overtime_by_month'];
             }
-            
+
             // Format the total to ensure minutes have two digits
             $totalAllOvertime = number_format($totalAllOvertime, 2, '.', '');
 
@@ -332,13 +335,13 @@ class ReportEmailService
     {
         $business_id = $user->business_id;
         $activities = Activity::with(['subject'])
-                                ->leftjoin('users as u', 'u.id', '=', 'activity_log.causer_id')
-                                ->where('activity_log.business_id', $business_id)
-                                ->select(
-                                    'activity_log.*',
-                                    DB::raw("CONCAT(COALESCE(u.surname, ''), ' ', COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as created_by")
-                                )->whereDate('activity_log.created_at', '>=', $start_date)
-                                ->whereDate('activity_log.created_at', '<=', $end_date)->get();
+            ->leftjoin('users as u', 'u.id', '=', 'activity_log.causer_id')
+            ->where('activity_log.business_id', $business_id)
+            ->select(
+                'activity_log.*',
+                DB::raw("CONCAT(COALESCE(u.surname, ''), ' ', COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as created_by")
+            )->whereDate('activity_log.created_at', '>=', $start_date)
+            ->whereDate('activity_log.created_at', '<=', $end_date)->get();
 
         return $activities;
     }
@@ -349,9 +352,8 @@ class ReportEmailService
         $business_id = $user->business_id;
         $location_id = 10;
 
-        $purchase_details = $this->transactionUtil->getPurchaseTotals
-        (
-            $business_id, 
+        $purchase_details = $this->transactionUtil->getPurchaseTotals(
+            $business_id,
             $start_date,
             $end_date,
             // $location_id
@@ -365,7 +367,8 @@ class ReportEmailService
         );
 
         $transaction_types = [
-            'purchase_return', 'sell_return',
+            'purchase_return',
+            'sell_return',
         ];
 
         $transaction_totals = $this->transactionUtil->getTransactionTotals(
@@ -383,7 +386,8 @@ class ReportEmailService
             'total' => $sell_details['total_sell_inc_tax'] - $total_sell_return_inc_tax - ($purchase_details['total_purchase_inc_tax'] - $total_purchase_return_inc_tax),
             'due' => $sell_details['invoice_due'] - $purchase_details['purchase_due'],
         ];
-        return ['purchase' => $purchase_details,
+        return [
+            'purchase' => $purchase_details,
             'sell' => $sell_details,
             'total_purchase_return' => $total_purchase_return_inc_tax,
             'total_sell_return' => $total_sell_return_inc_tax,
@@ -398,7 +402,7 @@ class ReportEmailService
         $selling_price_groups = SellingPriceGroup::where('business_id', $business_id)->get();
         $allowed_selling_price_group = false;
         foreach ($selling_price_groups as $selling_price_group) {
-            if ($user->can('selling_price_group.'.$selling_price_group->id)) {
+            if ($user->can('selling_price_group.' . $selling_price_group->id)) {
                 $allowed_selling_price_group = true;
                 break;
             }
@@ -408,8 +412,21 @@ class ReportEmailService
         } else {
             $show_manufacturing_data = 0;
         }
-        $filters = request()->only(['location_id', 'category_id', 'sub_category_id', 'brand_id', 'unit_id', 'tax_id', 'type',
-            'only_mfg_products', 'active_state',  'not_for_selling', 'repair_model_id', 'product_id', 'active_state', ]);
+        $filters = request()->only([
+            'location_id',
+            'category_id',
+            'sub_category_id',
+            'brand_id',
+            'unit_id',
+            'tax_id',
+            'type',
+            'only_mfg_products',
+            'active_state',
+            'not_for_selling',
+            'repair_model_id',
+            'product_id',
+            'active_state',
+        ]);
 
         $filters['not_for_selling'] = isset($filters['not_for_selling']) && $filters['not_for_selling'] == 'true' ? 1 : 0;
 
@@ -450,7 +467,7 @@ class ReportEmailService
 
         $potential_profit = $closing_stock_by_sp - $closing_stock_by_pp;
         $profit_margin = empty($closing_stock_by_sp) ? 0 : ($potential_profit / $closing_stock_by_sp) * 100;
-        
+
         return [
             'closing_stock_by_pp' => $closing_stock_by_pp,
             'closing_stock_by_sp' => $closing_stock_by_sp,
@@ -463,7 +480,7 @@ class ReportEmailService
     {
         $business_id = $user->business_id;
         $location_id = null;
-        
+
         // $purchase_details = $this->transactionUtil->getPurchaseTotals($business_id, $start_date, $end_date, $location_id);
         $fy = $this->businessUtil->getCurrentFinancialYear($business_id);
         $user_id = $user->id;
@@ -498,27 +515,27 @@ class ReportEmailService
         $contact_id = null;
 
         $contacts = Contact::where('contacts.business_id', $business_id)
-        ->join('transactions AS t', 'contacts.id', '=', 't.contact_id')
-        ->active()
-        ->groupBy('contacts.id')
-        ->select(
-            DB::raw("SUM(IF(t.type = 'purchase', final_total, 0)) as total_purchase"),
-            DB::raw("SUM(IF(t.type = 'purchase_return', final_total, 0)) as total_purchase_return"),
-            DB::raw("SUM(IF(t.type = 'sell' AND t.status = 'final', final_total, 0)) as total_invoice"),
-            DB::raw("SUM(IF(t.type = 'purchase', (SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as purchase_paid"),
-            DB::raw("SUM(IF(t.type = 'sell' AND t.status = 'final', (SELECT SUM(IF(is_return = 1,-1*amount,amount)) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as invoice_received"),
-            DB::raw("SUM(IF(t.type = 'sell_return', (SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as sell_return_paid"),
-            DB::raw("SUM(IF(t.type = 'purchase_return', (SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as purchase_return_received"),
-            DB::raw("SUM(IF(t.type = 'sell_return', final_total, 0)) as total_sell_return"),
-            DB::raw("SUM(IF(t.type = 'opening_balance', final_total, 0)) as opening_balance"),
-            DB::raw("SUM(IF(t.type = 'opening_balance', (SELECT SUM(IF(is_return = 1,-1*amount,amount)) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as opening_balance_paid"),
-            DB::raw("SUM(IF(t.type = 'ledger_discount' AND sub_type='sell_discount', final_total, 0)) as total_ledger_discount_sell"),
-            DB::raw("SUM(IF(t.type = 'ledger_discount' AND sub_type='purchase_discount', final_total, 0)) as total_ledger_discount_purchase"),
-            'contacts.supplier_business_name',
-            'contacts.name',
-            'contacts.id',
-            'contacts.type as contact_type'
-        );
+            ->join('transactions AS t', 'contacts.id', '=', 't.contact_id')
+            ->active()
+            ->groupBy('contacts.id')
+            ->select(
+                DB::raw("SUM(IF(t.type = 'purchase', final_total, 0)) as total_purchase"),
+                DB::raw("SUM(IF(t.type = 'purchase_return', final_total, 0)) as total_purchase_return"),
+                DB::raw("SUM(IF(t.type = 'sell' AND t.status = 'final', final_total, 0)) as total_invoice"),
+                DB::raw("SUM(IF(t.type = 'purchase', (SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as purchase_paid"),
+                DB::raw("SUM(IF(t.type = 'sell' AND t.status = 'final', (SELECT SUM(IF(is_return = 1,-1*amount,amount)) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as invoice_received"),
+                DB::raw("SUM(IF(t.type = 'sell_return', (SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as sell_return_paid"),
+                DB::raw("SUM(IF(t.type = 'purchase_return', (SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as purchase_return_received"),
+                DB::raw("SUM(IF(t.type = 'sell_return', final_total, 0)) as total_sell_return"),
+                DB::raw("SUM(IF(t.type = 'opening_balance', final_total, 0)) as opening_balance"),
+                DB::raw("SUM(IF(t.type = 'opening_balance', (SELECT SUM(IF(is_return = 1,-1*amount,amount)) FROM transaction_payments WHERE transaction_payments.transaction_id=t.id), 0)) as opening_balance_paid"),
+                DB::raw("SUM(IF(t.type = 'ledger_discount' AND sub_type='sell_discount', final_total, 0)) as total_ledger_discount_sell"),
+                DB::raw("SUM(IF(t.type = 'ledger_discount' AND sub_type='purchase_discount', final_total, 0)) as total_ledger_discount_purchase"),
+                'contacts.supplier_business_name',
+                'contacts.name',
+                'contacts.id',
+                'contacts.type as contact_type'
+            );
         $permitted_locations = $user->permitted_locations();
 
         if ($permitted_locations != 'all') {
@@ -541,11 +558,11 @@ class ReportEmailService
         $contact_id = null;
 
         $query = Transaction::leftjoin('customer_groups AS CG', 'transactions.customer_group_id', '=', 'CG.id')
-        ->where('transactions.business_id', $business_id)
-        ->where('transactions.type', 'sell')
-        ->where('transactions.status', 'final')
-        ->groupBy('transactions.customer_group_id')
-        ->select(DB::raw('SUM(final_total) as total_sell'), 'CG.name');
+            ->where('transactions.business_id', $business_id)
+            ->where('transactions.type', 'sell')
+            ->where('transactions.status', 'final')
+            ->groupBy('transactions.customer_group_id')
+            ->select(DB::raw('SUM(final_total) as total_sell'), 'CG.name');
 
         $group_id = null;
 
@@ -566,7 +583,6 @@ class ReportEmailService
         $customer_group = $query->get();
 
         return $customer_group;
-
     }
 
     // GET Tax Report
@@ -617,9 +633,9 @@ class ReportEmailService
         $business_id = $user->business_id;
         $location_id = null;
         $contact_id = null;
-        
+
         $query = Transaction::where('business_id', $business_id)
-        ->where('type', 'stock_adjustment');
+            ->where('type', 'stock_adjustment');
 
         //Check for permitted locations of a user
         $permitted_locations = $user->permitted_locations();
@@ -649,9 +665,9 @@ class ReportEmailService
 
     // GET TRENDING PRODUCT REPORT
     public function getTrendingProducts(User $user, $start_date = null, $end_date = null)
-    {                       
+    {
         Auth::login($user);
-        
+
         $business_id = $user->business_id;
         $location_id = null;
         $contact_id = null;
@@ -664,12 +680,11 @@ class ReportEmailService
         ];
 
         $products = $this->productUtil->getTrendingProducts($business_id, $filters);
-        
-       
+
+
         Auth::logout();
 
         return $products;
-        
     }
 
     // GET Items Report
@@ -681,66 +696,65 @@ class ReportEmailService
 
         $query = TransactionSellLinesPurchaseLines::leftJoin('transaction_sell_lines 
             as SL', 'SL.id', '=', 'transaction_sell_lines_purchase_lines.sell_line_id')
-        ->leftJoin('stock_adjustment_lines 
+            ->leftJoin('stock_adjustment_lines 
             as SAL', 'SAL.id', '=', 'transaction_sell_lines_purchase_lines.stock_adjustment_line_id')
-        ->leftJoin('transactions as sale', 'SL.transaction_id', '=', 'sale.id')
-        ->leftJoin('transactions as stock_adjustment', 'SAL.transaction_id', '=', 'stock_adjustment.id')
-        ->join('purchase_lines as PL', 'PL.id', '=', 'transaction_sell_lines_purchase_lines.purchase_line_id')
-        ->join('transactions as purchase', 'PL.transaction_id', '=', 'purchase.id')
-        ->join('business_locations as bl', 'purchase.location_id', '=', 'bl.id')
-        ->join(
-            'variations as v',
-            'PL.variation_id',
-            '=',
-            'v.id'
+            ->leftJoin('transactions as sale', 'SL.transaction_id', '=', 'sale.id')
+            ->leftJoin('transactions as stock_adjustment', 'SAL.transaction_id', '=', 'stock_adjustment.id')
+            ->join('purchase_lines as PL', 'PL.id', '=', 'transaction_sell_lines_purchase_lines.purchase_line_id')
+            ->join('transactions as purchase', 'PL.transaction_id', '=', 'purchase.id')
+            ->join('business_locations as bl', 'purchase.location_id', '=', 'bl.id')
+            ->join(
+                'variations as v',
+                'PL.variation_id',
+                '=',
+                'v.id'
             )
-        ->join('product_variations as pv', 'v.product_variation_id', '=', 'pv.id')
-        ->join('products as p', 'PL.product_id', '=', 'p.id')
-        ->join('units as u', 'p.unit_id', '=', 'u.id')
-        ->leftJoin('contacts as suppliers', 'purchase.contact_id', '=', 'suppliers.id')
-        ->leftJoin('contacts as customers', 'sale.contact_id', '=', 'customers.id')
-        ->where('purchase.business_id', $business_id)
-        ->select(
-            'v.sub_sku as sku',
-            'p.type as product_type',
-            'p.name as product_name',
-            'v.name as variation_name',
-            'pv.name as product_variation',
-            'u.short_name as unit',
-            'purchase.transaction_date as purchase_date',
-            'purchase.ref_no as purchase_ref_no',
-            'purchase.type as purchase_type',
-            'purchase.id as purchase_id',
-            'suppliers.name as supplier',
-            'suppliers.supplier_business_name',
-            'PL.purchase_price_inc_tax as purchase_price',
-            'sale.transaction_date as sell_date',
-            'stock_adjustment.transaction_date as stock_adjustment_date',
-            'sale.invoice_no as sale_invoice_no',
-            'stock_adjustment.ref_no as stock_adjustment_ref_no',
-            'customers.name as customer',
-            'customers.supplier_business_name as customer_business_name',
-            'transaction_sell_lines_purchase_lines.quantity as quantity',
-            'SL.unit_price_inc_tax as selling_price',
-            'SAL.unit_price as stock_adjustment_price',
-            'transaction_sell_lines_purchase_lines.stock_adjustment_line_id',
-            'transaction_sell_lines_purchase_lines.sell_line_id',
-            'transaction_sell_lines_purchase_lines.purchase_line_id',
-            'transaction_sell_lines_purchase_lines.qty_returned',
-            'bl.name as location',
-            'SL.sell_line_note',
-            'PL.lot_number'
-        );
+            ->join('product_variations as pv', 'v.product_variation_id', '=', 'pv.id')
+            ->join('products as p', 'PL.product_id', '=', 'p.id')
+            ->join('units as u', 'p.unit_id', '=', 'u.id')
+            ->leftJoin('contacts as suppliers', 'purchase.contact_id', '=', 'suppliers.id')
+            ->leftJoin('contacts as customers', 'sale.contact_id', '=', 'customers.id')
+            ->where('purchase.business_id', $business_id)
+            ->select(
+                'v.sub_sku as sku',
+                'p.type as product_type',
+                'p.name as product_name',
+                'v.name as variation_name',
+                'pv.name as product_variation',
+                'u.short_name as unit',
+                'purchase.transaction_date as purchase_date',
+                'purchase.ref_no as purchase_ref_no',
+                'purchase.type as purchase_type',
+                'purchase.id as purchase_id',
+                'suppliers.name as supplier',
+                'suppliers.supplier_business_name',
+                'PL.purchase_price_inc_tax as purchase_price',
+                'sale.transaction_date as sell_date',
+                'stock_adjustment.transaction_date as stock_adjustment_date',
+                'sale.invoice_no as sale_invoice_no',
+                'stock_adjustment.ref_no as stock_adjustment_ref_no',
+                'customers.name as customer',
+                'customers.supplier_business_name as customer_business_name',
+                'transaction_sell_lines_purchase_lines.quantity as quantity',
+                'SL.unit_price_inc_tax as selling_price',
+                'SAL.unit_price as stock_adjustment_price',
+                'transaction_sell_lines_purchase_lines.stock_adjustment_line_id',
+                'transaction_sell_lines_purchase_lines.sell_line_id',
+                'transaction_sell_lines_purchase_lines.purchase_line_id',
+                'transaction_sell_lines_purchase_lines.qty_returned',
+                'bl.name as location',
+                'SL.sell_line_note',
+                'PL.lot_number'
+            );
 
         $permitted_locations = $user->permitted_locations();
 
         if ($permitted_locations != 'all') {
             $query->whereIn('purchase.location_id', $permitted_locations);
         }
-        
+
         $items_report = $query->get();
         return $items_report;
-            
     }
 
     public function getProductPurchaseReport(User $user, $start_date = null, $end_date = null)
@@ -755,39 +769,39 @@ class ReportEmailService
             'purchase_lines.transaction_id',
             '=',
             't.id'
-                )
-                ->join(
-                    'variations as v',
-                    'purchase_lines.variation_id',
-                    '=',
-                    'v.id'
-                )
-                ->join('product_variations as pv', 'v.product_variation_id', '=', 'pv.id')
-                ->join('contacts as c', 't.contact_id', '=', 'c.id')
-                ->join('products as p', 'pv.product_id', '=', 'p.id')
-                ->leftjoin('units as u', 'p.unit_id', '=', 'u.id')
-                ->where('t.business_id', $business_id)
-                ->where('t.type', 'purchase')
-                ->select(
-                    'p.name as product_name',
-                    'p.type as product_type',
-                    'pv.name as product_variation',
-                    'v.name as variation_name',
-                    'v.sub_sku',
-                    'c.name as supplier',
-                    'c.supplier_business_name',
-                    't.id as transaction_id',
-                    't.ref_no',
-                    't.transaction_date as transaction_date',
-                    'purchase_lines.purchase_price_inc_tax as unit_purchase_price',
-                    DB::raw('(purchase_lines.quantity - purchase_lines.quantity_returned) as purchase_qty'),
-                    'purchase_lines.quantity_adjusted',
-                    'u.short_name as unit',
-                    DB::raw('((purchase_lines.quantity - purchase_lines.quantity_returned - purchase_lines.quantity_adjusted) * purchase_lines.purchase_price_inc_tax) as subtotal')
-                )
-                ->groupBy('purchase_lines.id');
+        )
+            ->join(
+                'variations as v',
+                'purchase_lines.variation_id',
+                '=',
+                'v.id'
+            )
+            ->join('product_variations as pv', 'v.product_variation_id', '=', 'pv.id')
+            ->join('contacts as c', 't.contact_id', '=', 'c.id')
+            ->join('products as p', 'pv.product_id', '=', 'p.id')
+            ->leftjoin('units as u', 'p.unit_id', '=', 'u.id')
+            ->where('t.business_id', $business_id)
+            ->where('t.type', 'purchase')
+            ->select(
+                'p.name as product_name',
+                'p.type as product_type',
+                'pv.name as product_variation',
+                'v.name as variation_name',
+                'v.sub_sku',
+                'c.name as supplier',
+                'c.supplier_business_name',
+                't.id as transaction_id',
+                't.ref_no',
+                't.transaction_date as transaction_date',
+                'purchase_lines.purchase_price_inc_tax as unit_purchase_price',
+                DB::raw('(purchase_lines.quantity - purchase_lines.quantity_returned) as purchase_qty'),
+                'purchase_lines.quantity_adjusted',
+                'u.short_name as unit',
+                DB::raw('((purchase_lines.quantity - purchase_lines.quantity_returned - purchase_lines.quantity_adjusted) * purchase_lines.purchase_price_inc_tax) as subtotal')
+            )
+            ->groupBy('purchase_lines.id');
 
-        
+
         if (! empty($start_date) && ! empty($end_date)) {
             $query->whereBetween(DB::raw('date(transaction_date)'), [$start_date, $end_date]);
         }
@@ -801,7 +815,6 @@ class ReportEmailService
         $product_purchase_report = $query->get();
 
         return $product_purchase_report;
-    
     }
 
 
@@ -864,7 +877,7 @@ class ReportEmailService
                 'transaction_sell_lines.parent_sell_line_id',
                 DB::raw('((transaction_sell_lines.quantity - transaction_sell_lines.quantity_returned) * transaction_sell_lines.unit_price_inc_tax) as subtotal')
             )
-            ->groupBy('transaction_sell_lines.id');        
+            ->groupBy('transaction_sell_lines.id');
 
         if (! empty($start_date) && ! empty($end_date)) {
             $query->where('t.transaction_date', '>=', $start_date)
@@ -874,7 +887,6 @@ class ReportEmailService
         $product_sell_report = $query->get();
 
         return $product_sell_report;
-
     }
 
     public function getPurchasePaymentReport(User $user, $start_date = null, $end_date = null)
@@ -929,9 +941,9 @@ class ReportEmailService
             ->groupBy('transaction_payments.id');
 
 
-            if (! empty($start_date) && ! empty($end_date)) {
-                $query->whereBetween(DB::raw('date(paid_on)'), [$start_date, $end_date]);
-            }
+        if (! empty($start_date) && ! empty($end_date)) {
+            $query->whereBetween(DB::raw('date(paid_on)'), [$start_date, $end_date]);
+        }
 
         $permitted_locations = $user->permitted_locations();
 
@@ -944,9 +956,6 @@ class ReportEmailService
         $purchase_payment_report = $query->get();
 
         return $purchase_payment_report;
-        
-
-        
     }
 
     public function getSalesRepresentativeTotalSell(User $user, $start_date = null, $end_date = null, $location_id = null, $contact_id = null)
@@ -1022,7 +1031,8 @@ class ReportEmailService
             //Get Commision
             $total_commission = $commission_percentage * $payment_details['total_payment_with_commission'] / 100;
 
-            return ['total_payment_with_commission' => $payment_details['total_payment_with_commission'] ?? 0,
+            return [
+                'total_payment_with_commission' => $payment_details['total_payment_with_commission'] ?? 0,
                 'total_commission' => $total_commission,
                 'commission_percentage' => $commission_percentage,
             ];
@@ -1033,7 +1043,8 @@ class ReportEmailService
         //Get Commision
         $total_commission = $commission_percentage * $sell_details['total_sales_with_commission'] / 100;
 
-        return ['total_sales_with_commission' => $sell_details['total_sales_with_commission'],
+        return [
+            'total_sales_with_commission' => $sell_details['total_sales_with_commission'],
             'total_commission' => $total_commission,
             'commission_percentage' => $commission_percentage,
         ];
@@ -1044,55 +1055,55 @@ class ReportEmailService
         $business_id = $user->business_id;
 
         $expenses = Transaction::leftJoin('expense_categories AS ec', 'transactions.expense_category_id', '=', 'ec.id')
-                    ->leftJoin('expense_categories AS esc', 'transactions.expense_sub_category_id', '=', 'esc.id')
-                    ->join(
-                        'business_locations AS bl',
-                        'transactions.location_id',
-                        '=',
-                        'bl.id'
-                    )
-                    ->leftJoin('tax_rates as tr', 'transactions.tax_id', '=', 'tr.id')
-                    ->leftJoin('users AS U', 'transactions.expense_for', '=', 'U.id')
-                    ->leftJoin('users AS usr', 'transactions.created_by', '=', 'usr.id')
-                    ->leftJoin('contacts AS c', 'transactions.contact_id', '=', 'c.id')
-                    ->leftJoin(
-                        'transaction_payments AS TP',
-                        'transactions.id',
-                        '=',
-                        'TP.transaction_id'
-                    )
-                    ->where('transactions.business_id', $business_id)
-                    ->whereIn('transactions.type', ['expense', 'expense_refund'])
-                    ->select(
-                        'transactions.id',
-                        'transactions.document',
-                        'transaction_date',
-                        'ref_no',
-                        'ec.name as category',
-                        'esc.name as sub_category',
-                        'payment_status',
-                        'additional_notes',
-                        'final_total',
-                        'transactions.is_recurring',
-                        'transactions.recur_interval',
-                        'transactions.recur_interval_type',
-                        'transactions.recur_repetitions',
-                        'transactions.subscription_repeat_on',
-                        'bl.name as location_name',
-                        DB::raw("CONCAT(COALESCE(U.surname, ''),' ',COALESCE(U.first_name, ''),' ',COALESCE(U.last_name,'')) as expense_for"),
-                        DB::raw("CONCAT(tr.name ,' (', tr.amount ,' )') as tax"),
-                        DB::raw('SUM(TP.amount) as amount_paid'),
-                        DB::raw("CONCAT(COALESCE(usr.surname, ''),' ',COALESCE(usr.first_name, ''),' ',COALESCE(usr.last_name,'')) as added_by"),
-                        'transactions.recur_parent_id',
-                        'c.name as contact_name',
-                        'transactions.type'
-                    )
-                    ->with(['recurring_parent'])
-                    ->groupBy('transactions.id');
+            ->leftJoin('expense_categories AS esc', 'transactions.expense_sub_category_id', '=', 'esc.id')
+            ->join(
+                'business_locations AS bl',
+                'transactions.location_id',
+                '=',
+                'bl.id'
+            )
+            ->leftJoin('tax_rates as tr', 'transactions.tax_id', '=', 'tr.id')
+            ->leftJoin('users AS U', 'transactions.expense_for', '=', 'U.id')
+            ->leftJoin('users AS usr', 'transactions.created_by', '=', 'usr.id')
+            ->leftJoin('contacts AS c', 'transactions.contact_id', '=', 'c.id')
+            ->leftJoin(
+                'transaction_payments AS TP',
+                'transactions.id',
+                '=',
+                'TP.transaction_id'
+            )
+            ->where('transactions.business_id', $business_id)
+            ->whereIn('transactions.type', ['expense', 'expense_refund'])
+            ->select(
+                'transactions.id',
+                'transactions.document',
+                'transaction_date',
+                'ref_no',
+                'ec.name as category',
+                'esc.name as sub_category',
+                'payment_status',
+                'additional_notes',
+                'final_total',
+                'transactions.is_recurring',
+                'transactions.recur_interval',
+                'transactions.recur_interval_type',
+                'transactions.recur_repetitions',
+                'transactions.subscription_repeat_on',
+                'bl.name as location_name',
+                DB::raw("CONCAT(COALESCE(U.surname, ''),' ',COALESCE(U.first_name, ''),' ',COALESCE(U.last_name,'')) as expense_for"),
+                DB::raw("CONCAT(tr.name ,' (', tr.amount ,' )') as tax"),
+                DB::raw('SUM(TP.amount) as amount_paid'),
+                DB::raw("CONCAT(COALESCE(usr.surname, ''),' ',COALESCE(usr.first_name, ''),' ',COALESCE(usr.last_name,'')) as added_by"),
+                'transactions.recur_parent_id',
+                'c.name as contact_name',
+                'transactions.type'
+            )
+            ->with(['recurring_parent'])
+            ->groupBy('transactions.id');
 
         $expenses->whereDate('transaction_date', '>=', $start_date)
-                ->whereDate('transaction_date', '<=', $end_date)
-                ->get();
+            ->whereDate('transaction_date', '<=', $end_date)
+            ->get();
 
         return $expenses;
     }
@@ -1103,16 +1114,16 @@ class ReportEmailService
         $sells = $this->transactionUtil->getListSells($business_id, null);
 
         $permitted_locations = $user->permitted_locations();
-            if ($permitted_locations != 'all') {
-                $sells->whereIn('transactions.location_id', $permitted_locations);
-            }
+        if ($permitted_locations != 'all') {
+            $sells->whereIn('transactions.location_id', $permitted_locations);
+        }
 
         $sells->whereDate('transactions.transaction_date', '>=', $start_date)
-                ->whereDate('transactions.transaction_date', '<=', $end_date);
+            ->whereDate('transactions.transaction_date', '<=', $end_date);
 
         return $sells;
     }
-    
+
     public function getExpenseReport(User $user, $start_date = null, $end_date = null, $location_id = null, $contact_id = null)
     {
         $business_id = $user->business_id;

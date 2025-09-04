@@ -63,8 +63,10 @@ class Daily extends Command
     public function handle()
     {
         $datas = ReportSettings::where('interval', 'daily')->get();
+        // dd($datas->toArray());
 
         foreach ($datas as $data) {
+            Log::info($data->type);
             $this->reportEmailService->generateReportAttachment($data, $this->getDay(), $data->interval);
         }
 

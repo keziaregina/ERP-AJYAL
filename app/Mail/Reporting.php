@@ -31,7 +31,7 @@ class Reporting extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(ReportSettings $report_settings, $filename,$type)
+    public function __construct(ReportSettings $report_settings, $filename, $type)
     {
         $this->data = $report_settings;
 
@@ -51,7 +51,7 @@ class Reporting extends Mailable implements ShouldQueue
     public function envelope()
     {
         return new Envelope(
-            subject: 'Reporting '. $this->report_type,
+            subject: 'Reporting ' . $this->report_type,
             metadata: [
                 'type' => $this->type,
             ],
@@ -86,8 +86,8 @@ class Reporting extends Mailable implements ShouldQueue
     public function attachments()
     {
         return [
-            Attachment::fromStorageDisk('public',$this->path)->as(basename($this->path)) 
-            ->withMime('application/pdf'), 
+            Attachment::fromStorageDisk('public', $this->path)->as(basename($this->path))
+                ->withMime('application/pdf'),
         ];
     }
 }
