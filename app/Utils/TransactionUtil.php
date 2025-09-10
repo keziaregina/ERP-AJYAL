@@ -2950,8 +2950,7 @@ class TransactionUtil extends Util
         $filters = [],
         $type = 'by_category'
     ) {
-    $query = DB::table('expense_categories as ec')->leftJoin('transactions', function ($query) use ($business_id, $filters) {
-            $query->on('transactions.expense_category_id', '=', 'ec.id')
+    $query = Transaction::leftjoin('expense_categories as ec', 'transactions.expense_category_id', '=', 'ec.id')
             ->where('transactions.business_id', $business_id)
             ->whereIn('type', ['expense', 'expense_refund']);
         // ->where('payment_status', 'paid');
@@ -2986,7 +2985,6 @@ class TransactionUtil extends Util
                 $filters['end_date'],
             ]);
         }
-    });
 
         //Check tht type of report and return data accordingly
         if ($type == 'by_category') {
@@ -2995,34 +2993,7 @@ class TransactionUtil extends Util
                 'ec.name as category'
             )
                 ->groupBy('expense_category_id')
-        ->groupBy('ec.id', 'ec.name');
-
-        $others = DB::table('transactions')
-            ->select(
-                DB::raw("COALESCE(SUM(IF(type='expense_refund', -1 * final_total, final_total)), 0) as total_expense"),
-                DB::raw("'Others' as category")
-            )
-            ->whereNull('transactions.expense_category_id')
-            ->where('transactions.business_id', $business_id)
-            ->whereIn('type', ['expense', 'expense_refund']);
-
-        if (! empty($filters['location_id'])) {
-            $others->where('transactions.location_id', $filters['location_id']);
-        }
-        if (! empty($filters['created_by'])) {
-            $others->where('transactions.created_by', $filters['created_by']);
-        }
-        if (! empty($filters['expense_for'])) {
-            $others->where('transactions.expense_for', $filters['expense_for']);
-        }
-        if (! empty($filters['start_date']) && ! empty($filters['end_date'])) {
-            $others->whereBetween(DB::raw('date(transactions.transaction_date)'), [
-                $filters['start_date'],
-                $filters['end_date'],
-            ]);
-        }
-
-        $expenses = $expenses->unionAll($others)->get();
+                ->get();
         } elseif ($type == 'total') {
             $expenses = $query->select(
                 DB::raw("SUM( IF(transactions.type='expense_refund', -1 * final_total, final_total) ) as total_expense")

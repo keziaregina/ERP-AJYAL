@@ -1082,12 +1082,47 @@ class ReportController extends Controller
 
         $expenses = $this->transactionUtil->getExpenseReport($business_id, $filters);
 
-        $values = [];
-        $labels = [];
-        foreach ($expenses as $expense) {
-            $values[] = (float) $expense->total_expense;
-            $labels[] = ! empty($expense->category) ? $expense->category : __('report.others');
+        $categories = ExpenseCategory::where('business_id', $business_id)
+            ->pluck('name', 'id');
+
+        $expenses_by_cat = collect($expenses)->keyBy('category');
+
+        $expenses = collect();
+
+        foreach ($categories as $id => $name) {
+            $total = isset($expenses_by_cat[$name]) ? (float) $expenses_by_cat[$name]->total_expense : 0;
+            $expenses->push((object)[
+                'category' => $name,
+                'total_expense' => $total
+            ]);
         }
+
+        $othersQuery = DB::table('transactions')
+            ->where('business_id', $business_id)
+            ->whereNull('expense_category_id')
+            ->whereIn('type', ['expense', 'expense_refund']);
+
+        if (! empty($filters['location_id'])) {
+            $othersQuery->where('location_id', $filters['location_id']);
+        }
+        if (! empty($filters['start_date']) && ! empty($filters['end_date'])) {
+            $othersQuery->whereBetween(DB::raw('date(transaction_date)'), [
+                $filters['start_date'],
+                $filters['end_date'],
+            ]);
+        }
+
+        $othersTotal = $othersQuery->select(
+            DB::raw("COALESCE(SUM(CASE WHEN type = 'expense_refund' THEN -1 * final_total ELSE final_total END), 0) as total_expense")
+        )->value('total_expense');
+
+        $expenses->push((object)[
+            'category' => __('report.others'),
+            'total_expense' => (float) $othersTotal
+        ]);
+
+        $labels = $expenses->pluck('category')->toArray();
+        $values = $expenses->pluck('total_expense')->map(fn($v) => (float) $v)->toArray();
 
         $chart = new CommonChart;
         $chart->labels($labels)
