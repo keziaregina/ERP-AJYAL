@@ -186,7 +186,7 @@ class HomeController extends Controller
             $fy_sells_by_location_data[$loc_id]['values'] = $values_data;
         }
 
-        $sells_chart_2 = Cache::remember('home.sells_chart_2', 60 , function () use ($labels,$currency,$all_locations,$values) {
+        $sells_chart_2 = Cache::remember('home.sells_chart_2', 60, function () use ($labels, $currency, $all_locations, $values, $fy_sells_by_location_data) {
             $sells_chart_2 = new CommonChart;
             $sells_chart_2->labels($labels)
                         ->options($this->__chartOptions(__(
