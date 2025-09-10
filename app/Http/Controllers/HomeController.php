@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\BusinessLocation;
-use App\Charts\CommonChart;
-use App\Currency;
-use App\Media;
-use App\Transaction;
+use DB;
 use App\User;
-use App\Utils\BusinessUtil;
+use App\Media;
+use Datatables;
+use App\Currency;
+use App\Utils\Util;
+use App\Transaction;
+use App\BusinessLocation;
 use App\Utils\ModuleUtil;
+use App\Utils\ProductUtil;
+use App\Charts\CommonChart;
+use App\Utils\BusinessUtil;
+use Illuminate\Http\Request;
 use App\Utils\RestaurantUtil;
 use App\Utils\TransactionUtil;
-use App\Utils\ProductUtil;
-use App\Utils\Util;
 use App\VariationLocationDetails;
-use Datatables;
-use DB;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Notifications\DatabaseNotification;
 
 class HomeController extends Controller
@@ -124,24 +125,28 @@ class HomeController extends Controller
             $location_sells[$loc_id]['values'] = $values;
         }
 
-        $sells_chart_1 = new CommonChart;
+        $sells_chart_1 = Cache::remember('home.sells_chart_1', 60, function () use ($labels, $currency, $all_locations, $all_sell_values, $location_sells) {
+            $sells_chart_1 = new CommonChart;
 
-        $sells_chart_1->labels($labels)
-                        ->options($this->__chartOptions(__(
-                            'home.total_sells',
-                            ['currency' => $currency->code]
-                            )));
-
-        if (! empty($location_sells)) {
-            foreach ($location_sells as $location_sell) {
-                $sells_chart_1->dataset($location_sell['loc_label'], 'line', $location_sell['values']);
+            $sells_chart_1->labels($labels)
+                            ->options($this->__chartOptions(__(
+                                'home.total_sells',
+                                ['currency' => $currency->code]
+                                )));
+    
+            if (! empty($location_sells)) {
+                foreach ($location_sells as $location_sell) {
+                    $sells_chart_1->dataset($location_sell['loc_label'], 'line', $location_sell['values']);
+                }
             }
-        }
-
-        if (count($all_locations) > 1) {
-            $sells_chart_1->dataset(__('report.all_locations'), 'line', $all_sell_values);
-        }
-
+    
+            if (count($all_locations) > 1) {
+                $sells_chart_1->dataset(__('report.all_locations'), 'line', $all_sell_values);
+            }
+            
+            return $sells_chart_1;
+        });
+        
         $labels = [];
         $values = [];
         $date = strtotime($fy['start']);
@@ -181,20 +186,23 @@ class HomeController extends Controller
             $fy_sells_by_location_data[$loc_id]['values'] = $values_data;
         }
 
-        $sells_chart_2 = new CommonChart;
-        $sells_chart_2->labels($labels)
-                    ->options($this->__chartOptions(__(
-                        'home.total_sells',
-                        ['currency' => $currency->code]
-                            )));
-        if (! empty($fy_sells_by_location_data)) {
-            foreach ($fy_sells_by_location_data as $location_sell) {
-                $sells_chart_2->dataset($location_sell['loc_label'], 'line', $location_sell['values']);
+        $sells_chart_2 = Cache::remember('home.sells_chart_2', 60 , function () use ($labels,$currency,$all_locations,$values) {
+            $sells_chart_2 = new CommonChart;
+            $sells_chart_2->labels($labels)
+                        ->options($this->__chartOptions(__(
+                            'home.total_sells',
+                            ['currency' => $currency->code]
+                                )));
+            if (! empty($fy_sells_by_location_data)) {
+                foreach ($fy_sells_by_location_data as $location_sell) {
+                    $sells_chart_2->dataset($location_sell['loc_label'], 'line', $location_sell['values']);
+                }
             }
-        }
-        if (count($all_locations) > 1) {
-            $sells_chart_2->dataset(__('report.all_locations'), 'line', $values);
-        }
+            if (count($all_locations) > 1) {
+                $sells_chart_2->dataset(__('report.all_locations'), 'line', $values);
+            }
+            return $sells_chart_2;
+        });
 
         //Get Dashboard widgets from module
         $module_widgets = $this->moduleUtil->getModuleData('dashboard_widget');
