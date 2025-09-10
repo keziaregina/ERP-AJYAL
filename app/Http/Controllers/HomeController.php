@@ -293,30 +293,34 @@ class HomeController extends Controller
         if (request()->ajax()) {
             $business_id = request()->session()->get('user.business_id');
             $permitted_locations = auth()->user()->permitted_locations();
-            $products = $this->productUtil->getProductAlert($business_id, $permitted_locations);
+            $products = Cache::remember('home.getProductStockAlert', 60 , function () use ($business_id, $permitted_locations) {
+                $query = $this->productUtil->getProductAlert($business_id, $permitted_locations);
+                return Datatables::of($query)
+                    ->editColumn('product', function ($row) {
+                        if ($row->type == 'single') {
+                            return $row->product.' ('.$row->sku.')';
+                        } else {
+                            return $row->product.' - '.$row->product_variation.' - '.$row->variation.' ('.$row->sub_sku.')';
+                        }
+                    })
+                    ->editColumn('stock', function ($row) {
+                        $stock = $row->stock ? $row->stock : 0;
+    
+                        return '<span data-is_quantity="true" class="display_currency" data-currency_symbol=false>'.(float) $stock.'</span> '.$row->unit;
+                    })
+                    ->removeColumn('sku')
+                    ->removeColumn('sub_sku')
+                    ->removeColumn('unit')
+                    ->removeColumn('type')
+                    ->removeColumn('product_variation')
+                    ->removeColumn('variation')
+                    ->rawColumns([2])
+                    ->make(false);
+                });
+            }
 
-            return Datatables::of($products)
-                ->editColumn('product', function ($row) {
-                    if ($row->type == 'single') {
-                        return $row->product.' ('.$row->sku.')';
-                    } else {
-                        return $row->product.' - '.$row->product_variation.' - '.$row->variation.' ('.$row->sub_sku.')';
-                    }
-                })
-                ->editColumn('stock', function ($row) {
-                    $stock = $row->stock ? $row->stock : 0;
+            return $products;
 
-                    return '<span data-is_quantity="true" class="display_currency" data-currency_symbol=false>'.(float) $stock.'</span> '.$row->unit;
-                })
-                ->removeColumn('sku')
-                ->removeColumn('sub_sku')
-                ->removeColumn('unit')
-                ->removeColumn('type')
-                ->removeColumn('product_variation')
-                ->removeColumn('variation')
-                ->rawColumns([2])
-                ->make(false);
-        }
     }
 
     /**
