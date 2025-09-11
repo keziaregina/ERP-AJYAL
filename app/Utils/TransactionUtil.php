@@ -2950,7 +2950,7 @@ class TransactionUtil extends Util
         $filters = [],
         $type = 'by_category'
     ) {
-        $query = Transaction::leftjoin('expense_categories AS ec', 'transactions.expense_category_id', '=', 'ec.id')
+    $query = Transaction::leftjoin('expense_categories as ec', 'transactions.expense_category_id', '=', 'ec.id')
             ->where('transactions.business_id', $business_id)
             ->whereIn('type', ['expense', 'expense_refund']);
         // ->where('payment_status', 'paid');
