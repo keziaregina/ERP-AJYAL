@@ -313,8 +313,31 @@ class EssentialsLeaveController extends Controller
         }
 
         if (request()->ajax()) {
-            try {
-                EssentialsLeave::where('business_id', $business_id)->where('id', $id)->delete();
+            try {                
+                $EssentialsLeave = EssentialsLeave::where('business_id', $business_id)
+                ->where('id', $id)
+                ->select('user_id', 'start_date', 'end_date')
+                ->first();
+                // Log::info(json_encode($EssentialsLeave, JSON_PRETTY_PRINT));
+                // exit;
+
+                $startDate = $EssentialsLeave->start_date;
+                $endDate = $EssentialsLeave->end_date;
+                $range = CarbonPeriod::create($startDate, $endDate);
+                
+                foreach ($range as $date) {
+                    $days = date('d', strtotime($date));
+                    $months = date('m', strtotime($date));
+                    $years = date('Y', strtotime($date));                
+                
+                    $overTimeHour = EmployeeOvertime::
+                        where('user_id', $EssentialsLeave->user_id)
+                        ->where('day', $days)
+                        ->where('month', $months)
+                        ->where('year', $years)
+                        ->delete();  
+                }          
+
 
                 $output = ['success' => true,
                     'msg' => __('lang_v1.deleted_success'),
@@ -390,6 +413,15 @@ class EssentialsLeaveController extends Controller
                         'total_hour' => $leave_status,
                         'type' => EmployeeOvertime::TYPES['Leave Request'],
                     ]);
+                }
+
+                if ($input['status'] == 'cancelled') {
+                    $overTimeHour = EmployeeOvertime::
+                        where('user_id', $leave->user_id)
+                      ->where('day', $days)
+                      ->where('month', $months)
+                      ->where('year', $years)
+                      ->delete();
                 }
             }
 
