@@ -337,6 +337,8 @@ class EssentialsLeaveController extends Controller
                         ->where('year', $years)
                         ->delete();  
                 }          
+                EssentialsLeave::where('business_id', $business_id)
+                ->where('id', $id)->delete();
 
 
                 $output = ['success' => true,
