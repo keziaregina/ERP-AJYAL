@@ -274,20 +274,16 @@ class PayrollController extends Controller
             ->get();
 
         $add_payroll_for = array_diff($employee_ids, $payrolls->pluck('expense_for')->toArray());
-        // dd( $payrolls->pluck('expense_for'));
-        // dd($add_payroll_for);
 
         if (! empty($add_payroll_for)) {
             $location = BusinessLocation::where('business_id', $business_id)
                 ->find($location_id);
 
             //initialize required data
-            // dd($transaction_date);
 
             $start_date = $transaction_date;
-            // $end_date = \Carbon::parse($transaction_end_date);
             $end_date = \Carbon::parse($start_date)->lastOfMonth();
-            // dd($end_date);
+
             $month_name = $end_date->format('F');
 
             $employees = User::where('business_id', $business_id)
@@ -299,8 +295,6 @@ class PayrollController extends Controller
                         });
                 })
                 ->find($add_payroll_for);
-
-            // dd($employees);
 
             $payrolls = [];
             foreach ($employees as $employee) {
@@ -521,7 +515,7 @@ class PayrollController extends Controller
 
                             $payrolls[$employee->id]['deductions']['deduction_names'][] = 'Sick Leave Days';
                             $payrolls[$employee->id]['deductions']['deduction_short_names'][] = 'sick_leave_days';
-                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] = ($daily_food_allowance + $dailyRate) * $sickLeaveDays;
+                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] = $dailyRate * $sickLeaveDays;
                             $payrolls[$employee->id]['deductions']['deduction_types'][] = 'fixed';
                             $payrolls[$employee->id]['deductions']['deduction_col_types'][] = 'auto';
                             $payrolls[$employee->id]['deductions']['deduction_percents'][] = 0;
@@ -540,7 +534,7 @@ class PayrollController extends Controller
 
                             $payrolls[$employee->id]['deductions']['deduction_names'][] = 'Absent Days';
                             $payrolls[$employee->id]['deductions']['deduction_short_names'][] = 'absent_days';
-                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] = ($daily_food_allowance + $dailyRate) * $absentDays;
+                            $payrolls[$employee->id]['deductions']['deduction_amounts'][] =  $dailyRate * $absentDays;
                             $payrolls[$employee->id]['deductions']['deduction_types'][] = 'fixed';
                             $payrolls[$employee->id]['deductions']['deduction_col_types'][] = 'auto';
                             $payrolls[$employee->id]['deductions']['deduction_percents'][] = 0;
@@ -550,11 +544,6 @@ class PayrollController extends Controller
             }
             $grorious_employee = number_format(EssentialsAllowanceAndDeduction::where('description', 'like', '%glorious employee allowance%')->get()->first()->amount, 3, '.');
 
-
-            // Log::info('test');
-            // Log::info($grorious_employee);
-
-            // dd($payrolls);
             $action = 'create';
 
             return view('essentials::payroll.create2')
