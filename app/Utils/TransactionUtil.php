@@ -3239,7 +3239,8 @@ class TransactionUtil extends Util
 
         $allow_overselling = ! empty($business['pos_settings']['allow_overselling']) ?
             true : false;
-        // $allow_overselling = true;
+            // dd($business);
+        // ($allow_overselling) = true;
 
         //Set flag to check for expired items during SELLING only.
         $stop_selling_expired = false;
@@ -3258,6 +3259,7 @@ class TransactionUtil extends Util
             if (empty($product) || $product->enable_stock != 1) {
                 continue;
             }
+            // dd( $qty_selling);
 
             $qty_sum_query = $this->get_pl_quantity_sum_string('PL');
 
@@ -3312,12 +3314,17 @@ class TransactionUtil extends Util
                 'PL.mfg_quantity_used as mfg_quantity_used',
                 'transactions.invoice_no'
             )->get();
+            // dd($rows);
+            // dd($query);
 
             $purchase_sell_map = [];
 
             //Iterate over the rows, assign the purchase line to sell lines.
             $qty_selling = $line->quantity;
+            // dd($qty_selling);
+            // dd($line);
             foreach ($rows as $k => $row) {
+
                 $qty_allocated = 0;
 
                 //Check if qty_available is more or equal
@@ -3380,9 +3387,12 @@ class TransactionUtil extends Util
                 if ($qty_selling == 0) {
                     break;
                 }
+                // Log::info("qty kasih berapa");
+                // Log::info( $qty_selling);
             }
-
-            if (! ($qty_selling == 0 || is_null($qty_selling))) {
+            // dd([$qty_selling, ! ($qty_selling == 0 || is_null($qty_selling))] );
+                    //  if (! ($qty_selling == 0 || is_null($qty_selling))) {
+            if (!$qty_selling < 0 ){
                 //If overselling not allowed through exception else create mapping with blank purchase_line_id
                 if (! $allow_overselling) {
                     $variation = Variation::find($line->variation_id);
