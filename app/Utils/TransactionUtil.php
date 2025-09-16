@@ -3227,8 +3227,9 @@ class TransactionUtil extends Util
      * @param  int  $purchase_line_id (default: null)
      * @return object
      */
-    public function mapPurchaseSell($business, $transaction_lines, $mapping_type = 'purchase', $check_expiry = true, $purchase_line_id = null)
+    public function mapPurchaseSell($business, $transaction_lines, $transaction, $mapping_type = 'purchase', $check_expiry = true, $purchase_line_id = null)
     {
+        // dd($transaction);
         if (empty($transaction_lines)) {
             return false;
         }
@@ -3239,8 +3240,7 @@ class TransactionUtil extends Util
 
         $allow_overselling = ! empty($business['pos_settings']['allow_overselling']) ?
             true : false;
-            // dd($business);
-        // ($allow_overselling) = true;
+        // $allow_overselling = true;
 
         //Set flag to check for expired items during SELLING only.
         $stop_selling_expired = false;
@@ -3259,7 +3259,6 @@ class TransactionUtil extends Util
             if (empty($product) || $product->enable_stock != 1) {
                 continue;
             }
-            // dd( $qty_selling);
 
             $qty_sum_query = $this->get_pl_quantity_sum_string('PL');
 
@@ -3314,17 +3313,12 @@ class TransactionUtil extends Util
                 'PL.mfg_quantity_used as mfg_quantity_used',
                 'transactions.invoice_no'
             )->get();
-            // dd($rows);
-            // dd($query);
 
             $purchase_sell_map = [];
 
             //Iterate over the rows, assign the purchase line to sell lines.
             $qty_selling = $line->quantity;
-            // dd($qty_selling);
-            // dd($line);
             foreach ($rows as $k => $row) {
-
                 $qty_allocated = 0;
 
                 //Check if qty_available is more or equal
@@ -3387,12 +3381,9 @@ class TransactionUtil extends Util
                 if ($qty_selling == 0) {
                     break;
                 }
-                // Log::info("qty kasih berapa");
-                // Log::info( $qty_selling);
             }
-            // dd([$qty_selling, ! ($qty_selling == 0 || is_null($qty_selling))] );
-                    //  if (! ($qty_selling == 0 || is_null($qty_selling))) {
-            if (!$qty_selling < 0 ){
+
+            if (! ($qty_selling == 0 || is_null($qty_selling))) {
                 //If overselling not allowed through exception else create mapping with blank purchase_line_id
                 if (! $allow_overselling) {
                     $variation = Variation::find($line->variation_id);
@@ -3405,6 +3396,26 @@ class TransactionUtil extends Util
                     }
 
                     if ($mapping_type == 'purchase') {
+                    $mismatch_error_query = Transaction::join('purchase_lines AS PL', 'transactions.id', '=', 'PL.transaction_id')
+                        ->where('transactions.business_id', $business['id'])
+                        ->where('transactions.location_id', $business['location_id'])
+                        ->whereIn('transactions.type', [
+                            'purchase',
+                            'purchase_transfer',
+                            'opening_stock',
+                            'production_purchase',
+                        ])
+                        ->where('PL.product_id', $line->product_id)
+                        ->where('PL.variation_id', $line->variation_id)
+                        ->where('transactions.status', '!=', 'received')
+                        ->get();
+
+                    if ($mismatch_error_query->count() > 0) {
+                        $id = $line->transaction_id ?? $product->id;
+
+                        $mismatch_error = 'Ditemukan transaksi dengan status selain "received" pada transaksi dengan ID ' . $id;
+                            
+                    } else {
                         $mismatch_error = trans(
                             'messages.purchase_sell_mismatch_exception',
                             ['product' => $mismatch_name]
@@ -3413,6 +3424,8 @@ class TransactionUtil extends Util
                         if ($stop_selling_expired) {
                             $mismatch_error .= __('lang_v1.available_stock_expired');
                         }
+                    }
+
                     } elseif ($mapping_type == 'stock_adjustment') {
                         $mismatch_error = trans(
                             'messages.purchase_stock_adjustment_mismatch_exception',
