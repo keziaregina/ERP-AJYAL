@@ -525,6 +525,7 @@ class SellPosController extends Controller
                         }
                     }
                     //update product stock
+                    // dd($input);
                     foreach ($input['products'] as $product) {
                         $decrease_qty = $this->productUtil
                             ->num_uf($product['quantity']);
@@ -570,6 +571,7 @@ class SellPosController extends Controller
                     //purchase & sell lines in
                     //transaction_sell_lines_purchase_lines table
                     $business_details = $this->businessUtil->getDetails($business_id);
+                    // dd($business_details);
                     $pos_settings = empty($business_details->pos_settings) ? $this->businessUtil->defaultPosSettings() : json_decode($business_details->pos_settings, true);
 
                     $business = ['id' => $business_id,
