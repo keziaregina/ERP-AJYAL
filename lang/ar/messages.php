@@ -30,6 +30,7 @@
      'print' => 'طباعة',
      'submit' => 'إرسال',
      'purchase_sell_mismatch_exception' => 'خطأ: غير مصرح به: عدم التوافق بين الكمية المباعة والكمية التي تم شراؤها المنتج : product:',
+     'status_transaction_not_received' =>  'هذا الإجراء غير مسموح به لوجود معاملة معلقة. رقم المرجع : :Reference',
      'purchase_stock_adjustment_mismatch_exception' => 'خطأ: غير مسموح: عدم التوافق بين تعديل المخزون والكمية التي تم شراؤها المنتج : product:',
      'transaction_edit_not_allowed' => 'لا يُسمح بإصدار المعاملة بعد days: الأيام.',
      'print_all' => 'طباعة الكل',
