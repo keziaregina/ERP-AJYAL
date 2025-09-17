@@ -3396,7 +3396,7 @@ class TransactionUtil extends Util
                     }
 
                     if ($mapping_type == 'purchase') {
-                    $mismatch_error_query = Transaction::join('purchase_lines AS PL', 'transactions.id', '=', 'PL.transaction_id')
+                        $mismatch_error_query = Transaction::join('purchase_lines AS PL', 'transactions.id', '=', 'PL.transaction_id')
                         ->where('transactions.business_id', $business['id'])
                         ->where('transactions.location_id', $business['location_id'])
                         ->whereIn('transactions.type', [
@@ -3408,24 +3408,17 @@ class TransactionUtil extends Util
                         ->where('PL.product_id', $line->product_id)
                         ->where('PL.variation_id', $line->variation_id)
                         ->where('transactions.status', '!=', 'received')
-                        ->get();
+                        ->select('transactions.ref_no')->get();
+                //    dd($mismatch_error_query);
+                        if ($mismatch_error_query->isNotEmpty()) {
+                            $id = $mismatch_error_query->pluck('ref_no')->implode(', ');
 
-                    if ($mismatch_error_query->count() > 0) {
-                        $id = $line->transaction_id ?? $product->id;
-
-                        $mismatch_error = 'Ditemukan transaksi dengan status selain "received" pada transaksi dengan ID ' . $id;
-                            
-                    } else {
-                        $mismatch_error = trans(
-                            'messages.purchase_sell_mismatch_exception',
-                            ['product' => $mismatch_name]
-                        );
-
-                        if ($stop_selling_expired) {
-                            $mismatch_error .= __('lang_v1.available_stock_expired');
-                        }
-                    }
-
+                            $mismatch_error = trans(
+                                'messages.status_transaction_not_received',
+                                ['Reference' => $id]
+                            );
+                        }    
+                        
                     } elseif ($mapping_type == 'stock_adjustment') {
                         $mismatch_error = trans(
                             'messages.purchase_stock_adjustment_mismatch_exception',

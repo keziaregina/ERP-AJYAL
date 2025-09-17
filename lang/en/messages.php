@@ -40,6 +40,7 @@ return [
     'print' => 'Print',
     'submit' => 'Submit',
     'purchase_sell_mismatch_exception' => 'ERROR: NOT ALLOWED: Mismatch between sold and purchase quantity. Product: :product',
+    'status_transaction_not_received' => 'ERROR: NOT ALLOWED: This action is not permitted because there is a pending transaction. Reference Number : :Reference',
     'purchase_stock_adjustment_mismatch_exception' => 'ERROR: NOT ALLOWED: Mismatch between stock adjustment and purchase quantity. Product: :product',
     'transaction_edit_not_allowed' => 'Transaction edit not allowed after :days days.',
     'name' => 'Name',
