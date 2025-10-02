@@ -4658,6 +4658,7 @@ class TransactionUtil extends Util
 
         if (in_array('sell', $transaction_types)) {
             $query->addSelect(
+                DB::raw("SUM(IF(transactions.type='ledger_discount' AND transactions.status='final', total_before_tax, 0)) as total_ledger_discount"),
                 DB::raw("SUM(IF(transactions.type='sell' AND transactions.status='final', IF(discount_type = 'percentage', COALESCE(discount_amount, 0)*total_before_tax/100, COALESCE(discount_amount, 0)), 0)) as total_sell_discount"),
                 DB::raw("SUM(IF(transactions.type='sell' AND transactions.status='final', rp_redeemed_amount, 0)) as total_reward_amount"),
                 DB::raw("SUM(IF(transactions.type='sell' AND transactions.status='final', round_off_amount, 0)) as total_sell_round_off")
@@ -4729,7 +4730,7 @@ class TransactionUtil extends Util
         if (in_array('sell', $transaction_types)) {
             $output['total_sell_discount'] =
                 ! empty($transaction_totals->total_sell_discount) ?
-                $transaction_totals->total_sell_discount : 0;
+                $transaction_totals->total_sell_discount + $transaction_totals->total_ledger_discount : 0;
 
             $output['total_reward_amount'] =
                 ! empty($transaction_totals->total_reward_amount) ?

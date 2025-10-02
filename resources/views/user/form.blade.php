@@ -117,6 +117,7 @@
     @show_tooltip(__('lang_v1.tax_payer_id_help'))
     {!! Form::text('bank_details[tax_payer_id]', !empty($bank_details['tax_payer_id']) ? $bank_details['tax_payer_id'] : null, ['class' => 'form-control', 'id' => 'tax_payer_id', 'placeholder' => __( 'lang_v1.tax_payer_id') ]); !!}
 </div>
+{{-- @dd($user->toArray()) --}}
 
 {{-- Employee BIC CODE --}}
 <div class="form-group col-md-3">
@@ -125,14 +126,11 @@
     <select name="bic_code" id="user_bank_code" placeholder="" autocomplete="off">
         <option disabled selected>Select Bic Code</option>
         @foreach ($bicCode as $code)
-
-        @if ($user != null )
-        @if ($code['id'] == $user->bic_id)
-        <option value="{{ $code['id'] }}" selected>{{ $code['name'] }}</option>
-        @else
-        <option value="{{ $code['id'] }}">{{ $code['name'] }}</option>
-        @endif
-        @endif
+            @if ($user != null && $code['id'] == $user->bic_id)
+                <option value="{{ $code['id'] }}" selected>{{ $code['name'] }}</option>
+            @else
+                <option value="{{ $code['id'] }}">{{ $code['name'] }}</option>
+            @endif
         @endforeach
     </select>
   </div>
@@ -143,14 +141,11 @@
         <select name="salary_code" id="user_salary_code" placeholder="" autocomplete="off">
             <option disabled selected>Select Salary Frequency</option>
             @foreach ($salaryCode as $Scode)
-
-            @if($user != null)
-            @if ($Scode['id'] == $user->salary_id)
-            <option value="{{ $Scode['id'] }}" selected>{{ $Scode['name'] }}</option>
-            @else
-            <option value="{{ $Scode['id'] }}">{{ $Scode['name'] }}</option>
-            @endif
-            @endif
+                @if($user != null && $Scode['id'] == $user->salary_id)
+                    <option value="{{ $Scode['id'] }}" selected>{{ $Scode['name'] }}</option>
+                @else
+                    <option value="{{ $Scode['id'] }}">{{ $Scode['name'] }}</option>
+                @endif
             @endforeach
         </select>
     </div>
