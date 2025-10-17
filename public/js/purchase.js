@@ -848,7 +848,7 @@ function update_purchase_entry_row_values(row) {
     if (typeof row != 'undefined') {
         console.log("testes");
         console.log(row);
-        console.log(userCanPurchasePrice);
+        // console.log(userCanPurchasePrice);
         // console.log(window.userCanPurchasePrice);
 
         var quantity = __read_number(row.find('.purchase_quantity'), true);
