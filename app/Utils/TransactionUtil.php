@@ -3227,7 +3227,7 @@ class TransactionUtil extends Util
      * @param  int  $purchase_line_id (default: null)
      * @return object
      */
-    public function mapPurchaseSell($business, $transaction_lines, $transaction, $mapping_type = 'purchase', $check_expiry = true, $purchase_line_id = null)
+    public function mapPurchaseSell($business, $transaction_lines, $transaction = null, $mapping_type = 'purchase', $check_expiry = true, $purchase_line_id = null)
     {
         // dd($transaction);
         if (empty($transaction_lines)) {
