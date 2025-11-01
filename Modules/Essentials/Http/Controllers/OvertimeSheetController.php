@@ -21,6 +21,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Essentials\Utils\EssentialsUtil;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
+use Modules\Essentials\Entities\EssentialsLeave;
 
 class OvertimeSheetController extends Controller
 {
@@ -72,8 +73,9 @@ class OvertimeSheetController extends Controller
 
     function store(Request $request)
     {
-        
+
         try {
+            $business_id = request()->session()->get('user.business_id');
 
             $request->validate([
                 'user_id' => 'required|array',
@@ -105,6 +107,40 @@ class OvertimeSheetController extends Controller
                     'created_by' => auth()->id(),
                     'type' => EmployeeOvertime::TYPES['Manual Overtime']
                 ]);
+
+                $formattedDate = $year . '-' . $month . '-' . $day;
+                if ($request->overtime_hours === 'VL') {
+                    $ref_count = $this->moduleUtil->setAndGetReferenceCount('leave');
+                    $settings = request()->session()->get('business.essentials_settings');
+                    $settings = ! empty($settings) ? json_decode($settings, true) : [];
+                    $prefix = ! empty($settings['leave_ref_no_prefix']) ? $settings['leave_ref_no_prefix'] : '';
+                    
+                    $input = [];
+
+                    $input['ref_no'] = $this->moduleUtil->generateReferenceNumber('leave', $ref_count, null, $prefix);
+                    $input['business_id'] = $business_id;
+                    $input['status'] = 'approved';
+                    $input['start_date'] = $formattedDate;
+                    $input['end_date'] = $formattedDate;
+                    $input['user_id'] = $user;
+                    $input['essentials_leave_type_id'] = 1;
+                    $input['reason'] = 'Vacation Leave';
+
+                    EssentialsLeave::updateOrCreate([
+                        'user_id' => $user,
+                        'start_date' => $formattedDate,
+                        'end_date' => $formattedDate,
+                    ], $input);
+                } else {
+                    $checkLeave = EssentialsLeave::where('user_id', $user)
+                        ->where('start_date', $formattedDate)
+                        ->where('end_date', $formattedDate)
+                        ->first();
+
+                    if ($checkLeave) {
+                        $checkLeave->delete();
+                    }
+                }
             }
             
 
@@ -191,8 +227,8 @@ class OvertimeSheetController extends Controller
                 ->whereIn('user_id', $employees->pluck('id'))
                 ->get();
 
-            // Group overtime records by user_id
-            $overtimeByUser = $overtimeRecords->groupBy('user_id');
+                // Group overtime records by user_id
+                $overtimeByUser = $overtimeRecords->groupBy('user_id');
 
             // Process the data to create a structured format
             $result = $employees->map(function ($employee) use ($overtimeByUser, $currentMonth) {
