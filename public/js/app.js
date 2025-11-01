@@ -1645,7 +1645,7 @@ $(document).ready(function() {
                                 width: 200
                             },
                             { 
-                            text: window.exportDataExpenses.end_date + `:${window.endDate}`,
+                            text: window.exportDataExpenses.start_date + `:${window.startDate}`,
                                 alignment: window.userLang,
                                 fontSize: 9,
                                 width: 200
