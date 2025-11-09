@@ -376,7 +376,12 @@ class ProductionController extends Controller
                     'location_id' => $production_sell->location_id,
                     'pos_settings' => $pos_settings,
                 ];
-                $this->transactionUtil->mapPurchaseSell($business, $production_sell->sell_lines, 'production_purchase');
+
+                $mapping = $this->transactionUtil->mapPurchaseSell($business, $production_sell->sell_lines, null, 'production_purchase');
+
+                if (is_array($mapping) && $mapping['success'] == 0) {
+                    return redirect()->action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'index'])->with('status', $mapping);
+                }
             }
 
             DB::commit();
