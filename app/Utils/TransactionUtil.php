@@ -3242,6 +3242,7 @@ class TransactionUtil extends Util
             true : false;
         // $allow_overselling = true;
 
+        // dd($mapping_type);
         //Set flag to check for expired items during SELLING only.
         $stop_selling_expired = false;
         if ($check_expiry) {
@@ -3318,6 +3319,9 @@ class TransactionUtil extends Util
 
             //Iterate over the rows, assign the purchase line to sell lines.
             $qty_selling = $line->quantity;
+            // dd($qty_selling);
+            $test = [];
+            // dd($rows);
             foreach ($rows as $k => $row) {
                 $qty_allocated = 0;
 
@@ -3329,6 +3333,8 @@ class TransactionUtil extends Util
                     $qty_selling = $qty_selling - $row->quantity_available;
                     $qty_allocated = $row->quantity_available;
                 }
+
+                $test[] = $qty_selling;
 
                 //Check for sell mapping or stock adjsutment mapping
                 if ($mapping_type == 'stock_adjustment') {
@@ -3382,7 +3388,7 @@ class TransactionUtil extends Util
                     break;
                 }
             }
-
+            // dd($test);
             if (! ($qty_selling == 0 || is_null($qty_selling))) {
                 //If overselling not allowed through exception else create mapping with blank purchase_line_id
                 if (! $allow_overselling) {
@@ -3409,7 +3415,7 @@ class TransactionUtil extends Util
                         ->where('PL.variation_id', $line->variation_id)
                         ->where('transactions.status', '!=', 'received')
                         ->select('transactions.ref_no')->get();
-                //    dd($mismatch_error_query);
+
                         if ($mismatch_error_query->isNotEmpty()) {
                             $id = $mismatch_error_query->pluck('ref_no')->implode(', ');
 
@@ -3417,6 +3423,13 @@ class TransactionUtil extends Util
                                 'messages.status_transaction_not_received',
                                 ['Reference' => $id]
                             );
+                            
+                            $output = [
+                                'success' => 0,
+                                'msg' => $mismatch_error,
+                            ];
+    
+                            return $output;
                         }    
                         
                     } elseif ($mapping_type == 'stock_adjustment') {
@@ -3424,11 +3437,25 @@ class TransactionUtil extends Util
                             'messages.purchase_stock_adjustment_mismatch_exception',
                             ['product' => $mismatch_name]
                         );
+
+                        $output = [
+                            'success' => 0,
+                            'msg' => $mismatch_error,
+                        ];
+
+                        return $output;
                     } else {
                         $mismatch_error = trans(
                             'lang_v1.quantity_mismatch_exception',
                             ['product' => $mismatch_name]
                         );
+
+                        $output = [
+                            'success' => 0,
+                            'msg' => $mismatch_error,
+                        ];
+
+                        return $output;
                     }
 
                     $business_name = optional(Business::find($business['id']))->name;
