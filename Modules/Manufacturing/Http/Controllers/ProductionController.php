@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Utils\TransactionUtil;
 use App\VariationLocationDetails;
+use Exception;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
@@ -377,7 +378,7 @@ class ProductionController extends Controller
                     'pos_settings' => $pos_settings,
                 ];
 
-                $mapping = $this->transactionUtil->mapPurchaseSell($business, $production_sell->sell_lines, null, 'production_purchase');
+                $mapping = $this->transactionUtil->mapPurchaseSell($business, $production_sell->sell_lines, null, 'purchase');
 
                 if (is_array($mapping) && $mapping['success'] == 0) {
                     return redirect()->action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'index'])->with('status', $mapping);
@@ -869,7 +870,11 @@ class ProductionController extends Controller
                     'location_id' => $production_sell->location_id,
                     'pos_settings' => $request->session()->get('business.pos_settings'),
                 ];
-                $this->transactionUtil->mapPurchaseSell($business, $production_sell->sell_lines, 'production_purchase');
+                $mapping = $this->transactionUtil->mapPurchaseSell($business, $production_sell->sell_lines, null, 'production_purchase');
+
+                if (is_array($mapping) && $mapping['success'] == 0) {
+                    return redirect()->action([\Modules\Manufacturing\Http\Controllers\ProductionController::class, 'index'])->with('status', $mapping);
+                }
             }
 
             DB::commit();
@@ -923,6 +928,7 @@ class ProductionController extends Controller
                             ->where('mfg_is_final', 0)
                             ->first();
 
+                            // dd($transaction);
                 $purchase_lines = $transaction->purchase_lines;
 
                 $transactionInstance = $transaction;
@@ -946,8 +952,8 @@ class ProductionController extends Controller
                     'success' => true,
                     'msg' => __('lang_v1.deleted_success'),
                 ];
-            } catch (\Exception $e) {
-                \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
+            } catch (Exception $e) {
+                Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
 
                 $output['success'] = false;
                 $output['msg'] = trans('messages.something_went_wrong');
