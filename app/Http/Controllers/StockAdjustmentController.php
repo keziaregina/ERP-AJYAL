@@ -243,6 +243,7 @@ class StockAdjustmentController extends Controller
                 $business = ['id' => $business_id,
                     'accounting_method' => $request->session()->get('business.accounting_method'),
                     'location_id' => $input_data['location_id'],
+                    'pos_settings' => $request->session()->get('business.pos_settings'),
                 ];
 
                 

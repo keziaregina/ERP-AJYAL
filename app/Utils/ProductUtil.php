@@ -2069,7 +2069,18 @@ class ProductUtil extends Util
                                         ->orWhere('rpl.variation_id', $variation_id)
                                         ->orWhere('rsl.variation_id', $variation_id);
                                 })
-                                ->whereIn('transactions.type', ['sell', 'purchase', 'stock_adjustment', 'opening_stock', 'sell_transfer', 'purchase_transfer', 'production_purchase', 'purchase_return', 'sell_return', 'production_sell'])
+                                ->whereIn('transactions.type', [
+                                    'sell', 
+                                    'purchase', 
+                                    'stock_adjustment', 
+                                    'opening_stock', 
+                                    'sell_transfer', 
+                                    'purchase_transfer', 
+                                    'production_purchase', 
+                                    'purchase_return', 
+                                    'sell_return', 
+                                    'production_sell'
+                                ])
                                 ->select(
                                     'transactions.id as transaction_id',
                                     'transactions.type as transaction_type',
@@ -2092,6 +2103,8 @@ class ProductUtil extends Util
                                 )
                                 ->orderBy('transactions.transaction_date', 'asc')
                                 ->get();
+
+        // dd($stock_history);
 
         $stock_history_array = [];
         $stock = 0;
