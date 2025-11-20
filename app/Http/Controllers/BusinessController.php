@@ -17,6 +17,7 @@ use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Permission;
 
 class BusinessController extends Controller
@@ -457,6 +458,15 @@ class BusinessController extends Controller
             $business->fill($business_details);
             $business->save();
 
+            Activity::create([
+                'log_name' => 'default',
+                'description' => 'update_business_settings',
+                'subject_id' => $business->id,
+                'subject_type' => Business::class,
+                'causer_id' => auth()->user()->id,
+                'causer_type' => User::class,
+                'properties' => $business,
+            ]);
             //update session data
             $request->session()->put('business', $business);
 
